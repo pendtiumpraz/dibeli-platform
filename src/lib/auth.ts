@@ -1,0 +1,83 @@
+import { NextAuthOptions } from 'next-auth'
+import GoogleProvider from 'next-auth/providers/google'
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import { prisma } from './prisma'
+import { calculateTrialEndDate } from './utils'
+import { Adapter } from 'next-auth/adapters'
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma) as Adapter,
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: 'openid email profile https://www.googleapis.com/auth/drive.file',
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    }),
+  ],
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      if (!user.email) return false
+
+      const existingUser = await prisma.user.findUnique({
+        where: { email: user.email },
+      })
+
+      if (!existingUser && account) {
+        const trialStart = new Date()
+        const trialEnd = calculateTrialEndDate(trialStart)
+
+        await prisma.user.create({
+          data: {
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            googleId: account.providerAccountId,
+            googleAccessToken: account.access_token,
+            googleRefreshToken: account.refresh_token,
+            tier: 'TRIAL',
+            trialStartDate: trialStart,
+            trialEndDate: trialEnd,
+          },
+        })
+      } else if (existingUser && account) {
+        await prisma.user.update({
+          where: { email: user.email },
+          data: {
+            googleAccessToken: account.access_token,
+            googleRefreshToken: account.refresh_token,
+          },
+        })
+      }
+
+      return true
+    },
+    async session({ session, user }) {
+      if (session.user) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email! },
+        })
+
+        if (dbUser) {
+          session.user.id = dbUser.id
+          session.user.tier = dbUser.tier
+          session.user.isSuperAdmin = dbUser.isSuperAdmin
+          session.user.trialEndDate = dbUser.trialEndDate
+        }
+      }
+      return session
+    },
+  },
+  pages: {
+    signIn: '/auth/signin',
+    error: '/auth/error',
+  },
+  session: {
+    strategy: 'database',
+  },
+}
