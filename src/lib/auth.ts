@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       // PrismaAdapter handles User and Account creation automatically
       // We just need to set initial tier and trial dates for new users
       
@@ -34,6 +34,9 @@ export const authOptions: NextAuthOptions = {
           where: { email: user.email },
         })
 
+        // Check if user is SuperAdmin for redirect
+        const isSuperAdmin = user.email === 'dibeli.my.id@gmail.com' || existingUser?.isSuperAdmin
+
         // For new users, update with trial info after adapter creates them
         if (!existingUser) {
           const trialStart = new Date()
@@ -43,11 +46,12 @@ export const authOptions: NextAuthOptions = {
           // Store trial dates in a way that won't conflict
           if (account) {
             // Just allow signin, we'll set trial info in session callback
-            return true
+            return isSuperAdmin ? '/dashboard/admin' : true
           }
         }
 
-        return true
+        // Existing user - redirect SuperAdmin to admin panel
+        return isSuperAdmin ? '/dashboard/admin' : true
       } catch (error) {
         console.error('SignIn callback error:', error)
         return false
