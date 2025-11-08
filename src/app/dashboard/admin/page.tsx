@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import AdminLayout from '@/components/AdminLayout'
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions)
@@ -34,7 +35,8 @@ export default async function AdminPage() {
   const unlimitedUsers = users.filter(u => u.tier === 'UNLIMITED').length
 
   return (
-    <div className="p-8">
+    <AdminLayout user={session.user}>
+      <div className="p-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">🔐 SuperAdmin Panel</h1>
@@ -250,6 +252,7 @@ export default async function AdminPage() {
           </a>
         </div>
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   )
 }

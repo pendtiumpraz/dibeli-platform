@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import AdminLayout from '@/components/AdminLayout'
 
 export default async function UserEditPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
@@ -23,7 +24,8 @@ export default async function UserEditPage({ params }: { params: { id: string } 
 
   // Form untuk update user tier & role
   return (
-    <div className="p-8">
+    <AdminLayout user={session.user}>
+      <div className="p-8">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -180,6 +182,7 @@ export default async function UserEditPage({ params }: { params: { id: string } 
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </AdminLayout>
   )
 }
