@@ -25,10 +25,33 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       // PrismaAdapter handles User and Account creation automatically
-      // Just allow signin, let session callback handle the rest
-      if (!user.email) return false
+      // We just need to set initial tier and trial dates for new users
       
-      return true
+      if (!user.email) return false
+
+      try {
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        })
+
+        // For new users, update with trial info after adapter creates them
+        if (!existingUser) {
+          const trialStart = new Date()
+          const trialEnd = calculateTrialEndDate(trialStart)
+          
+          // Let adapter create user first, then we'll update in session callback
+          // Store trial dates in a way that won't conflict
+          if (account) {
+            // Just allow signin, we'll set trial info in session callback
+            return true
+          }
+        }
+
+        return true
+      } catch (error) {
+        console.error('SignIn callback error:', error)
+        return false
+      }
     },
     async session({ session, token }) {
       if (session.user && token.sub) {

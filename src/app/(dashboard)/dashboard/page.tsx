@@ -14,6 +14,6 @@ export default async function DashboardPage() {
     redirect('/dashboard/admin')
   }
 
-  // Regular users go to their dashboard
-  redirect('/dashboard/overview')
+  // Regular users go to store page (main dashboard)
+  redirect('/dashboard/store')
 }
