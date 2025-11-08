@@ -78,33 +78,45 @@ export const authOptions: NextAuthOptions = {
             session.user.isSuperAdmin = isSuperAdmin
             session.user.trialEndDate = dbUser.trialEndDate
           } else {
-            // New user created by adapter, set trial info
-            const trialStart = new Date()
-            const trialEnd = calculateTrialEndDate(trialStart)
+            // User doesn't exist yet (race condition with PrismaAdapter)
+            // Set defaults for session, adapter will create user
             const isSuperAdmin = session.user.email === 'dibeli.my.id@gmail.com'
             
-            const updatedUser = await prisma.user.update({
-              where: { id: token.sub },
-              data: {
-                tier: isSuperAdmin ? 'UNLIMITED' : 'TRIAL',
-                trialStartDate: trialStart,
-                trialEndDate: trialEnd,
-                isSuperAdmin,
-              },
-            })
+            const trialEnd = calculateTrialEndDate(new Date())
             
-            session.user.id = updatedUser.id
-            session.user.tier = updatedUser.tier
-            session.user.isSuperAdmin = updatedUser.isSuperAdmin
-            session.user.trialEndDate = updatedUser.trialEndDate
+            session.user.id = token.sub
+            session.user.tier = isSuperAdmin ? 'UNLIMITED' : 'TRIAL'
+            session.user.isSuperAdmin = isSuperAdmin
+            session.user.trialEndDate = trialEnd
             
-            // Send welcome email for new users (async, don't wait)
-            if (!isSuperAdmin) {
-              sendWelcomeEmail(
-                session.user.email || '',
-                session.user.name || 'Sobat Seller',
-                trialEnd
-              ).catch(console.error)
+            // Try to update user with trial info (might fail if user not created yet)
+            try {
+              const trialStart = new Date()
+              const trialEnd = calculateTrialEndDate(trialStart)
+              
+              await prisma.user.update({
+                where: { id: token.sub },
+                data: {
+                  tier: isSuperAdmin ? 'UNLIMITED' : 'TRIAL',
+                  trialStartDate: trialStart,
+                  trialEndDate: trialEnd,
+                  isSuperAdmin,
+                },
+              })
+              
+              session.user.trialEndDate = trialEnd
+              
+              // Send welcome email for new users (async, don't wait)
+              if (!isSuperAdmin) {
+                sendWelcomeEmail(
+                  session.user.email || '',
+                  session.user.name || 'Sobat Seller',
+                  trialEnd
+                ).catch(console.error)
+              }
+            } catch (updateError) {
+              // User not created yet by adapter, skip update
+              console.log('User not ready yet, will update on next session')
             }
           }
         } catch (error) {
