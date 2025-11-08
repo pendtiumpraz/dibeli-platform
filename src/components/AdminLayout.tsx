@@ -17,12 +17,12 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
   const pathname = usePathname()
 
   const menuItems = [
-    { href: '/dashboard/admin', label: '🏠 Dashboard', icon: '📊' },
-    { href: '/dashboard/admin/templates', label: '🎨 Templates', icon: '🎨' },
-    { href: '/dashboard/admin/stores', label: '🏪 Stores', icon: '🏪' },
-    { href: '/dashboard/admin/roles', label: '👑 Roles', icon: '👑' },
-    { href: '/dashboard/admin/analytics', label: '📈 Analytics', icon: '📈' },
-    { href: '/dashboard', label: '← User Dashboard', icon: '👤' },
+    { href: '/dashboard/admin', label: 'Dashboard', icon: '📊' },
+    { href: '/dashboard/admin/templates', label: 'Templates', icon: '🎨' },
+    { href: '/dashboard/admin/stores', label: 'Stores', icon: '🏪' },
+    { href: '/dashboard/admin/roles', label: 'Roles', icon: '👑' },
+    { href: '/dashboard/admin/analytics', label: 'Analytics', icon: '📈' },
+    { href: '/dashboard', label: 'User Dashboard', icon: '👤' },
   ]
 
   const handleLogout = async () => {
