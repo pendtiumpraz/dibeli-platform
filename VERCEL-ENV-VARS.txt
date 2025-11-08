@@ -1,0 +1,63 @@
+# ============================================
+# VERCEL ENVIRONMENT VARIABLES
+# Copy-paste these to Vercel Dashboard
+# ============================================
+
+# 1. DATABASE_URL
+Name: DATABASE_URL
+Value: prisma+postgres://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqd3RfaWQiOjEsInNlY3VyZV9rZXkiOiJza18zaUl5UERYVlphN1A1d3RqLXpWbTciLCJhcGlfa2V5IjoiMDFLOUo2RzRRRlpQM0JHRjMwRUNLWUtYWTciLCJ0ZW5hbnRfaWQiOiI4NDUzYTRhZjYwMGI2Y2Q1ZmRhYjkzZGFkZjRhMTg0MmQxZGQyOTdjMTIxNGU4ZmMyYzg4MjlkMWVlZTcyYTRjIiwiaW50ZXJuYWxfc2VjcmV0IjoiYzZiMzQwZWYtYjhhOS00YzBjLTliZGEtNjFhODZiODA3YThiIn0.2DptL5x10E2_AqSdLfvbqHjgGsOgqAFyzY1ygB7xyKU
+Environment: Production, Preview, Development
+
+# 2. NEXTAUTH_SECRET
+Name: NEXTAUTH_SECRET
+Value: KBZsbJYtK33kk0+dntx5lBP/oA2iQ61XeCB4iYR2hfg=
+Environment: Production, Preview, Development
+
+# 3. NEXTAUTH_URL
+Name: NEXTAUTH_URL
+Value: https://dibeli-platform.vercel.app
+Environment: Production ONLY
+
+# 4. GOOGLE_CLIENT_ID
+Name: GOOGLE_CLIENT_ID
+Value: 1031782040891-e1ehj2dv3h43g2q20dino4dhcv597ona.apps.googleusercontent.com
+Environment: Production, Preview, Development
+
+# 5. GOOGLE_CLIENT_SECRET
+Name: GOOGLE_CLIENT_SECRET
+Value: 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
+Environment: Production, Preview, Development
+
+# 6. SMTP_HOST
+Name: SMTP_HOST
+Value: smtp.gmail.com
+Environment: Production, Preview, Development
+
+# 7. SMTP_PORT
+Name: SMTP_PORT
+Value: 587
+Environment: Production, Preview, Development
+
+# 8. SMTP_USER
+Name: SMTP_USER
+Value: dibeli.my.id@gmail.com
+Environment: Production, Preview, Development
+
+# 9. SMTP_PASS
+Name: SMTP_PASS
+Value: zgco varv nrxs hpun
+Environment: Production, Preview, Development
+
+# 10. SMTP_FROM
+Name: SMTP_FROM
+Value: dibeli.my.id <dibeli.my.id@gmail.com>
+Environment: Production, Preview, Development
+
+# 11. NEXT_PUBLIC_APP_URL
+Name: NEXT_PUBLIC_APP_URL
+Value: https://dibeli-platform.vercel.app
+Environment: Production ONLY
+
+# ============================================
+# TOTAL: 11 Environment Variables
+# ============================================
