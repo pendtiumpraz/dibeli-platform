@@ -61,22 +61,35 @@ export const authOptions: NextAuthOptions = {
           })
 
           if (dbUser) {
+            // Check if user should be SuperAdmin
+            const isSuperAdmin = session.user.email === 'dibeli.my.id@gmail.com' || dbUser.isSuperAdmin
+            
+            // Update SuperAdmin status if needed
+            if (isSuperAdmin && !dbUser.isSuperAdmin) {
+              await prisma.user.update({
+                where: { id: token.sub },
+                data: { isSuperAdmin: true },
+              })
+            }
+            
             // User exists, use their data
             session.user.id = dbUser.id
             session.user.tier = dbUser.tier
-            session.user.isSuperAdmin = dbUser.isSuperAdmin
+            session.user.isSuperAdmin = isSuperAdmin
             session.user.trialEndDate = dbUser.trialEndDate
           } else {
             // New user created by adapter, set trial info
             const trialStart = new Date()
             const trialEnd = calculateTrialEndDate(trialStart)
+            const isSuperAdmin = session.user.email === 'dibeli.my.id@gmail.com'
             
             const updatedUser = await prisma.user.update({
               where: { id: token.sub },
               data: {
-                tier: 'TRIAL',
+                tier: isSuperAdmin ? 'UNLIMITED' : 'TRIAL',
                 trialStartDate: trialStart,
                 trialEndDate: trialEnd,
+                isSuperAdmin,
               },
             })
             
@@ -86,11 +99,13 @@ export const authOptions: NextAuthOptions = {
             session.user.trialEndDate = updatedUser.trialEndDate
             
             // Send welcome email for new users (async, don't wait)
-            sendWelcomeEmail(
-              session.user.email || '',
-              session.user.name || 'Sobat Seller',
-              trialEnd
-            ).catch(console.error)
+            if (!isSuperAdmin) {
+              sendWelcomeEmail(
+                session.user.email || '',
+                session.user.name || 'Sobat Seller',
+                trialEnd
+              ).catch(console.error)
+            }
           }
         } catch (error) {
           console.error('Session callback error:', error)
