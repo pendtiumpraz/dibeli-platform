@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import AdminLayout from '@/components/AdminLayout'
+import { DeleteTemplateButton } from '@/components/DeleteTemplateButton'
 
 export default async function AdminTemplatesPage() {
   const session = await getServerSession(authOptions)
@@ -188,24 +189,7 @@ export default async function AdminTemplatesPage() {
                     >
                       View
                     </a>
-                    <form
-                      action="/api/admin/templates/delete"
-                      method="POST"
-                      className="inline"
-                      onSubmit={(e) => {
-                        if (!confirm('Delete this template?')) {
-                          e.preventDefault()
-                        }
-                      }}
-                    >
-                      <input type="hidden" name="templateId" value={template.id} />
-                      <button
-                        type="submit"
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
-                    </form>
+                    <DeleteTemplateButton templateId={template.id} templateName={template.name} />
                   </td>
                 </tr>
               ))}

@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import AdminLayout from '@/components/AdminLayout'
+import { RemoveAdminButton } from '@/components/RemoveAdminButton'
+import { PromoteUserButton } from '@/components/PromoteUserButton'
 
 export default async function AdminRolesPage() {
   const session = await getServerSession(authOptions)
@@ -165,24 +167,7 @@ export default async function AdminRolesPage() {
                         {isOwner ? (
                           <span className="text-gray-400">Cannot remove owner</span>
                         ) : (
-                          <form
-                            action="/api/admin/roles/remove"
-                            method="POST"
-                            className="inline"
-                            onSubmit={(e) => {
-                              if (!confirm(`Remove ${admin.name} as SuperAdmin?`)) {
-                                e.preventDefault()
-                              }
-                            }}
-                          >
-                            <input type="hidden" name="userId" value={admin.id} />
-                            <button
-                              type="submit"
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              Remove Role
-                            </button>
-                          </form>
+                          <RemoveAdminButton userId={admin.id} userName={admin.name || 'User'} />
                         )}
                       </td>
                     </tr>
@@ -252,24 +237,7 @@ export default async function AdminRolesPage() {
                           {new Date(user.createdAt).toLocaleDateString('id-ID')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <form
-                            action="/api/admin/roles/promote"
-                            method="POST"
-                            className="inline"
-                            onSubmit={(e) => {
-                              if (!confirm(`Promote ${user.name} to SuperAdmin?`)) {
-                                e.preventDefault()
-                              }
-                            }}
-                          >
-                            <input type="hidden" name="userId" value={user.id} />
-                            <button
-                              type="submit"
-                              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-semibold"
-                            >
-                              👑 Promote to SuperAdmin
-                            </button>
-                          </form>
+                          <PromoteUserButton userId={user.id} userName={user.name || 'User'} />
                         </td>
                       </tr>
                     ))}
