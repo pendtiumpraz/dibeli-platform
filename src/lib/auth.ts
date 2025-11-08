@@ -4,6 +4,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from './prisma'
 import { calculateTrialEndDate } from './utils'
 import { Adapter } from 'next-auth/adapters'
+import { sendWelcomeEmail } from './email'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -32,7 +33,7 @@ export const authOptions: NextAuthOptions = {
         const trialStart = new Date()
         const trialEnd = calculateTrialEndDate(trialStart)
 
-        await prisma.user.create({
+        const newUser = await prisma.user.create({
           data: {
             email: user.email,
             name: user.name,
@@ -44,6 +45,11 @@ export const authOptions: NextAuthOptions = {
             trialStartDate: trialStart,
             trialEndDate: trialEnd,
           },
+        })
+
+        // Send welcome email (don't wait for it)
+        sendWelcomeEmail(user.email, user.name || 'Sobat Seller', trialEnd).catch((error) => {
+          console.error('Failed to send welcome email:', error)
         })
       } else if (existingUser && account) {
         await prisma.user.update({
