@@ -7,7 +7,8 @@ import { Adapter } from 'next-auth/adapters'
 import { sendWelcomeEmail } from './email'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as Adapter,
+  // Note: Using JWT sessions, so no adapter needed
+  // adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -23,27 +24,57 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
-      // PrismaAdapter handles User and Account creation automatically
-      // We just need to set initial tier and trial dates for new users
-      
+    async signIn({ user, account, profile }) {
       if (!user.email) return false
 
       try {
-        const existingUser = await prisma.user.findUnique({
+        // Check if user exists
+        let dbUser = await prisma.user.findUnique({
           where: { email: user.email },
         })
 
-        // For new users, update with trial info after adapter creates them
-        if (!existingUser) {
+        // Create user if doesn't exist
+        if (!dbUser && account) {
           const trialStart = new Date()
           const trialEnd = calculateTrialEndDate(trialStart)
+          const isSuperAdmin = user.email === 'dibeli.my.id@gmail.com'
           
-          // Let adapter create user first, then we'll update in session callback
-          // Store trial dates in a way that won't conflict
-          if (account) {
-            // Just allow signin, we'll set trial info in session callback
-            return true
+          dbUser = await prisma.user.create({
+            data: {
+              email: user.email,
+              name: user.name,
+              image: user.image,
+              tier: isSuperAdmin ? 'UNLIMITED' : 'TRIAL',
+              trialStartDate: trialStart,
+              trialEndDate: trialEnd,
+              isSuperAdmin,
+            },
+          })
+
+          // Create OAuth account link
+          await prisma.account.create({
+            data: {
+              userId: dbUser.id,
+              type: account.type,
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+              refresh_token: account.refresh_token,
+              access_token: account.access_token,
+              expires_at: account.expires_at,
+              token_type: account.token_type,
+              scope: account.scope,
+              id_token: account.id_token,
+              session_state: account.session_state,
+            },
+          })
+
+          // Send welcome email for new users
+          if (!isSuperAdmin) {
+            sendWelcomeEmail(
+              user.email,
+              user.name || 'Sobat Seller',
+              trialEnd
+            ).catch(console.error)
           }
         }
 
