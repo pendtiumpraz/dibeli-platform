@@ -6,7 +6,7 @@ import { getDefaultTheme, formatPriceRupiah } from '@/lib/template-renderer'
 import { combineTemplate, getTemplatePackage } from '@/lib/template-combiner'
 import { getDriveImageUrl } from '@/lib/google-drive'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions)
     
@@ -14,23 +14,33 @@ export async function GET() {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
+    // Get templateId from query params
+    const { searchParams } = new URL(request.url)
+    const requestedTemplateId = searchParams.get('templateId')
+
     // Get user's store
     const store = await prisma.store.findFirst({
       where: { userId: session.user.id },
-      include: {
-        products: {
-          where: { isAvailable: true },
-          take: 6,
-        },
-      },
     })
 
     if (!store) {
       return new NextResponse('No store found', { status: 404 })
     }
 
-    // Get template package (default: modern-minimal)
-    const templateId = 'modern-minimal' // TODO: Get from store settings
+    // Get products
+    const products = await prisma.product.findMany({
+      where: {
+        storeId: store.id,
+        isAvailable: true,
+      },
+      orderBy: {
+        sortOrder: 'asc',
+      },
+      take: 6,
+    })
+
+    // Get template package (from query param or store settings)
+    const templateId = requestedTemplateId || store.templateId || 'modern-minimal'
     const templatePackage = getTemplatePackage(templateId)
     
     if (!templatePackage) {
@@ -42,7 +52,7 @@ export async function GET() {
       store: {
         name: store.name,
         logo: undefined,
-        badge: `${store.products.length}+ Produk Tersedia`,
+        badge: `${products.length}+ Produk Tersedia`,
         heroTitle: `Selamat Datang di ${store.name}`,
         heroSubtitle: store.description || 'Temukan produk berkualitas dengan harga terbaik. Belanja sekarang dan dapatkan penawaran spesial!',
         tagline: store.description || 'Produk Berkualitas Terbaik',
@@ -51,12 +61,12 @@ export async function GET() {
         address: store.address || undefined,
         showStats: true,
         stats: {
-          products: store.products.length,
+          products: products.length,
           customers: 100,
           rating: '4.9',
         },
       },
-      products: store.products.map((product) => {
+      products: products.map((product) => {
         const images = Array.isArray(product.images) ? product.images as string[] : []
         return {
           id: product.id,
