@@ -1,5 +1,47 @@
 # Google Drive Storage Setup
 
+## 2 Cara Setup
+
+### Cara 1: Pakai Folder Existing (Recommended)
+Langsung pakai folder yang sudah ada di Drive.
+
+**Steps:**
+1. Buka Google Drive
+2. Buat/pilih folder yang mau dipakai
+3. Copy Folder ID dari URL
+   ```
+   URL: https://drive.google.com/drive/folders/19PTMbU84pUTTdI3XSSgkNUvNXQZVwwXs
+   Folder ID: 19PTMbU84pUTTdI3XSSgkNUvNXQZVwwXs
+   ```
+4. Set di ENV:
+   ```bash
+   DRIVE_ROOT_FOLDER_ID="19PTMbU84pUTTdI3XSSgkNUvNXQZVwwXs"
+   ```
+
+**Benefits:**
+- ✅ Langsung pakai folder existing
+- ✅ Tidak create folder baru
+- ✅ Bisa organize manual di Drive
+- ✅ Lebih kontrol
+
+### Cara 2: Auto-Create by Name
+System auto create folder dengan nama yang di-config.
+
+**Steps:**
+1. Set di ENV:
+   ```bash
+   DRIVE_ROOT_FOLDER="dibeli.my.id"
+   DRIVE_STORES_FOLDER="toko"
+   ```
+2. System auto create jika belum ada
+
+**Benefits:**
+- ✅ Otomatis create folder
+- ✅ Nama folder konsisten
+- ✅ No manual setup needed
+
+---
+
 ## Struktur Folder
 
 Product images disimpan di Google Drive dengan struktur:

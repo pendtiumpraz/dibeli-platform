@@ -40,15 +40,29 @@ export async function createFolderStructure(storeName: string, productName: stri
   const drive = await getDriveClient()
 
   try {
-    // Get root folder name from ENV or use default
+    // Option 1: Use existing folder by ID (if provided)
+    const rootFolderId = process.env.DRIVE_ROOT_FOLDER_ID
+    
+    // Option 2: Use folder name (create if not exist)
     const rootFolderName = process.env.DRIVE_ROOT_FOLDER || 'dibeli.my.id'
     const storesFolderName = process.env.DRIVE_STORES_FOLDER || 'toko'
 
-    // Check if root folder exists
-    let rootFolder = await findFolder(drive, rootFolderName)
-    if (!rootFolder) {
-      rootFolder = await createFolder(drive, rootFolderName, null)
-      console.log(`Created root folder: ${rootFolderName}`)
+    let rootFolder: string
+    
+    if (rootFolderId) {
+      // Use existing folder by ID
+      console.log(`Using existing root folder ID: ${rootFolderId}`)
+      rootFolder = rootFolderId
+    } else {
+      // Find or create folder by name
+      const existingFolder = await findFolder(drive, rootFolderName)
+      if (existingFolder) {
+        rootFolder = existingFolder
+        console.log(`Found existing root folder: ${rootFolderName}`)
+      } else {
+        rootFolder = await createFolder(drive, rootFolderName, null)
+        console.log(`Created root folder: ${rootFolderName}`)
+      }
     }
 
     // Check if stores folder exists
