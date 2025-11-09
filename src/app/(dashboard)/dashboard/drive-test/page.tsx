@@ -6,6 +6,24 @@ import { Button } from '@/components/ui/button'
 export default function DriveTestPage() {
   const [testing, setTesting] = useState(false)
   const [result, setResult] = useState<any>(null)
+  const [status, setStatus] = useState<any>(null)
+  const [loadingStatus, setLoadingStatus] = useState(true)
+
+  const loadStatus = async () => {
+    try {
+      const res = await fetch('/api/drive-status')
+      const data = await res.json()
+      setStatus(data)
+    } catch (error) {
+      console.error('Failed to load status:', error)
+    } finally {
+      setLoadingStatus(false)
+    }
+  }
+
+  useState(() => {
+    loadStatus()
+  })
 
   const testDrive = async () => {
     setTesting(true)
@@ -32,6 +50,50 @@ export default function DriveTestPage() {
       </div>
 
       <div className="bg-white shadow rounded-lg p-6 space-y-6">
+        {/* Quick Status */}
+        {!loadingStatus && status && (
+          <div className={`p-4 rounded-lg border-2 ${
+            status.status === 'READY' 
+              ? 'bg-green-50 border-green-500' 
+              : 'bg-red-50 border-red-500'
+          }`}>
+            <div className="flex items-center gap-3">
+              {status.status === 'READY' ? (
+                <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              )}
+              <div className="flex-1">
+                <div className="font-bold text-lg">{status.message}</div>
+                {status.user && <div className="text-sm opacity-80">User: {status.user}</div>}
+              </div>
+            </div>
+            
+            {status.status !== 'READY' && (
+              <div className="mt-3 p-3 bg-white rounded border">
+                <p className="font-semibold text-sm mb-2">🔧 Quick Fix:</p>
+                <ol className="list-decimal list-inside text-sm space-y-1">
+                  <li><strong>Logout</strong> dari aplikasi (klik profile menu)</li>
+                  <li><strong>Login again</strong> dengan Google</li>
+                  <li><strong>Approve</strong> Drive permission ketika ditanya</li>
+                  <li>Refresh page ini dan cek status</li>
+                </ol>
+              </div>
+            )}
+
+            <details className="mt-3">
+              <summary className="cursor-pointer text-sm opacity-80">Technical Details</summary>
+              <pre className="mt-2 text-xs bg-white p-2 rounded border overflow-x-auto">
+{JSON.stringify(status, null, 2)}
+              </pre>
+            </details>
+          </div>
+        )}
+
         <div>
           <h2 className="text-lg font-semibold mb-2">Test Drive Access</h2>
           <p className="text-sm text-gray-600 mb-4">
