@@ -1,0 +1,27 @@
+<nav class="glass-nav">
+  <div class="glass-nav-container">
+    <div class="glass-logo">
+      {{#if store.logo}}
+      <div class="logo-image">
+        <img src="{{store.logo}}" alt="{{store.name}}">
+      </div>
+      {{/if}}
+      <span class="logo-text">{{store.name}}</span>
+    </div>
+    <ul class="glass-menu">
+      <li><a href="#home" class="glass-link">Home</a></li>
+      <li><a href="#products" class="glass-link">Produk</a></li>
+      <li><a href="#about" class="glass-link">Tentang</a></li>
+      <li><a href="#contact" class="glass-link">Kontak</a></li>
+    </ul>
+    <a href="https://wa.me/{{store.whatsappNumber}}" class="glass-cta" target="_blank">
+      <i class="fab fa-whatsapp"></i>
+      <span>Chat WhatsApp</span>
+    </a>
+    <div class="glass-hamburger" onclick="toggleGlassMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</nav>

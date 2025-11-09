@@ -1,0 +1,41 @@
+<nav class="premium-nav">
+  <div class="premium-nav-container">
+    <div class="premium-logo-section">
+      {{#if store.logo}}
+      <div class="premium-logo-img">
+        <img src="{{store.logo}}" alt="{{store.name}}">
+      </div>
+      {{/if}}
+      <div class="premium-logo-text">
+        <span class="premium-brand">{{store.name}}</span>
+        {{#if store.tagline}}
+        <span class="premium-tagline">{{store.tagline}}</span>
+        {{/if}}
+      </div>
+    </div>
+    <ul class="premium-menu">
+      <li><a href="#home">Beranda</a></li>
+      <li><a href="#products">Produk</a></li>
+      <li><a href="#bestseller">Best Seller</a></li>
+      <li><a href="#testimonials">Testimoni</a></li>
+      <li><a href="#contact">Kontak</a></li>
+    </ul>
+    <div class="premium-actions">
+      <button class="search-btn" onclick="toggleSearch()">
+        <i class="fas fa-search"></i>
+      </button>
+      <a href="https://wa.me/{{store.whatsappNumber}}" class="premium-whatsapp" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+        <span>Chat Sekarang</span>
+      </a>
+    </div>
+  </div>
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-box">
+      <input type="text" placeholder="Cari produk..." class="search-input">
+      <button class="close-search" onclick="toggleSearch()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</nav>

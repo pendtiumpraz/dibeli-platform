@@ -1,0 +1,115 @@
+<section class="hero ultimate-hero">
+  <div class="ultimate-bg">
+    <div class="animated-gradient"></div>
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+    </div>
+  </div>
+  
+  <div class="ultimate-content">
+    <div class="ultimate-left">
+      <div class="ultimate-badge-group">
+        <span class="ultimate-badge pulse">{{store.badge}}</span>
+        <span class="ultimate-badge">⭐ Rating {{store.stats.rating}}</span>
+      </div>
+      
+      <h1 class="ultimate-title">
+        <span class="title-word">{{store.name}}</span>
+        <span class="title-gradient">Produk Premium</span>
+        <span class="title-word">Untuk Anda</span>
+      </h1>
+      
+      <p class="ultimate-subtitle">{{store.heroSubtitle}}</p>
+      
+      <div class="ultimate-features">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fas fa-shipping-fast"></i>
+          </div>
+          <div class="feature-text">
+            <strong>Pengiriman Cepat</strong>
+            <span>24-48 jam sampai</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="feature-text">
+            <strong>100% Original</strong>
+            <span>Garansi keaslian</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <div class="feature-text">
+            <strong>24/7 Support</strong>
+            <span>Siap membantu Anda</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ultimate-cta-group">
+        <a href="#products" class="ultimate-btn primary">
+          <span>Belanja Sekarang</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="https://wa.me/{{store.whatsappNumber}}" class="ultimate-btn whatsapp" target="_blank">
+          <i class="fab fa-whatsapp"></i>
+          <span>Chat di WhatsApp</span>
+        </a>
+      </div>
+      
+      <div class="trust-badges">
+        <div class="trust-item">
+          <i class="fas fa-users"></i>
+          <span>{{store.stats.customers}}+ Pelanggan Puas</span>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-box"></i>
+          <span>{{store.stats.products}}+ Produk</span>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-star"></i>
+          <span>Rating {{store.stats.rating}}/5.0</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="ultimate-right">
+      <div class="showcase-grid">
+        {{#each products}}
+        {{#if (eq @index 0)}}
+        <div class="showcase-card main-card">
+          <img src="{{this.image}}" alt="{{this.name}}">
+          <div class="card-overlay">
+            <h3>{{this.name}}</h3>
+            <p>{{this.price}}</p>
+            <button class="quick-buy" onclick="orderProduct('{{this.name}}', '{{this.price}}')">
+              <i class="fab fa-whatsapp"></i> Beli
+            </button>
+          </div>
+        </div>
+        {{/if}}
+        {{#if (eq @index 1)}}
+        <div class="showcase-card small-card">
+          <img src="{{this.image}}" alt="{{this.name}}">
+          <div class="mini-badge">Hot</div>
+        </div>
+        {{/if}}
+        {{#if (eq @index 2)}}
+        <div class="showcase-card small-card">
+          <img src="{{this.image}}" alt="{{this.name}}">
+          <div class="mini-badge">New</div>
+        </div>
+        {{/if}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</section>
