@@ -80,6 +80,8 @@ export async function POST(req: Request) {
         categories: [],
         keywords: [],
         address: '',
+        isPublished: true, // Auto-publish new stores
+        isPubliclyListed: true, // Show in marketplace
       },
     })
 

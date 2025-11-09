@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Image from 'next/image'
 import { formatPrice, generateWhatsAppLink } from '@/lib/utils'
+import { getDriveImageUrl } from '@/lib/google-drive'
 import { Metadata } from 'next'
 
 interface StorePageProps {
@@ -92,16 +93,28 @@ export default async function StorePage({ params }: StorePageProps) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {store.products.map((product) => (
+            {store.products.map((product) => {
+              // Get images from Drive
+              const images = typeof product.images === 'object' && product.images !== null && Array.isArray(product.images)
+                ? product.images as string[]
+                : []
+              
+              const firstImageId = images.length > 0 ? images[0] : null
+              
+              return (
               <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
-                {product.images && (product.images as any).length > 0 && (
-                  <div className="relative h-64">
-                    <Image
-                      src={(product.images as any)[0].url}
+                {firstImageId ? (
+                  <div className="relative h-64 bg-gray-100">
+                    <img
+                      src={getDriveImageUrl(firstImageId)}
                       alt={product.name}
-                      fill
-                      className="object-cover"
+                      className="w-full h-full object-cover"
+                      loading="lazy"
                     />
+                  </div>
+                ) : (
+                  <div className="h-64 bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center">
+                    <span className="text-gray-400 text-4xl">📦</span>
                   </div>
                 )}
                 <div className="p-4">
@@ -131,7 +144,8 @@ export default async function StorePage({ params }: StorePageProps) {
                   </div>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </main>
