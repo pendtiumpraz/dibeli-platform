@@ -22,6 +22,11 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { name, slug, tagline, whatsappNumber } = body
 
+    // Validate required fields
+    if (!name || !slug || !whatsappNumber) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
     const slugExists = await prisma.store.findUnique({
       where: { slug },
     })
@@ -36,9 +41,11 @@ export async function POST(req: Request) {
         name,
         slug,
         tagline,
+        description: tagline || `Selamat datang di ${name}`,
         whatsappNumber,
         categories: [],
         keywords: [],
+        address: '',
       },
     })
 

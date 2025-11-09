@@ -26,15 +26,18 @@ export default function CreateStorePage() {
         body: JSON.stringify(formData),
       })
 
+      const data = await res.json()
+
       if (res.ok) {
-        router.push('/dashboard')
+        alert('Toko berhasil dibuat! 🎉')
+        router.push('/dashboard/store')
         router.refresh()
       } else {
-        alert('Failed to create store')
+        alert(`Gagal membuat toko: ${data.error || 'Unknown error'}`)
       }
     } catch (error) {
-      console.error(error)
-      alert('Error creating store')
+      console.error('Store creation error:', error)
+      alert('Error: Tidak dapat terhubung ke server')
     } finally {
       setLoading(false)
     }
