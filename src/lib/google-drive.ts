@@ -183,13 +183,21 @@ export async function uploadImageToDrive(
   const drive = await getDriveClient()
 
   try {
-    console.log(`Uploading ${fileName} (${file.size} bytes, ${file.type})`)
+    console.log(`🔵 Starting upload: ${fileName}`)
+    console.log(`   - Size: ${file.size} bytes`)
+    console.log(`   - Type: ${file.type}`)
+    console.log(`   - Folder ID: ${folderId}`)
     
     // Convert File to buffer
+    console.log('📦 Converting file to buffer...')
     const arrayBuffer = await file.arrayBuffer()
+    console.log(`   - ArrayBuffer size: ${arrayBuffer.byteLength} bytes`)
+    
     const buffer = Buffer.from(arrayBuffer)
+    console.log(`   - Buffer size: ${buffer.length} bytes`)
     
     // Create readable stream from buffer
+    console.log('🌊 Creating stream from buffer...')
     const { Readable } = await import('stream')
     const stream = Readable.from(buffer)
 
@@ -198,6 +206,9 @@ export async function uploadImageToDrive(
       parents: [folderId],
     }
 
+    console.log('☁️ Uploading to Google Drive...')
+    console.log(`   - Metadata:`, JSON.stringify(fileMetadata))
+    
     const response = await drive.files.create({
       requestBody: fileMetadata,
       media: {
@@ -206,8 +217,12 @@ export async function uploadImageToDrive(
       },
       fields: 'id, webViewLink, webContentLink, thumbnailLink',
     })
+    
+    console.log('✅ Upload response received')
+    console.log(`   - File ID: ${response.data.id}`)
 
     // Make file publicly accessible
+    console.log('🔓 Setting public permissions...')
     if (response.data.id) {
       await drive.permissions.create({
         fileId: response.data.id,
@@ -216,16 +231,27 @@ export async function uploadImageToDrive(
           type: 'anyone',
         },
       })
+      console.log('✅ Permissions set successfully')
     }
 
-    return {
+    const result = {
       id: response.data.id!,
       webViewLink: response.data.webViewLink!,
       webContentLink: response.data.webContentLink!,
       thumbnailLink: response.data.thumbnailLink!,
     }
+    
+    console.log('🎉 Upload complete!')
+    console.log(`   - File ID: ${result.id}`)
+    console.log(`   - View URL: https://drive.google.com/uc?export=view&id=${result.id}`)
+    
+    return result
   } catch (error) {
-    console.error('Error uploading to Drive:', error)
+    console.error('❌ Error uploading to Drive:', error)
+    if (error instanceof Error) {
+      console.error('   - Message:', error.message)
+      console.error('   - Stack:', error.stack)
+    }
     throw error
   }
 }
