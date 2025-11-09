@@ -242,23 +242,45 @@ export default function TemplateMarketplace({
 
       {/* Preview Modal */}
       {previewUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl w-full max-w-6xl h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-xl font-bold">Template Preview</h3>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
+          onClick={() => setPreviewUrl(null)}
+        >
+          <div 
+            className="bg-white rounded-xl w-full max-w-6xl h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center p-4 border-b bg-gray-50">
+              <h3 className="text-xl font-bold text-gray-900">
+                <i className="fas fa-eye text-purple-600 mr-2"></i>
+                Template Preview
+              </h3>
               <button
                 onClick={() => setPreviewUrl(null)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-200 w-10 h-10 rounded-full flex items-center justify-center transition-all"
+                title="Close preview"
               >
                 <i className="fas fa-times text-2xl"></i>
               </button>
             </div>
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden relative">
               <iframe
                 src={previewUrl}
-                className="w-full h-full"
+                className="w-full h-full border-0"
                 title="Template Preview"
               />
+            </div>
+            <div className="p-4 border-t bg-gray-50 flex justify-between items-center">
+              <p className="text-sm text-gray-600">
+                <i className="fas fa-info-circle mr-2"></i>
+                Ini adalah preview dengan data toko dan produk Anda
+              </p>
+              <button
+                onClick={() => setPreviewUrl(null)}
+                className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-all"
+              >
+                Close Preview
+              </button>
             </div>
           </div>
         </div>
