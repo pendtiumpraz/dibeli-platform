@@ -2,10 +2,9 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { renderTemplate, getDefaultTheme, formatPriceRupiah } from '@/lib/template-renderer'
+import { getDefaultTheme, formatPriceRupiah } from '@/lib/template-renderer'
+import { combineTemplate, getTemplatePackage } from '@/lib/template-combiner'
 import { getDriveImageUrl } from '@/lib/google-drive'
-import fs from 'fs'
-import path from 'path'
 
 export async function GET() {
   try {
@@ -30,21 +29,32 @@ export async function GET() {
       return new NextResponse('No store found', { status: 404 })
     }
 
-    // Load template files
-    const templatesDir = path.join(process.cwd(), 'src', 'templates')
-    const html = fs.readFileSync(path.join(templatesDir, 'branded-cards-dynamic.html'), 'utf-8')
-    const css = fs.readFileSync(path.join(templatesDir, 'branded-cards-dynamic.css'), 'utf-8')
-    const js = fs.readFileSync(path.join(templatesDir, 'branded-cards-dynamic.js'), 'utf-8')
+    // Get template package (default: modern-minimal)
+    const templateId = 'modern-minimal' // TODO: Get from store settings
+    const templatePackage = getTemplatePackage(templateId)
+    
+    if (!templatePackage) {
+      return new NextResponse('Template not found', { status: 404 })
+    }
 
     // Prepare data
     const data = {
       store: {
         name: store.name,
         logo: undefined,
+        badge: `${store.products.length}+ Produk Tersedia`,
+        heroTitle: `Selamat Datang di ${store.name}`,
+        heroSubtitle: store.description || 'Temukan produk berkualitas dengan harga terbaik. Belanja sekarang dan dapatkan penawaran spesial!',
         tagline: store.description || 'Produk Berkualitas Terbaik',
         description: store.description || undefined,
         whatsappNumber: store.whatsappNumber,
         address: store.address || undefined,
+        showStats: true,
+        stats: {
+          products: store.products.length,
+          customers: 100,
+          rating: '4.9',
+        },
       },
       products: store.products.map((product) => {
         const images = Array.isArray(product.images) ? product.images as string[] : []
@@ -67,8 +77,8 @@ export async function GET() {
       theme: getDefaultTheme(),
     }
 
-    // Render template
-    const renderedHtml = renderTemplate(html, css, js, data)
+    // Render template using combiner
+    const renderedHtml = combineTemplate(templatePackage.config, data)
 
     return new NextResponse(renderedHtml, {
       headers: {

@@ -1,0 +1,35 @@
+<!-- Card 21: Hover Overlay Effect -->
+<div class="product-card card-hover-overlay">
+  <div class="card-image-wrapper">
+    <img src="{{this.image}}" alt="{{this.name}}" loading="lazy">
+    <div class="hover-overlay">
+      <div class="overlay-content">
+        <h3>{{this.name}}</h3>
+        <p>{{this.description}}</p>
+        <div class="overlay-actions">
+          <button class="overlay-btn" onclick="quickView('{{this.id}}')">
+            <i class="fas fa-eye"></i> Quick View
+          </button>
+          <button class="overlay-btn primary" onclick="orderProduct('{{this.name}}', '{{this.price}}')">
+            <i class="fab fa-whatsapp"></i> Beli Sekarang
+          </button>
+        </div>
+      </div>
+    </div>
+    {{#if this.isNew}}
+    <div class="card-badge new">Baru</div>
+    {{/if}}
+    {{#unless this.isAvailable}}
+    <div class="card-badge sold-out">Habis</div>
+    {{/unless}}
+  </div>
+  <div class="card-info">
+    <div class="card-price">{{this.price}}</div>
+    {{#if this.rating}}
+    <div class="card-rating">
+      <span class="stars">★★★★★</span>
+      <span class="rating-value">{{this.rating}}</span>
+    </div>
+    {{/if}}
+  </div>
+</div>

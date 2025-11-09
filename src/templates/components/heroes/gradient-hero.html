@@ -1,0 +1,37 @@
+<section class="hero gradient-hero">
+  <div class="hero-background">
+    <div class="gradient-sphere sphere-1"></div>
+    <div class="gradient-sphere sphere-2"></div>
+    <div class="gradient-sphere sphere-3"></div>
+  </div>
+  
+  <div class="hero-content">
+    <div class="hero-badge">{{store.badge}}</div>
+    <h1 class="hero-title">{{store.heroTitle}}</h1>
+    <p class="hero-subtitle">{{store.heroSubtitle}}</p>
+    
+    <div class="hero-buttons">
+      <a href="#products" class="btn btn-primary">Lihat Produk</a>
+      <a href="https://wa.me/{{store.whatsappNumber}}" class="btn btn-secondary" target="_blank">
+        <i class="fab fa-whatsapp"></i> Hubungi Kami
+      </a>
+    </div>
+    
+    {{#if store.showStats}}
+    <div class="hero-stats">
+      <div class="stat">
+        <h3 class="stat-number">{{store.stats.products}}+</h3>
+        <p>Produk</p>
+      </div>
+      <div class="stat">
+        <h3 class="stat-number">{{store.stats.customers}}+</h3>
+        <p>Pelanggan</p>
+      </div>
+      <div class="stat">
+        <h3 class="stat-number">{{store.stats.rating}}</h3>
+        <p>Rating</p>
+      </div>
+    </div>
+    {{/if}}
+  </div>
+</section>

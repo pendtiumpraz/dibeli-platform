@@ -1,0 +1,36 @@
+<!-- Card 22: 3D Flip Card -->
+<div class="product-card card-flip-3d">
+  <div class="card-flip-inner">
+    <div class="card-flip-front">
+      <img src="{{this.image}}" alt="{{this.name}}" loading="lazy">
+      <div class="flip-badge">Hover Me</div>
+      {{#if this.isNew}}
+      <div class="card-badge new">Baru</div>
+      {{/if}}
+    </div>
+    <div class="card-flip-back">
+      <div class="flip-content">
+        <h3>{{this.name}}</h3>
+        {{#if this.description}}
+        <p class="flip-description">{{this.description}}</p>
+        {{/if}}
+        <ul class="flip-features">
+          {{#if this.features}}
+            {{#each this.features}}
+            <li><i class="fas fa-check"></i> {{this}}</li>
+            {{/each}}
+          {{else}}
+            <li><i class="fas fa-check"></i> Kualitas Premium</li>
+            <li><i class="fas fa-check"></i> Garansi Resmi</li>
+            <li><i class="fas fa-check"></i> Original 100%</li>
+            <li><i class="fas fa-check"></i> Ready Stock</li>
+          {{/if}}
+        </ul>
+        <div class="flip-price">{{this.price}}</div>
+        <button class="flip-btn" onclick="orderProduct('{{this.name}}', '{{this.price}}')">
+          <i class="fab fa-whatsapp"></i> Beli Sekarang
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
