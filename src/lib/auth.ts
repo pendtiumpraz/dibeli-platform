@@ -97,10 +97,14 @@ export const authOptions: NextAuthOptions = {
             
             // Update SuperAdmin status if needed
             if (isSuperAdmin && !dbUser.isSuperAdmin) {
-              await prisma.user.update({
-                where: { id: token.sub },
-                data: { isSuperAdmin: true },
-              })
+              try {
+                await prisma.user.update({
+                  where: { id: dbUser.id },
+                  data: { isSuperAdmin: true },
+                })
+              } catch (updateError) {
+                console.error('Failed to update SuperAdmin status:', updateError)
+              }
             }
             
             // User exists, use their data
@@ -120,35 +124,9 @@ export const authOptions: NextAuthOptions = {
             session.user.isSuperAdmin = isSuperAdmin
             session.user.trialEndDate = trialEnd
             
-            // Try to update user with trial info (might fail if user not created yet)
-            try {
-              const trialStart = new Date()
-              const trialEnd = calculateTrialEndDate(trialStart)
-              
-              await prisma.user.update({
-                where: { id: token.sub },
-                data: {
-                  tier: isSuperAdmin ? 'UNLIMITED' : 'TRIAL',
-                  trialStartDate: trialStart,
-                  trialEndDate: trialEnd,
-                  isSuperAdmin,
-                },
-              })
-              
-              session.user.trialEndDate = trialEnd
-              
-              // Send welcome email for new users (async, don't wait)
-              if (!isSuperAdmin) {
-                sendWelcomeEmail(
-                  session.user.email || '',
-                  session.user.name || 'Sobat Seller',
-                  trialEnd
-                ).catch(console.error)
-              }
-            } catch (updateError) {
-              // User not created yet by adapter, skip update
-              console.log('User not ready yet, will update on next session')
-            }
+            // User doesn't exist yet, skip update
+            // The signIn callback will handle user creation and trial setup
+            console.log('User not found in session callback, likely being created')
           }
         } catch (error) {
           console.error('Session callback error:', error)
