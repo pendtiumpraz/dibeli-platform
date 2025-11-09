@@ -195,11 +195,6 @@ export async function uploadImageToDrive(
     
     const buffer = Buffer.from(arrayBuffer)
     console.log(`   - Buffer size: ${buffer.length} bytes`)
-    
-    // Create readable stream from buffer
-    console.log('🌊 Creating stream from buffer...')
-    const { Readable } = await import('stream')
-    const stream = Readable.from(buffer)
 
     const fileMetadata = {
       name: fileName,
@@ -208,14 +203,17 @@ export async function uploadImageToDrive(
 
     console.log('☁️ Uploading to Google Drive...')
     console.log(`   - Metadata:`, JSON.stringify(fileMetadata))
+    console.log(`   - Using buffer directly (${buffer.length} bytes)`)
     
+    // Upload using buffer directly (works in Edge Runtime)
     const response = await drive.files.create({
       requestBody: fileMetadata,
       media: {
         mimeType: file.type,
-        body: stream,
+        body: buffer.toString('base64'),
       },
       fields: 'id, webViewLink, webContentLink, thumbnailLink',
+      uploadType: 'multipart',
     })
     
     console.log('✅ Upload response received')

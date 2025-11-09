@@ -5,231 +5,33 @@ OAuth tokens found, checking expiry...
 Access token still valid
 Drive client created successfully
 Using existing root folder ID: 19PTMbU84pUTTdI3XSSgkNUvNXQZVwwXs
-Error creating folder structure: n [Error]: Insufficient permissions for the specified parent.
-    at m._request (/var/task/.next/server/chunks/7816.js:1:31547)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async g.requestAsync (/var/task/.next/server/chunks/7816.js:13:59308)
-    at async f (/var/task/.next/server/chunks/7816.js:19:1923)
-    at async d (/var/task/.next/server/chunks/9694.js:1:2993)
-    at async l (/var/task/.next/server/chunks/9694.js:1:2205)
-    at async c (/var/task/.next/server/app/api/products/[id]/route.js:1:4073)
+Created stores folder: toko
+Created store folder: beli
+Created product folder: iphone-
+Getting Drive client for user: pendtiumpraz@gmail.com
+OAuth tokens found, checking expiry...
+Access token still valid
+Drive client created successfully
+Uploading iphone--1762666400346-1.png (164422 bytes, image/png)
+Error uploading to Drive: TypeError: Cannot read properties of undefined (reading 'from')
+    at f (/var/task/.next/server/chunks/9694.js:1:3268)
+    at async c (/var/task/.next/server/app/api/products/[id]/route.js:1:4212)
     at async /var/task/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:34801
     at async eS.execute (/var/task/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:25910)
-    at async eS.handle (/var/task/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:36055) {
-  config: {
-    url: URL {
-      href: 'https://www.googleapis.com/drive/v3/files?fields=id',
-      origin: 'https://www.googleapis.com',
-      protocol: 'https:',
-      username: '',
-      password: '',
-      host: 'www.googleapis.com',
-      hostname: 'www.googleapis.com',
-      port: '',
-      pathname: '/drive/v3/files',
-      search: '?fields=id',
-      searchParams: URLSearchParams { 'fields' => 'id' },
-      hash: ''
-    },
-    method: 'POST',
-    apiVersion: '',
-    userAgentDirectives: [ [Object] ],
-    paramsSerializer: [Function (anonymous)],
-    data: {
-      name: 'toko',
-      mimeType: 'application/vnd.google-apps.folder',
-      parents: [Array]
-    },
-    headers: Headers {
-      'accept-encoding': 'gzip',
-      authorization: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
-      'user-agent': 'google-api-nodejs-client/8.0.0 (gzip)',
-      'x-goog-api-client': 'gdcl/8.0.0 gl-node/22.18.0',
-      'content-type': 'application/json'
-    },
-    params: { fields: 'id' },
-    validateStatus: [Function (anonymous)],
-    retry: true,
-    body: '{"name":"toko","mimeType":"application/vnd.google-apps.folder","parents":["19PTMbU84pUTTdI3XSSgkNUvNXQZVwwXs"]}',
-    responseType: 'unknown',
-    errorRedactor: [Function: e],
-    duplex: 'half',
-    retryConfig: {
-      currentRetryAttempt: 0,
-      retry: 3,
-      httpMethodsToRetry: [Array],
-      noResponseRetries: 2,
-      retryDelayMultiplier: 2,
-      timeOfFirstRequest: 1762666064678,
-      totalTimeout: 9007199254740991,
-      maxRetryDelay: 9007199254740991,
-      statusCodesToRetry: [Array]
-    }
-  },
-  response: W [Response] {
-    size: 0,
-    data: { error: [Object] },
-    config: {
-      url: URL {},
-      method: 'POST',
-      apiVersion: '',
-      userAgentDirectives: [Array],
-      paramsSerializer: [Function (anonymous)],
-      data: [Object],
-      headers: Headers {
-        'accept-encoding': 'gzip',
-        authorization: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
-        'user-agent': 'google-api-nodejs-client/8.0.0 (gzip)',
-        'x-goog-api-client': 'gdcl/8.0.0 gl-node/22.18.0',
-        'content-type': 'application/json'
-      },
-      params: [Object],
-      validateStatus: [Function (anonymous)],
-      retry: true,
-      body: '{"name":"toko","mimeType":"application/vnd.google-apps.folder","parents":["19PTMbU84pUTTdI3XSSgkNUvNXQZVwwXs"]}',
-      responseType: 'unknown',
-      errorRedactor: [Function: e],
-      duplex: 'half'
-    },
-    [Symbol(Body internals)]: {
-      body: [Gunzip],
-      stream: [Gunzip],
-      boundary: null,
-      disturbed: true,
-      error: null
-    },
-    [Symbol(Response internals)]: {
-      type: 'default',
-      url: 'https://www.googleapis.com/drive/v3/files?fields=id',
-      status: 403,
-      statusText: 'Forbidden',
-      headers: [Object],
-      counter: 0,
-      highWaterMark: 16384
-    }
-  },
-  code: 403,
-  status: 403,
-  error: undefined,
-  [Symbol(gaxios-gaxios-error)]: '7.1.3',
-  [cause]: {
-    message: 'Insufficient permissions for the specified parent.',
-    code: 403,
-    status: 'Forbidden',
-    errors: [ [Object] ]
-  }
-}
-❌ Google Drive upload failed: n [Error]: Insufficient permissions for the specified parent.
-    at m._request (/var/task/.next/server/chunks/7816.js:1:31547)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async g.requestAsync (/var/task/.next/server/chunks/7816.js:13:59308)
-    at async f (/var/task/.next/server/chunks/7816.js:19:1923)
-    at async d (/var/task/.next/server/chunks/9694.js:1:2993)
-    at async l (/var/task/.next/server/chunks/9694.js:1:2205)
-    at async c (/var/task/.next/server/app/api/products/[id]/route.js:1:4073)
+    at async eS.handle (/var/task/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:36055)
+    at async ei (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:16:25466)
+    at async es.responseCache.get.routeKind (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:17:1026)
+    at async r8.renderToResponseWithComponentsImpl (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:17:508)
+    at async r8.renderPageComponent (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:17:5028)
+    at async r8.renderToResponseImpl (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:17:5615)
+❌ Google Drive upload failed: TypeError: Cannot read properties of undefined (reading 'from')
+    at f (/var/task/.next/server/chunks/9694.js:1:3268)
+    at async c (/var/task/.next/server/app/api/products/[id]/route.js:1:4212)
     at async /var/task/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:34801
     at async eS.execute (/var/task/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:25910)
-    at async eS.handle (/var/task/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:36055) {
-  config: {
-    url: URL {
-      href: 'https://www.googleapis.com/drive/v3/files?fields=id',
-      origin: 'https://www.googleapis.com',
-      protocol: 'https:',
-      username: '',
-      password: '',
-      host: 'www.googleapis.com',
-      hostname: 'www.googleapis.com',
-      port: '',
-      pathname: '/drive/v3/files',
-      search: '?fields=id',
-      searchParams: URLSearchParams { 'fields' => 'id' },
-      hash: ''
-    },
-    method: 'POST',
-    apiVersion: '',
-    userAgentDirectives: [ [Object] ],
-    paramsSerializer: [Function (anonymous)],
-    data: {
-      name: 'toko',
-      mimeType: 'application/vnd.google-apps.folder',
-      parents: [Array]
-    },
-    headers: Headers {
-      'accept-encoding': 'gzip',
-      authorization: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
-      'user-agent': 'google-api-nodejs-client/8.0.0 (gzip)',
-      'x-goog-api-client': 'gdcl/8.0.0 gl-node/22.18.0',
-      'content-type': 'application/json'
-    },
-    params: { fields: 'id' },
-    validateStatus: [Function (anonymous)],
-    retry: true,
-    body: '{"name":"toko","mimeType":"application/vnd.google-apps.folder","parents":["19PTMbU84pUTTdI3XSSgkNUvNXQZVwwXs"]}',
-    responseType: 'unknown',
-    errorRedactor: [Function: e],
-    duplex: 'half',
-    retryConfig: {
-      currentRetryAttempt: 0,
-      retry: 3,
-      httpMethodsToRetry: [Array],
-      noResponseRetries: 2,
-      retryDelayMultiplier: 2,
-      timeOfFirstRequest: 1762666064678,
-      totalTimeout: 9007199254740991,
-      maxRetryDelay: 9007199254740991,
-      statusCodesToRetry: [Array]
-    }
-  },
-  response: W [Response] {
-    size: 0,
-    data: { error: [Object] },
-    config: {
-      url: URL {},
-      method: 'POST',
-      apiVersion: '',
-      userAgentDirectives: [Array],
-      paramsSerializer: [Function (anonymous)],
-      data: [Object],
-      headers: Headers {
-        'accept-encoding': 'gzip',
-        authorization: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
-        'user-agent': 'google-api-nodejs-client/8.0.0 (gzip)',
-        'x-goog-api-client': 'gdcl/8.0.0 gl-node/22.18.0',
-        'content-type': 'application/json'
-      },
-      params: [Object],
-      validateStatus: [Function (anonymous)],
-      retry: true,
-      body: '{"name":"toko","mimeType":"application/vnd.google-apps.folder","parents":["19PTMbU84pUTTdI3XSSgkNUvNXQZVwwXs"]}',
-      responseType: 'unknown',
-      errorRedactor: [Function: e],
-      duplex: 'half'
-    },
-    [Symbol(Body internals)]: {
-      body: [Gunzip],
-      stream: [Gunzip],
-      boundary: null,
-      disturbed: true,
-      error: null
-    },
-    [Symbol(Response internals)]: {
-      type: 'default',
-      url: 'https://www.googleapis.com/drive/v3/files?fields=id',
-      status: 403,
-      statusText: 'Forbidden',
-      headers: [Object],
-      counter: 0,
-      highWaterMark: 16384
-    }
-  },
-  code: 403,
-  status: 403,
-  error: undefined,
-  [Symbol(gaxios-gaxios-error)]: '7.1.3',
-  [cause]: {
-    message: 'Insufficient permissions for the specified parent.',
-    code: 403,
-    status: 'Forbidden',
-    errors: [ [Object] ]
-  }
-}
+    at async eS.handle (/var/task/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:36055)
+    at async ei (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:16:25466)
+    at async es.responseCache.get.routeKind (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:17:1026)
+    at async r8.renderToResponseWithComponentsImpl (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:17:508)
+    at async r8.renderPageComponent (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:17:5028)
+    at async r8.renderToResponseImpl (/var/task/node_modules/next/dist/compiled/next-server/server.runtime.prod.js:17:5615)
