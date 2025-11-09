@@ -202,6 +202,7 @@ ${getComponentCSS('products', config.productCard)}
  * Predefined template packages
  */
 export const TEMPLATE_PACKAGES: TemplatePackage[] = [
+  // ========== FREE TIER (1 template) ==========
   {
     id: 'modern-minimal',
     name: 'Modern Minimal',
@@ -215,6 +216,8 @@ export const TEMPLATE_PACKAGES: TemplatePackage[] = [
     },
     tier: 'FREE',
   },
+  
+  // ========== PREMIUM TIER (10 templates) ==========
   {
     id: 'bold-interactive',
     name: 'Bold Interactive',
@@ -292,6 +295,125 @@ export const TEMPLATE_PACKAGES: TemplatePackage[] = [
       footer: 'modern-footer',
     },
     tier: 'PREMIUM',
+  },
+  {
+    id: 'carousel-flip',
+    name: 'Carousel Flip',
+    description: 'Carousel hero + 3D flip cards - Best of both worlds',
+    thumbnail: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'carousel-hero',
+      productCard: 'card-flip-3d',
+      footer: 'modern-footer',
+    },
+    tier: 'PREMIUM',
+  },
+  {
+    id: 'split-slider',
+    name: 'Split Slider',
+    description: 'Split hero + image slider cards - Perfect combo',
+    thumbnail: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'split-hero',
+      productCard: 'card-image-slider',
+      footer: 'modern-footer',
+    },
+    tier: 'PREMIUM',
+  },
+  {
+    id: 'gradient-zoom',
+    name: 'Gradient Zoom',
+    description: 'Gradient hero + zoom cards - Clean & professional',
+    thumbnail: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'gradient-hero',
+      productCard: 'card-zoom-hover',
+      footer: 'modern-footer',
+    },
+    tier: 'PREMIUM',
+  },
+  {
+    id: 'carousel-glow',
+    name: 'Carousel Glow',
+    description: 'Carousel hero + gradient glow - Premium & luxurious',
+    thumbnail: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'carousel-hero',
+      productCard: 'card-gradient-glow',
+      footer: 'modern-footer',
+    },
+    tier: 'PREMIUM',
+  },
+  
+  // ========== UNLIMITED TIER (5 exclusive templates) ==========
+  {
+    id: 'ultimate-carousel',
+    name: 'Ultimate Carousel',
+    description: 'Carousel + multi-image slider - Maximum showcase power',
+    thumbnail: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'carousel-hero',
+      productCard: 'card-image-slider',
+      footer: 'modern-footer',
+    },
+    tier: 'UNLIMITED',
+  },
+  {
+    id: 'ultimate-split',
+    name: 'Ultimate Split',
+    description: 'Split hero + zoom hover - Professional excellence',
+    thumbnail: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'split-hero',
+      productCard: 'card-zoom-hover',
+      footer: 'modern-footer',
+    },
+    tier: 'UNLIMITED',
+  },
+  {
+    id: 'ultimate-gradient',
+    name: 'Ultimate Gradient',
+    description: 'Gradient hero + 3D flip - Engaging & modern',
+    thumbnail: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'gradient-hero',
+      productCard: 'card-flip-3d',
+      footer: 'modern-footer',
+    },
+    tier: 'UNLIMITED',
+  },
+  {
+    id: 'ultimate-luxury',
+    name: 'Ultimate Luxury',
+    description: 'Split hero + hover overlay - Timeless elegance',
+    thumbnail: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'split-hero',
+      productCard: 'card-hover-overlay',
+      footer: 'modern-footer',
+    },
+    tier: 'UNLIMITED',
+  },
+  {
+    id: 'ultimate-premium',
+    name: 'Ultimate Premium',
+    description: 'Carousel + zoom hover - Supreme combination',
+    thumbnail: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'carousel-hero',
+      productCard: 'card-zoom-hover',
+      footer: 'modern-footer',
+    },
+    tier: 'UNLIMITED',
   },
 ]
 

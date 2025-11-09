@@ -9,6 +9,7 @@ interface TemplateMarketplaceProps {
   userTier: string
   storeId: string
   storeSlug: string
+  currentTemplateId: string
 }
 
 export default function TemplateMarketplace({
@@ -16,10 +17,12 @@ export default function TemplateMarketplace({
   userTier,
   storeId,
   storeSlug,
+  currentTemplateId,
 }: TemplateMarketplaceProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'ALL' | 'FREE' | 'PREMIUM'>('ALL')
+  const [filter, setFilter] = useState<'ALL' | 'FREE' | 'PREMIUM' | 'UNLIMITED'>('ALL')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [activeTemplateId, setActiveTemplateId] = useState(currentTemplateId)
 
   const filteredTemplates = templates.filter((template) => {
     if (filter === 'ALL') return true
@@ -28,7 +31,9 @@ export default function TemplateMarketplace({
 
   const canUseTemplate = (template: TemplatePackage) => {
     if (template.tier === 'FREE') return true
-    return userTier === 'PREMIUM' || userTier === 'UNLIMITED'
+    if (template.tier === 'PREMIUM') return userTier === 'PREMIUM' || userTier === 'UNLIMITED'
+    if (template.tier === 'UNLIMITED') return userTier === 'UNLIMITED'
+    return false
   }
 
   const handlePreview = (templateId: string) => {
@@ -51,8 +56,9 @@ export default function TemplateMarketplace({
       })
 
       if (response.ok) {
-        alert('Template applied successfully!')
-        window.location.href = `/toko/${storeSlug}`
+        setActiveTemplateId(templateId)
+        alert('Template applied successfully! Visit your store to see the changes.')
+        // Optionally redirect or just update UI
       } else {
         alert('Failed to apply template')
       }
@@ -64,8 +70,21 @@ export default function TemplateMarketplace({
 
   return (
     <div>
+      {/* Current Active Template */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex items-center gap-3">
+          <i className="fas fa-check-circle text-blue-600 text-2xl"></i>
+          <div>
+            <p className="font-semibold text-blue-900">Currently Active Template</p>
+            <p className="text-blue-700">
+              {templates.find(t => t.id === activeTemplateId)?.name || 'Modern Minimal'}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Filter Tabs */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-3 mb-6 flex-wrap">
         <button
           onClick={() => setFilter('ALL')}
           className={`px-6 py-2 rounded-lg font-semibold transition-all ${
@@ -74,7 +93,7 @@ export default function TemplateMarketplace({
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           }`}
         >
-          All Templates
+          All ({templates.length})
         </button>
         <button
           onClick={() => setFilter('FREE')}
@@ -84,7 +103,7 @@ export default function TemplateMarketplace({
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           }`}
         >
-          Free
+          Free ({templates.filter(t => t.tier === 'FREE').length})
         </button>
         <button
           onClick={() => setFilter('PREMIUM')}
@@ -94,7 +113,17 @@ export default function TemplateMarketplace({
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           }`}
         >
-          Premium
+          Premium ({templates.filter(t => t.tier === 'PREMIUM').length})
+        </button>
+        <button
+          onClick={() => setFilter('UNLIMITED')}
+          className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+            filter === 'UNLIMITED'
+              ? 'bg-gradient-to-r from-purple-600 to-green-600 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          Unlimited ({templates.filter(t => t.tier === 'UNLIMITED').length})
         </button>
       </div>
 
@@ -102,12 +131,13 @@ export default function TemplateMarketplace({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredTemplates.map((template) => {
           const isLocked = !canUseTemplate(template)
+          const isActive = template.id === activeTemplateId
 
           return (
             <div
               key={template.id}
               className={`bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl ${
-                selectedTemplate === template.id ? 'ring-4 ring-purple-500' : ''
+                isActive ? 'ring-4 ring-green-500' : ''
               } ${isLocked ? 'opacity-75' : ''}`}
             >
               {/* Thumbnail */}
@@ -118,16 +148,28 @@ export default function TemplateMarketplace({
                   fill
                   className="object-cover"
                 />
-                {template.tier !== 'FREE' && (
+                {isActive && (
+                  <div className="absolute top-3 left-3 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
+                    <i className="fas fa-check"></i> ACTIVE
+                  </div>
+                )}
+                {template.tier === 'PREMIUM' && (
                   <div className="absolute top-3 right-3 px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full">
                     PREMIUM
+                  </div>
+                )}
+                {template.tier === 'UNLIMITED' && (
+                  <div className="absolute top-3 right-3 px-3 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold rounded-full">
+                    UNLIMITED
                   </div>
                 )}
                 {isLocked && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="text-center">
                       <i className="fas fa-lock text-white text-4xl mb-2"></i>
-                      <p className="text-white font-semibold">Upgrade to Premium</p>
+                      <p className="text-white font-semibold">
+                        {template.tier === 'UNLIMITED' ? 'Upgrade to Unlimited' : 'Upgrade to Premium'}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -152,14 +194,16 @@ export default function TemplateMarketplace({
                   </button>
                   <button
                     onClick={() => handleApplyTemplate(template.id)}
-                    disabled={isLocked}
+                    disabled={isLocked || isActive}
                     className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
-                      isLocked
+                      isActive
+                        ? 'bg-green-500 text-white cursor-default'
+                        : isLocked
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         : 'bg-gradient-to-r from-purple-600 to-green-600 text-white hover:shadow-lg'
                     }`}
                   >
-                    {isLocked ? 'Locked' : 'Apply'}
+                    {isActive ? 'Active' : isLocked ? 'Locked' : 'Apply'}
                   </button>
                 </div>
               </div>

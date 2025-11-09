@@ -29,6 +29,7 @@ export default async function TemplatesPage() {
       id: true,
       name: true,
       slug: true,
+      templateId: true,
     },
   })
 
@@ -52,6 +53,7 @@ export default async function TemplatesPage() {
         userTier={user.tier}
         storeId={store.id}
         storeSlug={store.slug}
+        currentTemplateId={store.templateId}
       />
     </div>
   )
