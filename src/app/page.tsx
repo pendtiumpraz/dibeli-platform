@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
+import { getDriveImageUrl } from "@/lib/google-drive";
 import Image from "next/image";
 
 export default async function HomePage() {
@@ -19,12 +20,18 @@ export default async function HomePage() {
       },
       take: 12,
       orderBy: [
+        { isFeatured: 'desc' },
         { viewCountWeek: 'desc' },
         { createdAt: 'desc' },
       ],
       include: {
         _count: {
           select: { products: true },
+        },
+        products: {
+          where: { isAvailable: true },
+          take: 1,
+          select: { images: true },
         },
       },
     })
@@ -274,7 +281,15 @@ export default async function HomePage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {stores.map((store, index) => {
-              // Placeholder images for stores without hero
+              // Get first product image from Drive
+              const firstProduct = store.products?.[0]
+              const productImages = firstProduct?.images
+              const imageArray = typeof productImages === 'object' && productImages !== null && Array.isArray(productImages)
+                ? productImages as string[]
+                : []
+              const firstDriveImageId = imageArray.length > 0 ? imageArray[0] : null
+              
+              // Placeholder images for stores without product images
               const placeholderImages = [
                 "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80",
                 "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&q=80",
@@ -282,21 +297,36 @@ export default async function HomePage() {
                 "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80",
               ];
               
+              const storeImage = firstDriveImageId 
+                ? getDriveImageUrl(firstDriveImageId)
+                : store.heroImage || placeholderImages[index % placeholderImages.length]
+              
               return (
                 <Link key={store.id} href={`/toko/${store.slug}`}>
                   <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-1 cursor-pointer">
                     <div className="h-48 relative bg-gradient-to-br from-purple-100 to-pink-100">
-                      <Image
-                        src={store.heroImage || placeholderImages[index % placeholderImages.length]}
-                        alt={store.name}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute top-2 right-2">
-                        <span className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-purple-600">
-                          ⭐ Top
-                        </span>
-                      </div>
+                      {firstDriveImageId ? (
+                        <img
+                          src={storeImage}
+                          alt={store.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <Image
+                          src={storeImage}
+                          alt={store.name}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
+                      {store.isFeatured && (
+                        <div className="absolute top-2 right-2">
+                          <span className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-purple-600">
+                            ⭐ Featured
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="p-4">
                       <div className="flex items-start gap-3 mb-3">
