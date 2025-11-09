@@ -92,52 +92,55 @@ export const authOptions: NextAuthOptions = {
           })
 
           if (dbUser) {
-            // Check if user should be SuperAdmin
-            const isSuperAdmin = session.user.email === 'dibeli.my.id@gmail.com' || dbUser.isSuperAdmin
-            
-            // Update SuperAdmin status if needed
-            if (isSuperAdmin && !dbUser.isSuperAdmin) {
-              try {
-                await prisma.user.update({
-                  where: { id: dbUser.id },
-                  data: { isSuperAdmin: true },
-                })
-              } catch (updateError) {
-                console.error('Failed to update SuperAdmin status:', updateError)
-              }
-            }
-            
             // User exists, use their data
             session.user.id = dbUser.id
             session.user.tier = dbUser.tier
-            session.user.isSuperAdmin = isSuperAdmin
+            session.user.isSuperAdmin = dbUser.isSuperAdmin
             session.user.trialEndDate = dbUser.trialEndDate
           } else {
-            // User doesn't exist yet (race condition with PrismaAdapter)
-            // Set defaults for session, adapter will create user
-            const isSuperAdmin = session.user.email === 'dibeli.my.id@gmail.com'
+            // User doesn't exist - this shouldn't happen after signIn
+            console.warn('User not found in session:', token.sub)
             
-            const trialEnd = calculateTrialEndDate(new Date())
-            
+            // Set safe defaults
             session.user.id = token.sub
-            session.user.tier = isSuperAdmin ? 'UNLIMITED' : 'TRIAL'
-            session.user.isSuperAdmin = isSuperAdmin
-            session.user.trialEndDate = trialEnd
-            
-            // User doesn't exist yet, skip update
-            // The signIn callback will handle user creation and trial setup
-            console.log('User not found in session callback, likely being created')
+            session.user.tier = 'TRIAL'
+            session.user.isSuperAdmin = false
+            session.user.trialEndDate = calculateTrialEndDate(new Date())
           }
         } catch (error) {
           console.error('Session callback error:', error)
+          
+          // Set safe defaults on error
+          session.user.id = token.sub || ''
+          session.user.tier = 'TRIAL'
+          session.user.isSuperAdmin = false
+          session.user.trialEndDate = calculateTrialEndDate(new Date())
         }
       }
       return session
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
+      // On sign in, user object is available
       if (user) {
         token.sub = user.id
+        token.email = user.email
       }
+      
+      // On update/subsequent calls, verify user still exists
+      if (trigger === 'update' || (!user && token.email)) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: token.email as string },
+          })
+          
+          if (dbUser) {
+            token.sub = dbUser.id
+          }
+        } catch (error) {
+          console.error('JWT callback error:', error)
+        }
+      }
+      
       return token
     },
   },
