@@ -187,6 +187,7 @@ model Store {
   keywords        String[]
   
   // Settings
+  templateId      String    @default("modern-minimal")
   isPublished     Boolean   @default(false)
   isPubliclyListed Boolean  @default(true)
   isFeatured      Boolean   @default(false)

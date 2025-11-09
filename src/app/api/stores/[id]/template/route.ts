@@ -48,12 +48,15 @@ export async function PUT(
     }
 
     // Update store template
-    // TODO: Add templateId field to Store model first
-    // For now, return success
+    await prisma.store.update({
+      where: { id: params.id },
+      data: { templateId },
+    })
+
     return NextResponse.json({
       success: true,
       templateId,
-      message: 'Template will be applied (pending DB migration)',
+      message: 'Template applied successfully!',
     })
   } catch (error) {
     console.error('Template update error:', error)

@@ -53,8 +53,8 @@ export default async function PublicStorePage({ params }: PageProps) {
     take: 50,
   })
 
-  // Get template (default: modern-minimal for free users)
-  const templateId = 'modern-minimal' // TODO: Get from store.templateId when we add it to model
+  // Get template from store settings
+  const templateId = store.templateId || 'modern-minimal'
   const templatePackage = getTemplatePackage(templateId)
 
   if (!templatePackage) {
