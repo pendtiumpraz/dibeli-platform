@@ -183,7 +183,7 @@ export default async function AdminPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {user.store ? (
                       <a
-                        href={`/${user.store.slug}`}
+                        href={`/toko/${user.store.slug}`}
                         target="_blank"
                         className="text-blue-600 hover:text-blue-800"
                       >
