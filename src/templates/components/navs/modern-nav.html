@@ -1,0 +1,25 @@
+<nav class="modern-nav">
+  <div class="nav-container">
+    <div class="nav-logo">
+      {{#if store.logo}}
+      <img src="{{store.logo}}" alt="{{store.name}}">
+      {{/if}}
+      <span>{{store.name}}</span>
+    </div>
+    <ul class="nav-menu">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#products">Produk</a></li>
+      <li><a href="#about">Tentang</a></li>
+      <li><a href="#contact">Kontak</a></li>
+    </ul>
+    <a href="https://wa.me/{{store.whatsappNumber}}" class="nav-cta" target="_blank">
+      <i class="fab fa-whatsapp"></i>
+      <span>Hubungi Kami</span>
+    </a>
+    <div class="hamburger" onclick="toggleMobileMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</nav>

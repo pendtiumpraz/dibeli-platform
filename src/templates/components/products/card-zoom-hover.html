@@ -1,0 +1,39 @@
+<!-- Card 24: Zoom Hover Effect -->
+<div class="product-card card-zoom-hover">
+  <div class="card-image-container">
+    <img src="{{this.image}}" alt="{{this.name}}" loading="lazy">
+    {{#if this.isNew}}
+    <div class="card-badge new">Baru</div>
+    {{/if}}
+    <div class="quick-actions">
+      <button class="action-btn" onclick="toggleWishlist(this)" title="Wishlist">
+        <i class="far fa-heart"></i>
+      </button>
+      <button class="action-btn" onclick="quickView('{{this.id}}')" title="Quick View">
+        <i class="fas fa-eye"></i>
+      </button>
+      <button class="action-btn" onclick="shareProduct('{{this.name}}')" title="Share">
+        <i class="fas fa-share-alt"></i>
+      </button>
+    </div>
+  </div>
+  <div class="card-details">
+    <div class="card-category">{{this.category}}</div>
+    <h3 class="card-title">{{this.name}}</h3>
+    {{#if this.rating}}
+    <div class="card-rating">
+      <span class="stars">★★★★★</span>
+      <span class="rating-count">({{this.reviewCount}})</span>
+    </div>
+    {{/if}}
+    <div class="card-price-box">
+      <span class="card-price">{{this.price}}</span>
+      {{#if this.stock}}
+      <span class="card-stock">{{this.stock}} tersisa</span>
+      {{/if}}
+    </div>
+    <button class="add-cart-btn" onclick="orderProduct('{{this.name}}', '{{this.price}}')" {{#unless this.isAvailable}}disabled{{/unless}}>
+      <i class="fab fa-whatsapp"></i> Beli Sekarang
+    </button>
+  </div>
+</div>

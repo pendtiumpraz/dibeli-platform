@@ -105,6 +105,17 @@ export function combineTemplate(config: TemplateConfig, data: TemplateData): str
   let css = ''
   let js = ''
 
+  // Add navigation
+  if (config.nav) {
+    const navHTML = getComponent('navs', config.nav)
+    const navCSS = getComponentCSS('navs', config.nav)
+    const navJS = getComponentJS('navs', config.nav)
+    
+    html += navHTML
+    css += navCSS
+    js += navJS
+  }
+
   // Add hero section
   if (config.hero) {
     const heroHTML = getComponent('heroes', config.hero)
@@ -172,6 +183,17 @@ ${getComponentCSS('products', config.productCard)}
   css += productsCSS
   js += productsJS
 
+  // Add footer
+  if (config.footer) {
+    const footerHTML = getComponent('footers', config.footer)
+    const footerCSS = getComponentCSS('footers', config.footer)
+    const footerJS = getComponentJS('footers', config.footer)
+    
+    html += footerHTML
+    css += footerCSS
+    js += footerJS
+  }
+
   // Render with Handlebars
   return renderTemplate(html, css, js, data)
 }
@@ -183,33 +205,65 @@ export const TEMPLATE_PACKAGES: TemplatePackage[] = [
   {
     id: 'modern-minimal',
     name: 'Modern Minimal',
-    description: 'Hero gradient dengan stats, product cards hover overlay',
+    description: 'Clean design dengan hover overlay cards - Perfect untuk pemula',
     thumbnail: 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=400&h=300&fit=crop',
     config: {
+      nav: 'modern-nav',
       hero: 'gradient-hero',
       productCard: 'card-hover-overlay',
+      footer: 'modern-footer',
     },
     tier: 'FREE',
   },
   {
     id: 'bold-interactive',
     name: 'Bold Interactive',
-    description: '3D flip cards untuk experience yang interactive',
+    description: '3D flip cards - Engaging & memorable experience',
     thumbnail: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=300&fit=crop',
     config: {
+      nav: 'modern-nav',
       hero: 'gradient-hero',
       productCard: 'card-flip-3d',
+      footer: 'modern-footer',
     },
     tier: 'PREMIUM',
   },
   {
     id: 'ecommerce-pro',
     name: 'E-Commerce Pro',
-    description: 'Multi-image slider untuk showcase produk lebih detail',
+    description: 'Multi-image slider - Showcase produk dengan detail maksimal',
     thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop',
     config: {
+      nav: 'modern-nav',
       hero: 'gradient-hero',
       productCard: 'card-image-slider',
+      footer: 'modern-footer',
+    },
+    tier: 'PREMIUM',
+  },
+  {
+    id: 'premium-zoom',
+    name: 'Premium Zoom',
+    description: 'Zoom hover dengan quick actions - Professional & feature-rich',
+    thumbnail: 'https://images.unsplash.com/photo-1555982105-d25af4182e4e?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'gradient-hero',
+      productCard: 'card-zoom-hover',
+      footer: 'modern-footer',
+    },
+    tier: 'PREMIUM',
+  },
+  {
+    id: 'luxury-glow',
+    name: 'Luxury Glow',
+    description: 'Gradient glow border - Premium & eye-catching design',
+    thumbnail: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'gradient-hero',
+      productCard: 'card-gradient-glow',
+      footer: 'modern-footer',
     },
     tier: 'PREMIUM',
   },

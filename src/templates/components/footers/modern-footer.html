@@ -1,0 +1,50 @@
+<footer class="modern-footer">
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <div class="footer-brand">
+          {{#if store.logo}}
+          <img src="{{store.logo}}" alt="{{store.name}}">
+          {{/if}}
+          <h3>{{store.name}}</h3>
+        </div>
+        {{#if store.description}}
+        <p class="footer-desc">{{store.description}}</p>
+        {{/if}}
+      </div>
+      
+      <div class="footer-section">
+        <h4>Kontak</h4>
+        <ul class="footer-links">
+          {{#if store.whatsappNumber}}
+          <li>
+            <a href="https://wa.me/{{store.whatsappNumber}}" target="_blank">
+              <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+          </li>
+          {{/if}}
+          {{#if store.address}}
+          <li>
+            <i class="fas fa-map-marker-alt"></i> {{store.address}}
+          </li>
+          {{/if}}
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Navigasi</h4>
+        <ul class="footer-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#products">Produk</a></li>
+          <li><a href="#about">Tentang Kami</a></li>
+          <li><a href="#contact">Kontak</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2024 {{store.name}}. All rights reserved.</p>
+      <p class="powered-by">Powered by <a href="https://dibeli.my.id" target="_blank">dibeli.my.id</a></p>
+    </div>
+  </div>
+</footer>

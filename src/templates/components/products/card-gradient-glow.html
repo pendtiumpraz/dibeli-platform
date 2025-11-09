@@ -1,0 +1,45 @@
+<!-- Card 26: Gradient Border Glow -->
+<div class="product-card card-gradient-glow">
+  <div class="glow-border"></div>
+  <div class="card-inner">
+    <div class="product-image">
+      <img src="{{this.image}}" alt="{{this.name}}" loading="lazy">
+      {{#if this.isNew}}
+      <div class="badge-new">New</div>
+      {{/if}}
+      <button class="heart-btn" onclick="toggleWishlist(this)">
+        <i class="far fa-heart"></i>
+      </button>
+    </div>
+    <div class="product-info">
+      <div class="product-header">
+        <h3 class="product-name">{{this.name}}</h3>
+        {{#if this.rating}}
+        <div class="product-rating">
+          <i class="fas fa-star"></i>
+          <span>{{this.rating}}</span>
+        </div>
+        {{/if}}
+      </div>
+      {{#if this.description}}
+      <p class="product-desc">{{this.description}}</p>
+      {{/if}}
+      <div class="product-footer">
+        <div class="price-tag">
+          <span class="price">{{this.price}}</span>
+          {{#if this.stock}}
+          <span class="stock-info">Stok: {{this.stock}}</span>
+          {{/if}}
+        </div>
+        <button class="buy-btn" onclick="orderProduct('{{this.name}}', '{{this.price}}')" {{#unless this.isAvailable}}disabled{{/unless}}>
+          <i class="fab fa-whatsapp"></i>
+          {{#if this.isAvailable}}
+          Beli
+          {{else}}
+          Habis
+          {{/if}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
