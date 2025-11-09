@@ -135,22 +135,27 @@ export async function uploadImageToDrive(
   const drive = await getDriveClient()
 
   try {
+    console.log(`Uploading ${fileName} (${file.size} bytes, ${file.type})`)
+    
     // Convert File to buffer
-    const buffer = Buffer.from(await file.arrayBuffer())
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    
+    // Create readable stream from buffer
+    const { Readable } = await import('stream')
+    const stream = Readable.from(buffer)
 
     const fileMetadata = {
       name: fileName,
       parents: [folderId],
     }
 
-    const media = {
-      mimeType: file.type,
-      body: require('stream').Readable.from(buffer),
-    }
-
     const response = await drive.files.create({
       requestBody: fileMetadata,
-      media: media,
+      media: {
+        mimeType: file.type,
+        body: stream,
+      },
       fields: 'id, webViewLink, webContentLink, thumbnailLink',
     })
 
