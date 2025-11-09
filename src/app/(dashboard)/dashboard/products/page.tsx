@@ -81,17 +81,46 @@ export default async function ProductsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {store.products.map((product) => (
+              {store.products.map((product) => {
+                const images = Array.isArray(product.images) ? product.images : []
+                return (
                 <tr key={product.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {product.name}
-                    </div>
-                    {product.description && (
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
-                        {product.description}
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      {/* Product Image */}
+                      {images.length > 0 ? (
+                        <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
+                          <img
+                            src={`https://drive.google.com/uc?export=view&id=${images[0]}`}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
+                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      )}
+                      
+                      {/* Product Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-900">
+                          {product.name}
+                        </div>
+                        {product.description && (
+                          <div className="text-sm text-gray-500 truncate max-w-xs">
+                            {product.description}
+                          </div>
+                        )}
+                        {images.length > 1 && (
+                          <div className="text-xs text-gray-400 mt-1">
+                            📸 {images.length} foto
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {formatPrice(product.price)}
@@ -117,7 +146,8 @@ export default async function ProductsPage() {
                     </button>
                   </td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         </div>
