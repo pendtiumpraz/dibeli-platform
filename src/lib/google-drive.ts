@@ -95,39 +95,46 @@ export async function createFolderStructure(storeName: string, productName: stri
     const rootFolderName = process.env.DRIVE_ROOT_FOLDER || 'dibeli.my.id'
     const storesFolderName = process.env.DRIVE_STORES_FOLDER || 'toko'
 
-    let rootFolder: string
+    let parentFolder: string
     
     if (rootFolderId) {
-      // Use existing folder by ID
+      // Use existing folder by ID - THIS IS THE ROOT, store folders go directly inside!
       console.log(`Using existing root folder ID: ${rootFolderId}`)
-      rootFolder = rootFolderId
+      console.log(`Store folders will be created directly inside this folder`)
+      parentFolder = rootFolderId
     } else {
-      // Find or create folder by name
-      const existingFolder = await findFolder(drive, rootFolderName)
-      if (existingFolder) {
-        rootFolder = existingFolder
+      // Auto-create structure: dibeli.my.id → toko → stores
+      const existingRoot = await findFolder(drive, rootFolderName)
+      let rootFolder: string
+      
+      if (existingRoot) {
+        rootFolder = existingRoot
         console.log(`Found existing root folder: ${rootFolderName}`)
       } else {
         rootFolder = await createFolder(drive, rootFolderName, null)
         console.log(`Created root folder: ${rootFolderName}`)
       }
+
+      // Create stores subfolder
+      let storesFolder = await findFolder(drive, storesFolderName, rootFolder)
+      if (!storesFolder) {
+        storesFolder = await createFolder(drive, storesFolderName, rootFolder)
+        console.log(`Created stores folder: ${storesFolderName}`)
+      }
+      
+      parentFolder = storesFolder
     }
 
-    // Check if stores folder exists
-    let storesFolder = await findFolder(drive, storesFolderName, rootFolder)
-    if (!storesFolder) {
-      storesFolder = await createFolder(drive, storesFolderName, rootFolder)
-      console.log(`Created stores folder: ${storesFolderName}`)
-    }
-
-    // Check if store folder exists
-    let storeFolder = await findFolder(drive, storeName, storesFolder)
+    // Check if store folder exists (directly in parentFolder)
+    let storeFolder = await findFolder(drive, storeName, parentFolder)
     if (!storeFolder) {
-      storeFolder = await createFolder(drive, storeName, storesFolder)
+      storeFolder = await createFolder(drive, storeName, parentFolder)
       console.log(`Created store folder: ${storeName}`)
+    } else {
+      console.log(`Using existing store folder: ${storeName}`)
     }
 
-    // Create product folder
+    // Create product folder inside store folder
     const productFolder = await createFolder(drive, productName, storeFolder)
     console.log(`Created product folder: ${productName}`)
 
@@ -203,17 +210,40 @@ export async function uploadImageToDrive(
 
     console.log('☁️ Uploading to Google Drive...')
     console.log(`   - Metadata:`, JSON.stringify(fileMetadata))
-    console.log(`   - Using buffer directly (${buffer.length} bytes)`)
+    console.log(`   - MimeType: ${file.type}`)
+    console.log(`   - Buffer size: ${buffer.length} bytes`)
     
-    // Upload using buffer directly (works in Edge Runtime)
+    // Upload using multipart upload with raw buffer
+    // Create multipart body manually
+    const boundary = '-------314159265358979323846'
+    const delimiter = `\r\n--${boundary}\r\n`
+    const closeDelimiter = `\r\n--${boundary}--`
+    
+    const metadata = {
+      name: fileName,
+      parents: [folderId],
+      mimeType: file.type,
+    }
+    
+    const multipartBody = Buffer.concat([
+      Buffer.from(delimiter),
+      Buffer.from('Content-Type: application/json; charset=UTF-8\r\n\r\n'),
+      Buffer.from(JSON.stringify(metadata)),
+      Buffer.from(delimiter),
+      Buffer.from(`Content-Type: ${file.type}\r\n\r\n`),
+      buffer,
+      Buffer.from(closeDelimiter),
+    ])
+    
+    console.log(`   - Multipart body size: ${multipartBody.length} bytes`)
+    
     const response = await drive.files.create({
-      requestBody: fileMetadata,
+      requestBody: metadata,
       media: {
         mimeType: file.type,
-        body: buffer.toString('base64'),
+        body: buffer,
       },
       fields: 'id, webViewLink, webContentLink, thumbnailLink',
-      uploadType: 'multipart',
     })
     
     console.log('✅ Upload response received')
