@@ -40,26 +40,34 @@ export async function createFolderStructure(storeName: string, productName: stri
   const drive = await getDriveClient()
 
   try {
+    // Get root folder name from ENV or use default
+    const rootFolderName = process.env.DRIVE_ROOT_FOLDER || 'dibeli.my.id'
+    const storesFolderName = process.env.DRIVE_STORES_FOLDER || 'toko'
+
     // Check if root folder exists
-    let rootFolder = await findFolder(drive, 'dibeli.my.id')
+    let rootFolder = await findFolder(drive, rootFolderName)
     if (!rootFolder) {
-      rootFolder = await createFolder(drive, 'dibeli.my.id', null)
+      rootFolder = await createFolder(drive, rootFolderName, null)
+      console.log(`Created root folder: ${rootFolderName}`)
     }
 
-    // Check if toko folder exists
-    let tokoFolder = await findFolder(drive, 'toko', rootFolder)
-    if (!tokoFolder) {
-      tokoFolder = await createFolder(drive, 'toko', rootFolder)
+    // Check if stores folder exists
+    let storesFolder = await findFolder(drive, storesFolderName, rootFolder)
+    if (!storesFolder) {
+      storesFolder = await createFolder(drive, storesFolderName, rootFolder)
+      console.log(`Created stores folder: ${storesFolderName}`)
     }
 
     // Check if store folder exists
-    let storeFolder = await findFolder(drive, storeName, tokoFolder)
+    let storeFolder = await findFolder(drive, storeName, storesFolder)
     if (!storeFolder) {
-      storeFolder = await createFolder(drive, storeName, tokoFolder)
+      storeFolder = await createFolder(drive, storeName, storesFolder)
+      console.log(`Created store folder: ${storeName}`)
     }
 
     // Create product folder
     const productFolder = await createFolder(drive, productName, storeFolder)
+    console.log(`Created product folder: ${productName}`)
 
     return productFolder
   } catch (error) {
