@@ -209,42 +209,56 @@ export async function uploadImageToDrive(
     }
 
     console.log('☁️ Uploading to Google Drive...')
-    console.log(`   - Metadata:`, JSON.stringify(fileMetadata))
+    console.log(`   - Folder ID: ${folderId}`)
+    console.log(`   - File name: ${fileName}`)
     console.log(`   - MimeType: ${file.type}`)
     console.log(`   - Buffer size: ${buffer.length} bytes`)
     
-    // Upload using multipart upload with raw buffer
-    // Create multipart body manually
-    const boundary = '-------314159265358979323846'
-    const delimiter = `\r\n--${boundary}\r\n`
-    const closeDelimiter = `\r\n--${boundary}--`
+    // Create axios-compatible config for upload
+    const axios = require('axios')
+    const FormData = require('form-data')
     
-    const metadata = {
+    // Get auth token from drive client
+    const auth = (drive as any).context._options.auth
+    const token = await auth.getAccessToken()
+    
+    console.log('   - Got access token for upload')
+    
+    // Create multipart form data
+    const form = new FormData()
+    
+    // Add metadata part
+    form.append('metadata', JSON.stringify({
       name: fileName,
       parents: [folderId],
       mimeType: file.type,
-    }
-    
-    const multipartBody = Buffer.concat([
-      Buffer.from(delimiter),
-      Buffer.from('Content-Type: application/json; charset=UTF-8\r\n\r\n'),
-      Buffer.from(JSON.stringify(metadata)),
-      Buffer.from(delimiter),
-      Buffer.from(`Content-Type: ${file.type}\r\n\r\n`),
-      buffer,
-      Buffer.from(closeDelimiter),
-    ])
-    
-    console.log(`   - Multipart body size: ${multipartBody.length} bytes`)
-    
-    const response = await drive.files.create({
-      requestBody: metadata,
-      media: {
-        mimeType: file.type,
-        body: buffer,
-      },
-      fields: 'id, webViewLink, webContentLink, thumbnailLink',
+    }), {
+      contentType: 'application/json; charset=UTF-8',
     })
+    
+    // Add file part
+    form.append('file', buffer, {
+      filename: fileName,
+      contentType: file.type,
+    })
+    
+    console.log('   - Uploading via multipart/form-data...')
+    
+    // Upload using axios directly
+    const uploadResponse = await axios.post(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink,webContentLink,thumbnailLink',
+      form,
+      {
+        headers: {
+          ...form.getHeaders(),
+          'Authorization': `Bearer ${token.token}`,
+        },
+      }
+    )
+    
+    const response = {
+      data: uploadResponse.data
+    }
     
     console.log('✅ Upload response received')
     console.log(`   - File ID: ${response.data.id}`)
