@@ -62,8 +62,64 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const body = await request.json()
-    const { name, description, price, stock, isAvailable } = body
+    const contentType = request.headers.get('content-type')
+    let name, description, price, stock, isAvailable, existingImages, deletedImages
+    let newImageFiles: File[] = []
+
+    if (contentType?.includes('multipart/form-data')) {
+      // Handle FormData (with new images)
+      const formData = await request.formData()
+      name = formData.get('name') as string
+      description = formData.get('description') as string
+      price = parseFloat(formData.get('price') as string)
+      stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : null
+      isAvailable = formData.get('isAvailable') === 'true'
+      existingImages = JSON.parse(formData.get('existingImages') as string || '[]')
+      deletedImages = JSON.parse(formData.get('deletedImages') as string || '[]')
+
+      // Get new image files
+      const images = formData.getAll('images')
+      newImageFiles = images.filter((file): file is File => file instanceof File && file.size > 0)
+    } else {
+      // Handle JSON (no new images)
+      const body = await request.json()
+      name = body.name
+      description = body.description
+      price = body.price
+      stock = body.stock
+      isAvailable = body.isAvailable
+      existingImages = body.existingImages || []
+      deletedImages = body.deletedImages || []
+    }
+
+    // Upload new images to Drive
+    const newImageIds: string[] = []
+    if (newImageFiles.length > 0) {
+      try {
+        console.log(`Uploading ${newImageFiles.length} new images to Google Drive...`)
+        const { createFolderStructure, uploadImageToDrive } = await import('@/lib/google-drive')
+        
+        const productSlug = name.toLowerCase().replace(/\s+/g, '-')
+        const folderId = await createFolderStructure(product.store.name, productSlug)
+        
+        for (let i = 0; i < newImageFiles.length; i++) {
+          const file = newImageFiles[i]
+          if (file.size > 0) {
+            const fileName = `${productSlug}-${Date.now()}-${i + 1}.${file.name.split('.').pop()}`
+            const uploadedFile = await uploadImageToDrive(file, folderId, fileName)
+            newImageIds.push(uploadedFile.id)
+          }
+        }
+        
+        console.log(`✅ Uploaded ${newImageIds.length} new images`)
+      } catch (driveError) {
+        console.error('❌ Google Drive upload failed:', driveError)
+        // Continue without new images
+      }
+    }
+
+    // Combine existing images (not deleted) with new images
+    const finalImages = [...existingImages, ...newImageIds]
 
     const updatedProduct = await prisma.product.update({
       where: { id: params.id },
@@ -74,6 +130,7 @@ export async function PUT(
         stock,
         isAvailable,
         slug: name.toLowerCase().replace(/\s+/g, '-'),
+        images: finalImages,
       },
     })
 

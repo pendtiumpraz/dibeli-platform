@@ -8,6 +8,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [product, setProduct] = useState<any>(null)
   const [formData, setFormData] = useState({
     name: '',
@@ -16,6 +17,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     stock: '',
     isAvailable: true,
   })
+  const [newImages, setNewImages] = useState<File[]>([])
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [existingImages, setExistingImages] = useState<string[]>([])
+  const [deletedImages, setDeletedImages] = useState<string[]>([])
 
   useEffect(() => {
     fetchProduct()
@@ -34,6 +39,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           stock: data.stock?.toString() || '',
           isAvailable: data.isAvailable,
         })
+        // Set existing images
+        if (data.images && Array.isArray(data.images)) {
+          setExistingImages(data.images)
+        }
       }
     } catch (error) {
       console.error(error)
@@ -42,34 +51,97 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     }
   }
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    const fileArray = Array.from(files)
+    setNewImages((prev) => [...prev, ...fileArray])
+
+    // Create previews
+    fileArray.forEach((file) => {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreviews((prev) => [...prev, reader.result as string])
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const removeNewImage = (index: number) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== index))
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const removeExistingImage = (imageId: string) => {
+    setExistingImages((prev) => prev.filter((id) => id !== imageId))
+    setDeletedImages((prev) => [...prev, imageId])
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
+    setUploading(true)
 
     try {
-      const res = await fetch(`/api/products/${params.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          price: parseFloat(formData.price),
-          stock: formData.stock ? parseInt(formData.stock) : null,
-        }),
-      })
+      // If there are new images, use FormData
+      if (newImages.length > 0) {
+        const formDataToSend = new FormData()
+        formDataToSend.append('name', formData.name)
+        formDataToSend.append('description', formData.description)
+        formDataToSend.append('price', formData.price)
+        formDataToSend.append('stock', formData.stock)
+        formDataToSend.append('isAvailable', formData.isAvailable.toString())
+        formDataToSend.append('existingImages', JSON.stringify(existingImages))
+        formDataToSend.append('deletedImages', JSON.stringify(deletedImages))
 
-      if (res.ok) {
-        alert('Produk berhasil diupdate! ✅')
-        router.push('/dashboard/products')
-        router.refresh()
+        // Add new image files
+        newImages.forEach((file) => {
+          formDataToSend.append('images', file)
+        })
+
+        const res = await fetch(`/api/products/${params.id}`, {
+          method: 'PUT',
+          body: formDataToSend,
+        })
+
+        if (res.ok) {
+          alert('Produk & foto berhasil diupdate! ✅')
+          router.push('/dashboard/products')
+          router.refresh()
+        } else {
+          const error = await res.json()
+          alert(error.error || 'Failed to update product')
+        }
       } else {
-        const error = await res.json()
-        alert(error.error || 'Failed to update product')
+        // No new images, just JSON
+        const res = await fetch(`/api/products/${params.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...formData,
+            price: parseFloat(formData.price),
+            stock: formData.stock ? parseInt(formData.stock) : null,
+            existingImages,
+            deletedImages,
+          }),
+        })
+
+        if (res.ok) {
+          alert('Produk berhasil diupdate! ✅')
+          router.push('/dashboard/products')
+          router.refresh()
+        } else {
+          const error = await res.json()
+          alert(error.error || 'Failed to update product')
+        }
       }
     } catch (error) {
       console.error(error)
       alert('Error updating product')
     } finally {
       setSaving(false)
+      setUploading(false)
     }
   }
 
@@ -99,44 +171,109 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 space-y-6">
-        {/* Show existing images */}
-        {product.images && product.images.length > 0 && (
+        {/* Existing images */}
+        {existingImages.length > 0 && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Foto Produk ({product.images.length})
+              Foto Saat Ini ({existingImages.length})
             </label>
             <div className="grid grid-cols-3 gap-4">
-              {product.images.map((imageId: string, index: number) => (
-                <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
+              {existingImages.map((imageId: string, index: number) => (
+                <div key={imageId} className="relative aspect-square rounded-lg overflow-hidden border-2 border-gray-200">
                   <img
                     src={`https://drive.google.com/uc?export=view&id=${imageId}`}
-                    alt={`${product.name} ${index + 1}`}
+                    alt={`Foto ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                    {index + 1}/{product.images.length}
+                    {index + 1}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => removeExistingImage(imageId)}
+                    className="absolute bottom-2 right-2 bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-full"
+                    title="Hapus foto"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              💡 Upload foto baru belum didukung. Untuk ganti foto, buat produk baru.
-            </p>
           </div>
         )}
 
-        {/* No images warning */}
-        {(!product.images || product.images.length === 0) && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-yellow-800">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              <span className="text-sm font-medium">Produk ini belum ada foto</span>
+        {/* New images preview */}
+        {imagePreviews.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Foto Baru ({imagePreviews.length})
+            </label>
+            <div className="grid grid-cols-3 gap-4">
+              {imagePreviews.map((preview: string, index: number) => (
+                <div key={index} className="relative aspect-square rounded-lg overflow-hidden border-2 border-green-500">
+                  <img
+                    src={preview}
+                    alt={`New ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                    NEW
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeNewImage(index)}
+                    className="absolute bottom-2 right-2 bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-full"
+                    title="Hapus foto"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
             </div>
-            <p className="text-sm text-yellow-700 mt-1">
-              Foto produk tidak terupload ke Google Drive. Cek Vercel logs atau coba buat produk baru dengan foto.
-            </p>
+          </div>
+        )}
+
+        {/* Upload new images */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {existingImages.length > 0 ? 'Tambah Foto Lagi' : 'Upload Foto Produk'}
+          </label>
+          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-purple-500 transition-colors">
+            <div className="space-y-1 text-center">
+              <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div className="flex text-sm text-gray-600">
+                <label className="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500">
+                  <span>Upload foto</span>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="sr-only"
+                  />
+                </label>
+                <p className="pl-1">atau drag and drop</p>
+              </div>
+              <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+            </div>
+          </div>
+        </div>
+
+        {uploading && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-blue-800">
+              <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span className="text-sm font-medium">Uploading foto ke Google Drive...</span>
+            </div>
           </div>
         )}
 
@@ -209,13 +346,24 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         </div>
 
         <div className="flex gap-4">
-          <Button type="submit" disabled={saving} className="flex-1">
-            {saving ? 'Menyimpan...' : 'Update Produk'}
+          <Button type="submit" disabled={saving || uploading} className="flex-1">
+            {uploading ? 'Uploading foto...' : saving ? 'Menyimpan...' : 'Update Produk'}
           </Button>
-          <Button type="button" variant="outline" onClick={() => router.back()}>
+          <Button type="button" variant="outline" onClick={() => router.back()} disabled={saving || uploading}>
             Batal
           </Button>
         </div>
+
+        {newImages.length > 0 && (
+          <p className="text-sm text-gray-600">
+            💡 {newImages.length} foto baru akan diupload ke Google Drive
+          </p>
+        )}
+        {deletedImages.length > 0 && (
+          <p className="text-sm text-red-600">
+            🗑️ {deletedImages.length} foto akan dihapus
+          </p>
+        )}
       </form>
     </div>
   )
