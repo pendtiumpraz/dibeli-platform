@@ -61,23 +61,40 @@ export async function POST(req: Request) {
       if (imageFiles.length > 0) {
         console.log(`Uploading ${imageFiles.length} images to Google Drive...`)
         
-        // Create folder structure in Drive
-        const productSlug = name.toLowerCase().replace(/\s+/g, '-')
-        const folderId = await createFolderStructure(store.name, productSlug)
-        
-        // Upload each image
-        for (let i = 0; i < imageFiles.length; i++) {
-          const file = imageFiles[i]
-          if (file.size > 0) {
-            const fileName = `${productSlug}-${i + 1}.${file.name.split('.').pop()}`
-            const uploadedFile = await uploadImageToDrive(file, folderId, fileName)
+        try {
+          // Create folder structure in Drive
+          const productSlug = name.toLowerCase().replace(/\s+/g, '-')
+          console.log(`Creating folder structure for: ${store.name}/${productSlug}`)
+          
+          const folderId = await createFolderStructure(store.name, productSlug)
+          console.log(`Folder created with ID: ${folderId}`)
+          
+          // Upload each image
+          for (let i = 0; i < imageFiles.length; i++) {
+            const file = imageFiles[i]
+            console.log(`Processing image ${i + 1}: ${file.name} (${file.size} bytes)`)
             
-            // Store Drive file ID (we'll construct URL when displaying)
-            images.push(uploadedFile.id)
+            if (file.size > 0) {
+              const fileName = `${productSlug}-${i + 1}.${file.name.split('.').pop()}`
+              console.log(`Uploading as: ${fileName}`)
+              
+              const uploadedFile = await uploadImageToDrive(file, folderId, fileName)
+              console.log(`Uploaded successfully, ID: ${uploadedFile.id}`)
+              
+              // Store Drive file ID (we'll construct URL when displaying)
+              images.push(uploadedFile.id)
+            }
           }
+          
+          console.log(`✅ Uploaded ${images.length} images successfully`)
+        } catch (driveError) {
+          console.error('❌ Google Drive upload failed:', driveError)
+          console.error('Error details:', driveError instanceof Error ? driveError.message : 'Unknown error')
+          console.error('Stack:', driveError instanceof Error ? driveError.stack : '')
+          
+          // Continue without images if Drive fails
+          console.log('⚠️ Product will be created without images')
         }
-        
-        console.log(`Uploaded ${images.length} images successfully`)
       }
     } else {
       // JSON body (no images)

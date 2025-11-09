@@ -4,36 +4,52 @@ import { authOptions } from './auth'
 import { prisma } from './prisma'
 
 export async function getDriveClient() {
-  const session = await getServerSession(authOptions)
-  
-  if (!session?.user?.email) {
-    throw new Error('Not authenticated')
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.email) {
+      throw new Error('Not authenticated')
+    }
+
+    console.log(`Getting Drive client for user: ${session.user.email}`)
+
+    // Get user's OAuth tokens from database
+    const account = await prisma.account.findFirst({
+      where: {
+        userId: session.user.id,
+        provider: 'google',
+      },
+    })
+
+    if (!account) {
+      throw new Error('No Google account linked. Please re-login with Google.')
+    }
+
+    if (!account.access_token) {
+      throw new Error('No Google access token found. Please re-login.')
+    }
+
+    console.log('OAuth tokens found, creating Drive client...')
+
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.NEXTAUTH_URL + '/api/auth/callback/google'
+    )
+
+    oauth2Client.setCredentials({
+      access_token: account.access_token,
+      refresh_token: account.refresh_token,
+    })
+
+    const drive = google.drive({ version: 'v3', auth: oauth2Client })
+    console.log('Drive client created successfully')
+    
+    return drive
+  } catch (error) {
+    console.error('Failed to get Drive client:', error)
+    throw error
   }
-
-  // Get user's OAuth tokens from database
-  const account = await prisma.account.findFirst({
-    where: {
-      userId: session.user.id,
-      provider: 'google',
-    },
-  })
-
-  if (!account?.access_token) {
-    throw new Error('No Google access token found')
-  }
-
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.NEXTAUTH_URL + '/api/auth/callback/google'
-  )
-
-  oauth2Client.setCredentials({
-    access_token: account.access_token,
-    refresh_token: account.refresh_token,
-  })
-
-  return google.drive({ version: 'v3', auth: oauth2Client })
 }
 
 export async function createFolderStructure(storeName: string, productName: string) {
