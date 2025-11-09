@@ -37,12 +37,25 @@ export default function TemplateMarketplace({
   }
 
   const handlePreview = (templateId: string) => {
+    // Preview available for ALL users (even if locked)
     setPreviewUrl(`/api/template-render-test?templateId=${templateId}`)
   }
 
   const handleApplyTemplate = async (templateId: string) => {
-    if (!canUseTemplate(templates.find((t) => t.id === templateId)!)) {
-      alert('Upgrade to PREMIUM to use this template!')
+    const template = templates.find((t) => t.id === templateId)
+    
+    if (!template) {
+      alert('Template not found!')
+      return
+    }
+    
+    // Check tier restrictions
+    if (!canUseTemplate(template)) {
+      if (template.tier === 'UNLIMITED') {
+        alert('⚡ Template UNLIMITED!\n\nUpgrade ke UNLIMITED tier untuk gunakan template eksklusif ini.')
+      } else {
+        alert('💎 Template PREMIUM!\n\nUpgrade ke PREMIUM tier untuk gunakan template ini.')
+      }
       return
     }
 
@@ -188,22 +201,37 @@ export default function TemplateMarketplace({
                 <div className="flex gap-2">
                   <button
                     onClick={() => handlePreview(template.id)}
-                    className="flex-1 px-4 py-2 border-2 border-purple-600 text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-all"
+                    className="flex-1 px-4 py-2 border-2 border-purple-600 text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-all flex items-center justify-center gap-2"
+                    title="Preview template dengan data toko Anda"
                   >
+                    <i className="fas fa-eye"></i>
                     Preview
                   </button>
                   <button
                     onClick={() => handleApplyTemplate(template.id)}
                     disabled={isLocked || isActive}
-                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
                       isActive
                         ? 'bg-green-500 text-white cursor-default'
                         : isLocked
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         : 'bg-gradient-to-r from-purple-600 to-green-600 text-white hover:shadow-lg'
                     }`}
+                    title={isActive ? 'Template sedang aktif' : isLocked ? 'Upgrade untuk unlock' : 'Gunakan template ini'}
                   >
-                    {isActive ? 'Active' : isLocked ? 'Locked' : 'Apply'}
+                    {isActive ? (
+                      <>
+                        <i className="fas fa-check"></i> Active
+                      </>
+                    ) : isLocked ? (
+                      <>
+                        <i className="fas fa-lock"></i> Locked
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-download"></i> Apply
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -236,18 +264,38 @@ export default function TemplateMarketplace({
         </div>
       )}
 
-      {/* Upgrade CTA */}
-      {userTier === 'GRATIS' && (
-        <div className="mt-12 bg-gradient-to-r from-purple-600 to-green-600 rounded-xl p-8 text-white text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Unlock All Premium Templates
-          </h2>
-          <p className="text-lg mb-6 opacity-95">
-            Upgrade to Premium dan dapatkan akses ke semua template professional!
-          </p>
-          <button className="px-8 py-4 bg-white text-purple-600 rounded-lg font-bold text-lg hover:shadow-2xl transition-all">
-            Upgrade Now - Rp 99.000/bulan
-          </button>
+      {/* Upgrade CTAs */}
+      {userTier !== 'UNLIMITED' && (
+        <div className="mt-12 space-y-6">
+          {userTier === 'TRIAL' || userTier === 'FREE' ? (
+            <div className="bg-gradient-to-r from-purple-600 to-green-600 rounded-xl p-8 text-white text-center">
+              <div className="text-5xl mb-4">💎</div>
+              <h2 className="text-3xl font-bold mb-4">
+                Unlock 10 Premium Templates
+              </h2>
+              <p className="text-lg mb-6 opacity-95 max-w-2xl mx-auto">
+                Upgrade ke PREMIUM dan dapatkan akses ke 10 template professional untuk bikin dagangan kamu LAKU!
+              </p>
+              <button className="px-8 py-4 bg-white text-purple-600 rounded-lg font-bold text-lg hover:shadow-2xl transition-all">
+                Upgrade to PREMIUM - Rp 99.000/bulan
+              </button>
+            </div>
+          ) : null}
+          
+          {userTier === 'PREMIUM' && (
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-8 text-white text-center">
+              <div className="text-5xl mb-4">⚡</div>
+              <h2 className="text-3xl font-bold mb-4">
+                Unlock 5 Ultimate Exclusive Templates
+              </h2>
+              <p className="text-lg mb-6 opacity-95 max-w-2xl mx-auto">
+                Upgrade ke UNLIMITED dan dapatkan akses ke semua template eksklusif dengan kombinasi terbaik!
+              </p>
+              <button className="px-8 py-4 bg-white text-purple-600 rounded-lg font-bold text-lg hover:shadow-2xl transition-all">
+                Upgrade to UNLIMITED - Rp 299.000/bulan
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
