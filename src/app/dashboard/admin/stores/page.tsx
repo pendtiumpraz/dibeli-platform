@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import AdminLayout from '@/components/AdminLayout'
+import { ToggleStoreActiveButton } from '@/components/ToggleStoreActiveButton'
 
 export default async function AdminStoresPage() {
   const session = await getServerSession(authOptions)
@@ -164,42 +165,60 @@ export default async function AdminStoresPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(store.createdAt).toLocaleDateString('id-ID')}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <a
-                        href={`/${store.slug}`}
-                        target="_blank"
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        View
-                      </a>
-                      <form
-                        action="/api/admin/stores/toggle-featured"
-                        method="POST"
-                        className="inline"
-                      >
-                        <input type="hidden" name="storeId" value={store.id} />
-                        <input type="hidden" name="isFeatured" value={(!store.isFeatured).toString()} />
-                        <button
-                          type="submit"
-                          className="text-purple-600 hover:text-purple-900"
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col gap-2">
+                        <a
+                          href={`/toko/${store.slug}`}
+                          target="_blank"
+                          className="text-blue-600 hover:text-blue-900 text-sm"
                         >
-                          {store.isFeatured ? 'Unfeature' : 'Feature'}
-                        </button>
-                      </form>
-                      <form
-                        action="/api/admin/stores/toggle-public"
-                        method="POST"
-                        className="inline"
-                      >
-                        <input type="hidden" name="storeId" value={store.id} />
-                        <input type="hidden" name="isPubliclyListed" value={(!store.isPubliclyListed).toString()} />
-                        <button
-                          type="submit"
-                          className={store.isPubliclyListed ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}
+                          👁️ Lihat Toko
+                        </a>
+                        
+                        <ToggleStoreActiveButton 
+                          storeId={store.id}
+                          storeName={store.name}
+                          isPublished={store.isPublished}
+                        />
+                        
+                        <form
+                          action="/api/admin/stores/toggle-featured"
+                          method="POST"
+                          className="inline"
                         >
-                          {store.isPubliclyListed ? 'Hide' : 'Show'}
-                        </button>
-                      </form>
+                          <input type="hidden" name="storeId" value={store.id} />
+                          <input type="hidden" name="isFeatured" value={(!store.isFeatured).toString()} />
+                          <button
+                            type="submit"
+                            className={`w-full px-3 py-1 rounded-lg text-sm font-semibold transition-colors ${
+                              store.isFeatured
+                                ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {store.isFeatured ? '⭐ Featured' : '☆ Set Featured'}
+                          </button>
+                        </form>
+                        
+                        <form
+                          action="/api/admin/stores/toggle-public"
+                          method="POST"
+                          className="inline"
+                        >
+                          <input type="hidden" name="storeId" value={store.id} />
+                          <input type="hidden" name="isPubliclyListed" value={(!store.isPubliclyListed).toString()} />
+                          <button
+                            type="submit"
+                            className={`w-full px-3 py-1 rounded-lg text-sm font-semibold transition-colors ${
+                              store.isPubliclyListed
+                                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {store.isPubliclyListed ? '🌐 Public' : '🔒 Private'}
+                          </button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 ))}
