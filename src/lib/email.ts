@@ -1,15 +1,30 @@
 import nodemailer from 'nodemailer'
 
-// Create reusable transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-})
+// Create reusable transporter (optional - email notifications)
+function getTransporter() {
+  // Skip if SMTP not configured
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log('SMTP not configured, email notifications disabled')
+    return null
+  }
+
+  try {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000,
+    })
+  } catch (error) {
+    console.error('Failed to create email transporter:', error)
+    return null
+  }
+}
 
 interface EmailOptions {
   to: string
@@ -20,6 +35,13 @@ interface EmailOptions {
 
 export async function sendEmail({ to, subject, html, text }: EmailOptions) {
   try {
+    const transporter = getTransporter()
+    
+    if (!transporter) {
+      console.log('Email skipped (SMTP not configured)')
+      return { success: false, error: 'SMTP not configured' }
+    }
+
     const info = await transporter.sendMail({
       from: process.env.SMTP_FROM || 'dibeli.my.id <noreply@dibeli.my.id>',
       to,
@@ -32,7 +54,8 @@ export async function sendEmail({ to, subject, html, text }: EmailOptions) {
     return { success: true, messageId: info.messageId }
   } catch (error) {
     console.error('Email error:', error)
-    return { success: false, error }
+    // Don't throw, just log and return
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
   }
 }
 
