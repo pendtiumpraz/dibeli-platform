@@ -94,10 +94,6 @@ export default async function ProductsPage() {
                             src={`https://drive.google.com/thumbnail?id=${images[0]}&sz=w200`}
                             alt={product.name}
                             className="w-full h-full object-cover"
-                            onError={(e) => {
-                              // Fallback to direct link if thumbnail fails
-                              e.currentTarget.src = `https://lh3.googleusercontent.com/d/${images[0]}=w200`
-                            }}
                           />
                         </div>
                       ) : (
