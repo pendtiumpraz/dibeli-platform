@@ -1,0 +1,40 @@
+<section class="hero carousel-hero">
+  <div class="carousel-hero-content">
+    <div class="carousel-text">
+      <div class="hero-badge">{{store.badge}}</div>
+      <h1 class="carousel-title">{{store.heroTitle}}</h1>
+      <p class="carousel-subtitle">{{store.heroSubtitle}}</p>
+      <div class="hero-buttons">
+        <a href="#products" class="btn btn-primary">Lihat Produk</a>
+        <a href="https://wa.me/{{store.whatsappNumber}}" class="btn btn-secondary" target="_blank">
+          <i class="fab fa-whatsapp"></i> Hubungi Kami
+        </a>
+      </div>
+    </div>
+    
+    <div class="products-carousel">
+      <button class="carousel-btn prev" onclick="prevCarousel()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="carousel-track">
+        {{#each products}}
+        <div class="carousel-item {{#if @first}}active{{/if}}">
+          <img src="{{this.image}}" alt="{{this.name}}">
+          <div class="carousel-caption">
+            <h3>{{this.name}}</h3>
+            <p>{{this.price}}</p>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      <button class="carousel-btn next" onclick="nextCarousel()">
+        <i class="fas fa-arrow-right"></i>
+      </button>
+      <div class="carousel-dots">
+        {{#each products}}
+        <span class="carousel-dot {{#if @first}}active{{/if}}" onclick="goToCarousel({{@index}})"></span>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</section>

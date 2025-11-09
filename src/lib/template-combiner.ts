@@ -267,6 +267,32 @@ export const TEMPLATE_PACKAGES: TemplatePackage[] = [
     },
     tier: 'PREMIUM',
   },
+  {
+    id: 'carousel-showcase',
+    name: 'Carousel Showcase',
+    description: 'Carousel hero dengan product showcase - Dynamic & engaging',
+    thumbnail: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'carousel-hero',
+      productCard: 'card-hover-overlay',
+      footer: 'modern-footer',
+    },
+    tier: 'PREMIUM',
+  },
+  {
+    id: 'split-modern',
+    name: 'Split Modern',
+    description: 'Split hero dengan image grid - Contemporary & stylish',
+    thumbnail: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop',
+    config: {
+      nav: 'modern-nav',
+      hero: 'split-hero',
+      productCard: 'card-gradient-glow',
+      footer: 'modern-footer',
+    },
+    tier: 'PREMIUM',
+  },
 ]
 
 /**

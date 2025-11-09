@@ -1,0 +1,58 @@
+<section class="hero split-hero">
+  <div class="split-hero-container">
+    <div class="split-hero-left">
+      <div class="hero-badge">{{store.badge}}</div>
+      <h1 class="split-hero-title">{{store.heroTitle}}</h1>
+      <p class="split-hero-subtitle">{{store.heroSubtitle}}</p>
+      
+      {{#if store.showStats}}
+      <div class="split-hero-stats">
+        <div class="stat-item">
+          <h3>{{store.stats.products}}+</h3>
+          <p>Produk</p>
+        </div>
+        <div class="stat-item">
+          <h3>{{store.stats.customers}}+</h3>
+          <p>Pelanggan</p>
+        </div>
+        <div class="stat-item">
+          <h3>{{store.stats.rating}}</h3>
+          <p>Rating</p>
+        </div>
+      </div>
+      {{/if}}
+      
+      <div class="hero-buttons">
+        <a href="#products" class="btn btn-primary">Lihat Produk</a>
+        <a href="https://wa.me/{{store.whatsappNumber}}" class="btn btn-secondary" target="_blank">
+          <i class="fab fa-whatsapp"></i> Hubungi Kami
+        </a>
+      </div>
+    </div>
+    
+    <div class="split-hero-right">
+      <div class="hero-image-grid">
+        {{#each products}}
+        {{#if (eq @index 0)}}
+        <div class="grid-image large">
+          <img src="{{this.image}}" alt="{{this.name}}">
+          {{#if this.isNew}}
+          <div class="image-badge">New</div>
+          {{/if}}
+        </div>
+        {{/if}}
+        {{#if (eq @index 1)}}
+        <div class="grid-image medium">
+          <img src="{{this.image}}" alt="{{this.name}}">
+        </div>
+        {{/if}}
+        {{#if (eq @index 2)}}
+        <div class="grid-image small">
+          <img src="{{this.image}}" alt="{{this.name}}">
+        </div>
+        {{/if}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</section>
