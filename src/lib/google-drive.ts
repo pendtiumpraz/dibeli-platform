@@ -14,7 +14,7 @@ export async function getDriveClient() {
     console.log(`Getting Drive client for user: ${session.user.email}`)
 
     // Get user's OAuth tokens from database
-    const account = await prisma.account.findFirst({
+    let account = await prisma.account.findFirst({
       where: {
         userId: session.user.id,
         provider: 'google',
@@ -29,7 +29,7 @@ export async function getDriveClient() {
       throw new Error('No Google access token found. Please re-login.')
     }
 
-    console.log('OAuth tokens found, creating Drive client...')
+    console.log('OAuth tokens found, checking expiry...')
 
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
@@ -41,6 +41,38 @@ export async function getDriveClient() {
       access_token: account.access_token,
       refresh_token: account.refresh_token,
     })
+
+    // Check if token is expired and refresh if needed
+    const now = Math.floor(Date.now() / 1000)
+    if (account.expires_at && account.expires_at < now) {
+      console.log('Access token expired, refreshing...')
+      
+      try {
+        const { credentials } = await oauth2Client.refreshAccessToken()
+        console.log('Token refreshed successfully')
+        
+        // Update account with new token
+        account = await prisma.account.update({
+          where: { id: account.id },
+          data: {
+            access_token: credentials.access_token,
+            expires_at: credentials.expiry_date ? Math.floor(credentials.expiry_date / 1000) : null,
+            refresh_token: credentials.refresh_token || account.refresh_token, // Keep old if not provided
+          },
+        })
+        
+        // Update oauth client with new token
+        oauth2Client.setCredentials({
+          access_token: credentials.access_token,
+          refresh_token: credentials.refresh_token || account.refresh_token,
+        })
+      } catch (refreshError) {
+        console.error('Failed to refresh token:', refreshError)
+        throw new Error('Token expired and refresh failed. Please logout and login again.')
+      }
+    } else {
+      console.log('Access token still valid')
+    }
 
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
     console.log('Drive client created successfully')
