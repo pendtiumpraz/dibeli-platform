@@ -1,7 +1,9 @@
 /**
  * Template Renderer - Convert template variables to real data
- * Supports Handlebars-style syntax: {{variable}} and {{#each}}
+ * Uses Handlebars for proper template parsing
  */
+
+import Handlebars from 'handlebars'
 
 export interface TemplateData {
   store: {
@@ -42,114 +44,23 @@ export interface TemplateData {
 }
 
 /**
- * Simple template variable replacement
- * Supports: {{store.name}}, {{product.price}}, etc
+ * Register Handlebars helpers
  */
-export function replaceVariables(
-  template: string,
-  data: TemplateData
-): string {
-  let result = template
-
-  // Replace store variables
-  result = result.replace(/\{\{store\.(\w+)\}\}/g, (match, key) => {
-    return (data.store as any)[key] || ''
-  })
-
-  // Replace theme variables
-  result = result.replace(/\{\{theme\.(\w+)\}\}/g, (match, key) => {
-    return (data.theme as any)[key] || ''
-  })
-
-  return result
-}
-
-/**
- * Process each loop for products
- * Supports: {{#each products}} ... {{/each}}
- */
-export function processProductLoop(
-  template: string,
-  products: TemplateData['products']
-): string {
-  const eachRegex = /\{\{#each products\}\}([\s\S]*?)\{\{\/each\}\}/g
-  
-  return template.replace(eachRegex, (match, loopContent) => {
-    return products.map((product, index) => {
-      let itemHtml = loopContent
-      
-      // Replace product variables
-      itemHtml = itemHtml.replace(/\{\{this\.(\w+)\}\}/g, (m: string, key: string) => {
-        return (product as any)[key] || ''
-      })
-      
-      // Replace index
-      itemHtml = itemHtml.replace(/\{\{@index\}\}/g, index.toString())
-      
-      // Handle conditional: {{#if this.isNew}}
-      itemHtml = itemHtml.replace(
-        /\{\{#if this\.(\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g,
-        (m: string, key: string, content: string) => {
-          return (product as any)[key] ? content : ''
-        }
-      )
-      
-      return itemHtml
-    }).join('')
-  })
-}
-
-/**
- * Apply theme CSS variables
- */
-export function applyThemeVariables(
-  css: string,
-  theme: TemplateData['theme']
-): string {
-  let result = css
-  
-  // Replace CSS variables
-  const replacements: Record<string, string> = {
-    '--primary-color': theme.primaryColor,
-    '--secondary-color': theme.secondaryColor,
-    '--accent-color': theme.accentColor,
-    '--bg-color': theme.backgroundColor,
-    '--text-color': theme.textColor,
-    '--font-family': theme.fontFamily,
-    '--heading-font': theme.headingFont,
-    '--border-radius': theme.borderRadius,
-  }
-  
-  Object.entries(replacements).forEach(([key, value]) => {
-    const regex = new RegExp(`var\\(${key}(?:,\\s*[^)]+)?\\)`, 'g')
-    result = result.replace(regex, value)
+function registerHelpers() {
+  // Helper for comparing values
+  Handlebars.registerHelper('eq', function(a, b) {
+    return a === b
   })
   
-  return result
-}
-
-/**
- * Apply theme to JavaScript
- */
-export function applyThemeToJS(
-  js: string,
-  data: TemplateData
-): string {
-  let result = js
-  
-  // Replace WhatsApp number
-  result = result.replace(/\{\{store\.whatsappNumber\}\}/g, data.store.whatsappNumber)
-  result = result.replace(/\{\{whatsappNumber\}\}/g, data.store.whatsappNumber)
-  
-  // Replace store name
-  result = result.replace(/\{\{store\.name\}\}/g, data.store.name)
-  
-  return result
+  // Helper for formatting currency
+  Handlebars.registerHelper('currency', function(value) {
+    return formatPriceRupiah(value)
+  })
 }
 
 /**
  * Main render function
- * Combines HTML, CSS, JS with data
+ * Combines HTML, CSS, JS with data using Handlebars
  */
 export function renderTemplate(
   html: string,
@@ -157,17 +68,27 @@ export function renderTemplate(
   js: string,
   data: TemplateData
 ): string {
-  // Process product loops first
-  let processedHtml = processProductLoop(html, data.products)
+  // Register helpers
+  registerHelpers()
   
-  // Replace simple variables
-  processedHtml = replaceVariables(processedHtml, data)
+  // Compile HTML template with Handlebars
+  const htmlTemplate = Handlebars.compile(html)
+  const processedHtml = htmlTemplate(data)
   
-  // Apply theme to CSS
-  const processedCss = applyThemeVariables(css, data.theme)
+  // Apply theme to CSS (replace var() with actual values)
+  let processedCss = css
+  processedCss = processedCss.replace(/var\(--primary-color[^)]*\)/g, data.theme.primaryColor)
+  processedCss = processedCss.replace(/var\(--secondary-color[^)]*\)/g, data.theme.secondaryColor)
+  processedCss = processedCss.replace(/var\(--accent-color[^)]*\)/g, data.theme.accentColor)
+  processedCss = processedCss.replace(/var\(--bg-color[^)]*\)/g, data.theme.backgroundColor)
+  processedCss = processedCss.replace(/var\(--text-color[^)]*\)/g, data.theme.textColor)
+  processedCss = processedCss.replace(/var\(--font-family[^)]*\)/g, data.theme.fontFamily)
+  processedCss = processedCss.replace(/var\(--heading-font[^)]*\)/g, data.theme.headingFont)
+  processedCss = processedCss.replace(/var\(--border-radius[^)]*\)/g, data.theme.borderRadius)
   
-  // Apply theme to JS
-  const processedJs = applyThemeToJS(js, data)
+  // Apply data to JS (compile with Handlebars)
+  const jsTemplate = Handlebars.compile(js)
+  const processedJs = jsTemplate(data)
   
   // Combine everything
   return `
