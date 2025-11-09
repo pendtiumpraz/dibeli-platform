@@ -181,9 +181,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
               {existingImages.map((imageId: string, index: number) => (
                 <div key={imageId} className="relative aspect-square rounded-lg overflow-hidden border-2 border-gray-200">
                   <img
-                    src={`https://drive.google.com/uc?export=view&id=${imageId}`}
+                    src={`https://drive.google.com/thumbnail?id=${imageId}&sz=w500`}
                     alt={`Foto ${index + 1}`}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to Googleusercontent if thumbnail fails
+                      e.currentTarget.src = `https://lh3.googleusercontent.com/d/${imageId}=w500`
+                    }}
                   />
                   <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
                     {index + 1}

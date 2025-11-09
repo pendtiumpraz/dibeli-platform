@@ -91,9 +91,13 @@ export default async function ProductsPage() {
                       {images.length > 0 ? (
                         <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
                           <img
-                            src={`https://drive.google.com/uc?export=view&id=${images[0]}`}
+                            src={`https://drive.google.com/thumbnail?id=${images[0]}&sz=w200`}
                             alt={product.name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Fallback to direct link if thumbnail fails
+                              e.currentTarget.src = `https://lh3.googleusercontent.com/d/${images[0]}=w200`
+                            }}
                           />
                         </div>
                       ) : (

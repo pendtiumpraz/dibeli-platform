@@ -134,9 +134,14 @@ export async function createFolderStructure(storeName: string, productName: stri
       console.log(`Using existing store folder: ${storeName}`)
     }
 
-    // Create product folder inside store folder
-    const productFolder = await createFolder(drive, productName, storeFolder)
-    console.log(`Created product folder: ${productName}`)
+    // Check if product folder exists (for edit scenario)
+    let productFolder = await findFolder(drive, productName, storeFolder)
+    if (!productFolder) {
+      productFolder = await createFolder(drive, productName, storeFolder)
+      console.log(`Created product folder: ${productName}`)
+    } else {
+      console.log(`Using existing product folder: ${productName}`)
+    }
 
     return productFolder
   } catch (error) {
@@ -300,7 +305,8 @@ export async function uploadImageToDrive(
 
 export function getDriveImageUrl(fileId: string): string {
   // Return direct image URL for embedding
-  return `https://drive.google.com/uc?export=view&id=${fileId}`
+  // Use thumbnail URL which works better for display
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`
 }
 
 export function getDriveThumbnailUrl(fileId: string, size: number = 400): string {
