@@ -1,0 +1,114 @@
+<div class="container">
+  <!-- Store Header -->
+  <header class="store-header">
+    <div class="store-brand">
+      {{#if store.logo}}
+      <img src="{{store.logo}}" alt="{{store.name}}" class="store-logo">
+      {{/if}}
+      <div class="store-info">
+        <h1 class="store-name">{{store.name}}</h1>
+        {{#if store.tagline}}
+        <p class="store-tagline">{{store.tagline}}</p>
+        {{/if}}
+      </div>
+    </div>
+  </header>
+
+  <!-- Products Grid -->
+  <div class="products-grid">
+    {{#each products}}
+    <div class="product-card branded-classic">
+      <!-- Brand Header -->
+      <div class="card-brand-header">
+        {{#if ../store.logo}}
+        <img src="{{../store.logo}}" alt="Brand Logo" class="brand-logo-small">
+        {{/if}}
+        <div class="brand-info">
+          <div class="brand-name">{{../store.name}}</div>
+          {{#if ../store.tagline}}
+          <div class="brand-tagline">{{../store.tagline}}</div>
+          {{/if}}
+        </div>
+      </div>
+      
+      <!-- Product Image -->
+      <div class="card-image">
+        <img src="{{this.image}}" alt="{{this.name}}" loading="lazy">
+        {{#if this.isNew}}
+        <div class="card-badge new">Baru</div>
+        {{/if}}
+        {{#if this.isAvailable}}
+        {{else}}
+        <div class="card-badge sold-out">Habis</div>
+        {{/if}}
+        <button class="card-wishlist" onclick="toggleWishlist(this)">
+          <i class="far fa-heart"></i>
+        </button>
+      </div>
+      
+      <!-- Product Content -->
+      <div class="card-content">
+        <h3 class="card-title">{{this.name}}</h3>
+        
+        {{#if this.description}}
+        <p class="card-description">{{this.description}}</p>
+        {{/if}}
+        
+        {{#if this.rating}}
+        <div class="card-rating">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star-half-alt"></i>
+          <span>({{this.reviewCount}} ulasan)</span>
+        </div>
+        {{/if}}
+        
+        <div class="card-price-section">
+          <div class="card-price">{{this.price}}</div>
+          {{#if this.stock}}
+          <div class="card-stock">Stok: {{this.stock}}</div>
+          {{/if}}
+        </div>
+        
+        <button 
+          class="card-button {{#if this.isAvailable}}{{else}}disabled{{/if}}" 
+          onclick="orderProduct('{{this.name}}', '{{this.price}}')"
+          {{#if this.isAvailable}}{{else}}disabled{{/if}}
+        >
+          {{#if this.isAvailable}}
+          <i class="fab fa-whatsapp"></i> Beli Sekarang
+          {{else}}
+          Stok Habis
+          {{/if}}
+        </button>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  
+  <!-- Store Footer -->
+  <footer class="store-footer">
+    <div class="footer-content">
+      <div class="footer-info">
+        <h3>{{store.name}}</h3>
+        {{#if store.description}}
+        <p>{{store.description}}</p>
+        {{/if}}
+        {{#if store.address}}
+        <p><i class="fas fa-map-marker-alt"></i> {{store.address}}</p>
+        {{/if}}
+      </div>
+      <div class="footer-contact">
+        <h4>Hubungi Kami</h4>
+        <a href="https://wa.me/{{store.whatsappNumber}}" class="whatsapp-link" target="_blank">
+          <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 {{store.name}}. Powered by dibeli.my.id</p>
+    </div>
+  </footer>
+</div>
