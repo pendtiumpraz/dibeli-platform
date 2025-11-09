@@ -113,11 +113,11 @@ export default async function AdminStoresPage() {
                             {store.name}
                           </div>
                           <a
-                            href={`/${store.slug}`}
+                            href={`/toko/${store.slug}`}
                             target="_blank"
                             className="text-xs text-blue-600 hover:text-blue-800"
                           >
-                            /{store.slug}
+                            /toko/{store.slug}
                           </a>
                         </div>
                       </div>

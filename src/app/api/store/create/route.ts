@@ -86,6 +86,33 @@ export async function POST(req: Request) {
     })
 
     console.log('Store created successfully:', store.id)
+
+    // Get first available free template
+    const defaultTemplate = await prisma.template.findFirst({
+      where: { isPremium: false },
+      orderBy: { createdAt: 'asc' },
+    })
+
+    if (defaultTemplate) {
+      // Auto-apply default template to new store
+      console.log('Applying default template to store...')
+      try {
+        await prisma.storeTemplate.create({
+          data: {
+            storeId: store.id,
+            templateId: defaultTemplate.id,
+            category: 'full_page',
+            isActive: true,
+          },
+        })
+        console.log('Default template applied successfully')
+      } catch (templateError) {
+        console.error('Failed to apply template:', templateError)
+        // Continue even if template application fails
+      }
+    } else {
+      console.log('No default template found, store created without template')
+    }
     console.log('=== STORE CREATION END ===')
 
     return NextResponse.json(store)
