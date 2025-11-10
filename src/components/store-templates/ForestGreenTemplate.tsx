@@ -72,9 +72,14 @@ export default function ForestGreenTemplate({ store, products }: StoreTemplatePr
                   <div className="text-2xl font-bold text-emerald-600 mb-4">
                     Rp {product.price.toLocaleString('id-ID')}
                   </div>
-                  <button onClick={() => handleWhatsAppOrder(product.name, product.price)} className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 rounded-xl font-semibold transition-all shadow-lg">
-                    Pesan Sekarang
-                  </button>
+                  {product.hasConversionPage && product.conversionPageSlug ? (
+                    <div className="space-y-2">
+                      <Link href={`/p/${product.conversionPageSlug}`} className="block w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-semibold text-center transition-colors">Lihat Detail</Link>
+                      <button onClick={() => handleWhatsAppOrder(product.name, product.price)} className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition-all shadow-lg">Pesan</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => handleWhatsAppOrder(product.name, product.price)} className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 rounded-xl font-semibold transition-all shadow-lg">Pesan Sekarang</button>
+                  )}
                 </div>
               </div>
             ))}

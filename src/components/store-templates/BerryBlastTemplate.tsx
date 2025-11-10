@@ -62,9 +62,14 @@ export default function BerryBlastTemplate({ store, products }: StoreTemplatePro
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2">{product.name}</h3>
                   <div className="text-2xl font-bold text-pink-600 mb-4">Rp {product.price.toLocaleString('id-ID')}</div>
-                  <button onClick={() => handleWhatsAppOrder(product.name, product.price)} className="w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white py-3 rounded-xl font-semibold shadow-lg">
-                    Pesan
-                  </button>
+                  {product.hasConversionPage && product.conversionPageSlug ? (
+                    <div className="space-y-2">
+                      <Link href={`/p/${product.conversionPageSlug}`} className="block w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl font-semibold text-center transition-colors">Lihat Detail</Link>
+                      <button onClick={() => handleWhatsAppOrder(product.name, product.price)} className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-xl font-semibold shadow-lg transition-colors">Pesan</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => handleWhatsAppOrder(product.name, product.price)} className="w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white py-3 rounded-xl font-semibold shadow-lg">Pesan</button>
+                  )}
                 </div>
               </div>
             ))}
