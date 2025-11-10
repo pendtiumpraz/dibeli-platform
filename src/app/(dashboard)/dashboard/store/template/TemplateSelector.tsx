@@ -180,17 +180,13 @@ export default function TemplateSelector({ currentTemplateId, storeSlug, userTie
                     </div>
                   )}
 
-                  {/* Template Preview Placeholder */}
-                  <div className={`h-48 bg-gradient-to-br ${
-                    tier === 'UNLIMITED' 
-                      ? 'from-purple-100 to-pink-100' 
-                      : tier === 'PREMIUM'
-                      ? 'from-blue-100 to-indigo-100'
-                      : 'from-gray-100 to-gray-200'
-                  } flex items-center justify-center`}>
-                    <div className="text-6xl opacity-50">
-                      {tier === 'UNLIMITED' ? '👑' : tier === 'PREMIUM' ? '💎' : '📄'}
-                    </div>
+                  {/* Template Preview Screenshot */}
+                  <div className="h-48 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={template.thumbnail} 
+                      alt={`${template.name} preview`}
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                    />
                   </div>
 
                   {/* Template Info */}

@@ -43,6 +43,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Simple Classic',
     description: 'Clean and functional design perfect for beginners',
     tier: 'FREE',
+    thumbnail: '/template-previews/simple-classic.svg',
     features: ['Basic layout', 'Product grid', 'WhatsApp integration', 'Mobile responsive'],
   },
   'minimal-clean': {
@@ -50,6 +51,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Minimal Clean',
     description: 'Ultra-minimalist design with focus on content and simplicity',
     tier: 'FREE',
+    thumbnail: '/template-previews/minimal-clean.svg',
     features: ['Ultra minimal style', 'List format layout', 'Fast loading', 'Clean typography', 'Text-focused design'],
   },
   
@@ -59,6 +61,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Elegant Shop',
     description: 'Professional and elegant design for premium brands',
     tier: 'PREMIUM',
+    thumbnail: '/template-previews/elegant-shop.svg',
     features: [
       'Gradient backgrounds',
       'Hover animations',
@@ -72,6 +75,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Modern Professional',
     description: 'Corporate professional design with slate color scheme',
     tier: 'PREMIUM',
+    thumbnail: '/template-previews/modern-professional.svg',
     features: [
       'Corporate slate theme',
       'Professional layout',
@@ -85,6 +89,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Bold & Colorful',
     description: 'Eye-catching vibrant design with energetic colors',
     tier: 'PREMIUM',
+    thumbnail: '/template-previews/bold-colorful.svg',
     features: [
       'Vibrant gradients',
       'Dynamic animations',
@@ -100,6 +105,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Luxury Boutique',
     description: 'Ultra-premium design with advanced animations',
     tier: 'UNLIMITED',
+    thumbnail: '/template-previews/luxury-boutique.svg',
     features: [
       'Animated background',
       'Luxury gradients',
@@ -115,6 +121,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Royal Marketplace',
     description: 'Regal purple & gold design with crown elements',
     tier: 'UNLIMITED',
+    thumbnail: '/template-previews/royal-marketplace.svg',
     features: [
       'Royal purple theme',
       'Gold accents & borders',
@@ -129,6 +136,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Futuristic Store',
     description: 'Sci-fi tech design with neon colors and grid patterns',
     tier: 'UNLIMITED',
+    thumbnail: '/template-previews/futuristic-store.svg',
     features: [
       'Neon cyan theme',
       'Tech grid background',
@@ -143,6 +151,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Artisan Craft',
     description: 'Artistic and unique design for creative brands',
     tier: 'UNLIMITED',
+    thumbnail: '/template-previews/luxury-boutique.svg',
     features: ['Artistic style', 'Unique layout', 'Creative elements', 'Hand-crafted feel'],
   },
   'modern-showcase': {
@@ -150,6 +159,7 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
     name: 'Modern Showcase',
     description: 'Trendy design perfect for showcasing products',
     tier: 'UNLIMITED',
+    thumbnail: '/template-previews/futuristic-store.svg',
     features: ['Trendy design', 'Product focus', 'Modern aesthetics', 'Instagram-worthy'],
   },
 }

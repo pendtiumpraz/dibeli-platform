@@ -1,0 +1,43 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Minimal Clean Template Preview -->
+  <rect width="800" height="600" fill="#ffffff"/>
+  
+  <!-- Minimal Navbar -->
+  <rect width="800" height="50" fill="#ffffff"/>
+  <rect x="0" y="49" width="800" height="1" fill="#e5e7eb"/>
+  <circle cx="30" cy="25" r="12" fill="#111827"/>
+  <rect x="50" y="20" width="80" height="10" rx="2" fill="#111827"/>
+  
+  <!-- Header -->
+  <rect x="100" y="80" width="600" height="1" fill="#f3f4f6"/>
+  <rect x="320" y="100" width="160" height="8" rx="2" fill="#6b7280"/>
+  <rect x="280" y="120" width="240" height="6" rx="2" fill="#9ca3af"/>
+  
+  <!-- Product List -->
+  <g transform="translate(100, 160)">
+    <!-- Product Item 1 -->
+    <rect x="0" y="0" width="600" height="1" fill="#f3f4f6"/>
+    <rect x="0" y="15" width="60" height="60" rx="4" fill="#f9fafb"/>
+    <rect x="75" y="20" width="180" height="10" rx="2" fill="#111827"/>
+    <rect x="75" y="40" width="100" height="12" rx="2" fill="#111827"/>
+    <rect x="520" y="35" width="70" height="8" rx="2" fill="#374151"/>
+    
+    <!-- Product Item 2 -->
+    <g transform="translate(0, 90)">
+      <rect x="0" y="0" width="600" height="1" fill="#f3f4f6"/>
+      <rect x="0" y="15" width="60" height="60" rx="4" fill="#f9fafb"/>
+      <rect x="75" y="20" width="200" height="10" rx="2" fill="#111827"/>
+      <rect x="75" y="40" width="110" height="12" rx="2" fill="#111827"/>
+      <rect x="520" y="35" width="70" height="8" rx="2" fill="#374151"/>
+    </g>
+    
+    <!-- Product Item 3 -->
+    <g transform="translate(0, 180)">
+      <rect x="0" y="0" width="600" height="1" fill="#f3f4f6"/>
+      <rect x="0" y="15" width="60" height="60" rx="4" fill="#f9fafb"/>
+      <rect x="75" y="20" width="160" height="10" rx="2" fill="#111827"/>
+      <rect x="75" y="40" width="95" height="12" rx="2" fill="#111827"/>
+      <rect x="520" y="35" width="70" height="8" rx="2" fill="#374151"/>
+    </g>
+  </g>
+</svg>
