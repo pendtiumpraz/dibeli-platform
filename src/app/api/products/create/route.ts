@@ -44,6 +44,33 @@ export async function POST(req: Request) {
     let stock: number | null
     let isAvailable: boolean
     let images: string[] = []
+    // Phase 1: Video + Discount
+    let videoUrl: string | null = null
+    let originalPrice: number | null = null
+    let discountPercent: number | null = null
+    let discountValidUntil: Date | null = null
+    // Phase 2: Conversion Page
+    let hasConversionPage: boolean = false
+    let conversionPageSlug: string | null = null
+    let conversionTemplate: string | null = null
+    let headline: string | null = null
+    let subheadline: string | null = null
+    // Phase 3: Benefits & Features
+    let benefits: any = []
+    let features: any = []
+    // Phase 4: Urgency Settings
+    let hasCountdown: boolean = false
+    let countdownEnd: Date | null = null
+    let limitedStock: number | null = null
+    let urgencyText: string | null = null
+    let ctaText: string | null = null
+    let ctaColor: string | null = null
+    // Phase 5: Social Proof
+    let testimonials: any = []
+    let bonuses: any = []
+    let faqs: any = []
+    let guarantee: string | null = null
+    let socialProof: string | null = null
 
     if (contentType.includes('multipart/form-data')) {
       // Handle file upload
@@ -54,6 +81,55 @@ export async function POST(req: Request) {
       price = parseFloat(formData.get('price') as string)
       stock = formData.get('stock') ? parseInt(formData.get('stock') as string) : null
       isAvailable = formData.get('isAvailable') !== 'false'
+      
+      // Phase 1: Video + Discount
+      videoUrl = formData.get('videoUrl') as string || null
+      originalPrice = formData.get('originalPrice') ? parseFloat(formData.get('originalPrice') as string) : null
+      discountPercent = formData.get('discountPercent') ? parseInt(formData.get('discountPercent') as string) : null
+      discountValidUntil = formData.get('discountValidUntil') ? new Date(formData.get('discountValidUntil') as string) : null
+      
+      // Phase 2: Conversion Page  
+      hasConversionPage = formData.get('hasConversionPage') === 'true'
+      conversionPageSlug = formData.get('conversionPageSlug') as string || null
+      conversionTemplate = formData.get('conversionTemplate') as string || null
+      headline = formData.get('headline') as string || null
+      subheadline = formData.get('subheadline') as string || null
+      
+      // Phase 3: Benefits & Features
+      if (formData.get('benefits')) {
+        benefits = JSON.parse(formData.get('benefits') as string)
+      }
+      if (formData.get('features')) {
+        features = JSON.parse(formData.get('features') as string)
+      }
+      
+      // Phase 4: Urgency Settings
+      hasCountdown = formData.get('hasCountdown') === 'true'
+      countdownEnd = formData.get('countdownEnd') ? new Date(formData.get('countdownEnd') as string) : null
+      limitedStock = formData.get('limitedStock') ? parseInt(formData.get('limitedStock') as string) : null
+      urgencyText = formData.get('urgencyText') as string || null
+      ctaText = formData.get('ctaText') as string || null
+      ctaColor = formData.get('ctaColor') as string || null
+      
+      // Phase 5: Social Proof
+      if (formData.get('testimonials')) {
+        testimonials = JSON.parse(formData.get('testimonials') as string)
+      }
+      if (formData.get('bonuses')) {
+        bonuses = JSON.parse(formData.get('bonuses') as string)
+      }
+      if (formData.get('faqs')) {
+        faqs = JSON.parse(formData.get('faqs') as string)
+      }
+      guarantee = formData.get('guarantee') as string || null
+      socialProof = formData.get('socialProof') as string || null
+      
+      console.log('📦 CREATE PRODUCT - Conversion Page Data:')
+      console.log('  hasConversionPage:', hasConversionPage)
+      console.log('  conversionPageSlug:', conversionPageSlug)
+      console.log('  headline:', headline)
+      console.log('  benefits count:', benefits.length)
+      console.log('  features count:', features.length)
 
       // Get uploaded images
       const imageFiles = formData.getAll('images') as File[]
@@ -116,8 +192,39 @@ export async function POST(req: Request) {
         stock,
         isAvailable,
         images, // Array of Drive file IDs
+        // Phase 1: Video + Discount
+        videoUrl,
+        originalPrice,
+        discountPercent,
+        discountValidUntil,
+        // Phase 2: Conversion Page
+        hasConversionPage,
+        conversionPageSlug,
+        conversionTemplate,
+        headline,
+        subheadline,
+        // Phase 3: Benefits & Features  
+        benefits,
+        features,
+        // Phase 4: Urgency Settings
+        hasCountdown,
+        countdownEnd,
+        limitedStock,
+        urgencyText,
+        ctaText,
+        ctaColor,
+        // Phase 5: Social Proof
+        testimonials,
+        bonuses,
+        faqs,
+        guarantee,
+        socialProof,
       },
     })
+    
+    console.log('✅ Product created with ID:', product.id)
+    console.log('✅ hasConversionPage in DB:', product.hasConversionPage)
+    console.log('✅ conversionPageSlug in DB:', product.conversionPageSlug)
 
     return NextResponse.json(product)
   } catch (error) {
