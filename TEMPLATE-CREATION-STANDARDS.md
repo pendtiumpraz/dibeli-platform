@@ -104,9 +104,9 @@ import Link from 'next/link'
 // In product card:
 {product.hasConversionPage && product.conversionPageSlug ? (
   <div className="space-y-2">
-    {/* Button 1: View Detail */}
+    {/* Button 1: View Detail - IMPORTANT: Use /p/ route! */}
     <Link
-      href={`/${store.slug}/${product.conversionPageSlug}`}
+      href={`/p/${product.conversionPageSlug}`}
       className="w-full bg-[primary-color] text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
     >
       Lihat Detail

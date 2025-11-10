@@ -202,7 +202,7 @@ export default function NeonNightsTemplate({ store, products }: StoreTemplatePro
                   {product.hasConversionPage && product.conversionPageSlug ? (
                     <div className="space-y-2">
                       <Link
-                        href={`/${store.slug}/${product.conversionPageSlug}`}
+                        href={`/p/${product.conversionPageSlug}`}
                         className="block w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 text-center"
                       >
                         Lihat Detail

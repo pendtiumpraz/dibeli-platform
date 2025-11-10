@@ -57,7 +57,7 @@ export default function MintFreshTemplate({ store, products }: StoreTemplateProp
                   </div>
                   {product.hasConversionPage && product.conversionPageSlug ? (
                     <div className="space-y-2">
-                      <Link href={`/${store.slug}/${product.conversionPageSlug}`} className="block w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold text-center transition-colors">Detail</Link>
+                      <Link href={`/p/${product.conversionPageSlug}`} className="block w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold text-center transition-colors">Detail</Link>
                       <button onClick={() => handleWhatsAppOrder(product.name, product.price)} className="w-full bg-teal-600 hover:bg-teal-700 text-white py-2 rounded-lg font-semibold transition-colors">Pesan</button>
                     </div>
                   ) : (

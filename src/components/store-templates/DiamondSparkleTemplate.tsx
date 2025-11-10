@@ -178,7 +178,7 @@ export default function DiamondSparkleTemplate({ store, products }: StoreTemplat
                   {product.hasConversionPage && product.conversionPageSlug ? (
                     <div className="space-y-2">
                       <Link
-                        href={`/${store.slug}/${product.conversionPageSlug}`}
+                        href={`/p/${product.conversionPageSlug}`}
                         className="block w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 text-center"
                       >
                         Lihat Detail
