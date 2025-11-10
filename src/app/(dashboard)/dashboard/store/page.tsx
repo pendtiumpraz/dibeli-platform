@@ -25,6 +25,9 @@ export default async function StorePage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Toko Saya</h1>
         <div className="flex gap-2">
+          <Link href="/dashboard/store/template">
+            <Button variant="outline">🎨 Pilih Template</Button>
+          </Link>
           <Link href="/dashboard/store/edit">
             <Button>✏️ Edit Profil Toko</Button>
           </Link>
