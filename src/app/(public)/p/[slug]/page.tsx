@@ -58,14 +58,22 @@ export default async function ConversionPage({ params }: ConversionPageProps) {
   // Render based on template
   const template = product.conversionTemplate || 'red-urgency'
 
-  // Cast JSON fields to proper types
+  // Cast JSON fields to proper types with backward compatibility
+  const rawBenefits = product.benefits as any
+  const rawFeatures = product.features as any
+  
   const templateProps = {
     product: {
       ...product,
-      benefits: (product.benefits as string[]) || [],
-      features: (product.features as string[]) || [],
-      testimonials: (product.testimonials as Array<{name: string, rating: number, text: string, role: string}>) || [],
-      bonuses: (product.bonuses as Array<{title: string, description: string, value: string}>) || [],
+      // Handle both old format (string[]) and new format ({text, imageUrl}[])
+      benefits: Array.isArray(rawBenefits) 
+        ? rawBenefits.map((b: any) => typeof b === 'string' ? {text: b} : b)
+        : [],
+      features: Array.isArray(rawFeatures)
+        ? rawFeatures.map((f: any) => typeof f === 'string' ? {text: f} : f)
+        : [],
+      testimonials: (product.testimonials as Array<{name: string, rating: number, text: string, role: string, photoUrl?: string}>) || [],
+      bonuses: (product.bonuses as Array<{title: string, description: string, value: string, imageUrl?: string}>) || [],
       faqs: (product.faqs as Array<{question: string, answer: string}>) || [],
     },
     store: product.store,

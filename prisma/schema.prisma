@@ -653,15 +653,15 @@ model Product {
   // Conversion Page Content
   headline    String?
   subheadline String?  @db.Text
-  benefits    String[] @default([])
-  features    String[] @default([])
+  benefits    Json? // [{text: string, imageUrl?: string}]
+  features    Json? // [{text: string, imageUrl?: string}]
 
   // Social Proof
-  testimonials Json? // [{name, text, rating, image, date}]
+  testimonials Json? // [{name, text, rating, role, photoUrl}]
   socialProof  String? // "1000+ pelanggan puas"
 
   // Bonuses & Offers
-  bonuses   Json? // [{title, description, image}]
+  bonuses   Json? // [{title, description, value, imageUrl}]
   guarantee String? @db.Text
 
   // Urgency

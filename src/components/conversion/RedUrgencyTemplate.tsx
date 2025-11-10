@@ -18,8 +18,8 @@ interface Product {
   stock: number | null
   limitedStock: number | null
   // Phase 3
-  benefits: string[]
-  features: string[]
+  benefits: Array<{text: string, imageUrl?: string}>
+  features: Array<{text: string, imageUrl?: string}>
   // Phase 4
   hasCountdown: boolean
   countdownEnd: Date | null
@@ -27,8 +27,8 @@ interface Product {
   ctaText: string | null
   ctaColor: string | null
   // Phase 5
-  testimonials: Array<{name: string, rating: number, text: string, role: string}>
-  bonuses: Array<{title: string, description: string, value: string}>
+  testimonials: Array<{name: string, rating: number, text: string, role: string, photoUrl?: string}>
+  bonuses: Array<{title: string, description: string, value: string, imageUrl?: string}>
   faqs: Array<{question: string, answer: string}>
   guarantee: string | null
   socialProof: string | null
@@ -281,8 +281,21 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {product.benefits.map((benefit, index) => (
                 <div key={index} className="flex items-start gap-3 bg-white p-4 rounded-lg shadow-md border-l-4 border-red-500">
-                  <span className="text-red-600 text-2xl flex-shrink-0 font-bold">✓</span>
-                  <p className="text-gray-800 font-medium">{benefit}</p>
+                  {benefit.imageUrl ? (
+                    <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden">
+                      <img
+                        src={`https://drive.google.com/thumbnail?id=${benefit.imageUrl}&sz=w100`}
+                        alt={benefit.text}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = `https://lh3.googleusercontent.com/d/${benefit.imageUrl}=w100`
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-red-600 text-2xl flex-shrink-0 font-bold">✓</span>
+                  )}
+                  <p className="text-gray-800 font-medium flex-1">{typeof benefit === 'string' ? benefit : benefit.text}</p>
                 </div>
               ))}
             </div>
@@ -301,8 +314,21 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
               <ul className="space-y-3">
                 {product.features.map((feature, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <span className="text-red-600 font-black text-lg">•</span>
-                    <span className="text-gray-700">{feature}</span>
+                    {typeof feature === 'object' && feature.imageUrl ? (
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden">
+                        <img
+                          src={`https://drive.google.com/thumbnail?id=${feature.imageUrl}&sz=w80`}
+                          alt={feature.text}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = `https://lh3.googleusercontent.com/d/${feature.imageUrl}=w80`
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <span className="text-red-600 font-black text-lg">•</span>
+                    )}
+                    <span className="text-gray-700">{typeof feature === 'string' ? feature : feature.text}</span>
                   </li>
                 ))}
               </ul>
@@ -321,25 +347,44 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {product.testimonials.map((testimonial, index) => (
                 <div key={index} className="bg-white p-6 rounded-xl shadow-lg border-2 border-red-100">
-                  <div className="flex gap-1 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <svg
-                        key={i}
-                        className={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                      </svg>
-                    ))}
+                  {/* Photo & Rating */}
+                  <div className="flex items-center gap-3 mb-4">
+                    {testimonial.photoUrl ? (
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden border-2 border-red-200">
+                        <img
+                          src={`https://drive.google.com/thumbnail?id=${testimonial.photoUrl}&sz=w100`}
+                          alt={testimonial.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = `https://lh3.googleusercontent.com/d/${testimonial.photoUrl}=w100`
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-xl">
+                        {testimonial.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-bold text-gray-900">{testimonial.name}</p>
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <svg
+                            key={i}
+                            className={`w-4 h-4 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   <p className="text-gray-700 mb-4 italic">"{testimonial.text}"</p>
-                  <div className="border-t pt-3">
-                    <p className="font-bold text-gray-900">{testimonial.name}</p>
-                    {testimonial.role && (
-                      <p className="text-sm text-gray-600">{testimonial.role}</p>
-                    )}
-                  </div>
+                  {testimonial.role && (
+                    <p className="text-sm text-gray-600 border-t pt-3">{testimonial.role}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -357,15 +402,33 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
             <div className="space-y-4">
               {product.bonuses.map((bonus, index) => (
                 <div key={index} className="bg-white rounded-xl p-6 shadow-xl border-l-4 border-red-600">
-                  <div className="flex items-start justify-between flex-wrap gap-4">
+                  <div className="flex items-start gap-4">
+                    {/* Bonus Image */}
+                    {bonus.imageUrl && (
+                      <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-yellow-300">
+                        <img
+                          src={`https://drive.google.com/thumbnail?id=${bonus.imageUrl}&sz=w200`}
+                          alt={bonus.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = `https://lh3.googleusercontent.com/d/${bonus.imageUrl}=w200`
+                          }}
+                        />
+                      </div>
+                    )}
+                    {/* Bonus Content */}
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {bonus.title}
-                      </h3>
-                      <p className="text-gray-700">{bonus.description}</p>
-                    </div>
-                    <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap">
-                      {bonus.value}
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            🎁 {bonus.title}
+                          </h3>
+                          <p className="text-gray-700">{bonus.description}</p>
+                        </div>
+                        <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap self-start">
+                          {bonus.value}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
