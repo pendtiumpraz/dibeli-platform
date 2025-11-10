@@ -5,25 +5,30 @@
 
 import { TemplateInfo } from './types'
 import SimpleClassicTemplate from './SimpleClassicTemplate'
+import MinimalCleanTemplate from './MinimalCleanTemplate'
 import ElegantShopTemplate from './ElegantShopTemplate'
+import ModernProfessionalTemplate from './ModernProfessionalTemplate'
+import BoldColorfulTemplate from './BoldColorfulTemplate'
 import LuxuryBoutiqueTemplate from './LuxuryBoutiqueTemplate'
+import RoyalMarketplaceTemplate from './RoyalMarketplaceTemplate'
+import FuturisticStoreTemplate from './FuturisticStoreTemplate'
 
 export const STORE_TEMPLATES = {
   // FREE TIER
   'simple-classic': SimpleClassicTemplate,
-  'minimal-clean': SimpleClassicTemplate, // Can add more later
+  'minimal-clean': MinimalCleanTemplate,
   
   // PREMIUM TIER
   'elegant-shop': ElegantShopTemplate,
-  'modern-professional': ElegantShopTemplate, // Can add more later
-  'bold-colorful': ElegantShopTemplate, // Can add more later
+  'modern-professional': ModernProfessionalTemplate,
+  'bold-colorful': BoldColorfulTemplate,
   
   // UNLIMITED TIER
   'luxury-boutique': LuxuryBoutiqueTemplate,
-  'royal-marketplace': LuxuryBoutiqueTemplate, // Can add more later
-  'futuristic-store': LuxuryBoutiqueTemplate, // Can add more later
-  'artisan-craft': LuxuryBoutiqueTemplate, // Can add more later
-  'modern-showcase': LuxuryBoutiqueTemplate, // Can add more later
+  'royal-marketplace': RoyalMarketplaceTemplate,
+  'futuristic-store': FuturisticStoreTemplate,
+  'artisan-craft': LuxuryBoutiqueTemplate, // TODO: Create unique template
+  'modern-showcase': FuturisticStoreTemplate, // TODO: Create unique template
 } as const
 
 export type StoreTemplateId = keyof typeof STORE_TEMPLATES
@@ -43,9 +48,9 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
   'minimal-clean': {
     id: 'minimal-clean',
     name: 'Minimal Clean',
-    description: 'Minimalist design with focus on content',
+    description: 'Ultra-minimalist design with focus on content and simplicity',
     tier: 'FREE',
-    features: ['Minimal style', 'Fast loading', 'Easy navigation', 'Clean typography'],
+    features: ['Ultra minimal style', 'List format layout', 'Fast loading', 'Clean typography', 'Text-focused design'],
   },
   
   // PREMIUM TIER
@@ -65,16 +70,28 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
   'modern-professional': {
     id: 'modern-professional',
     name: 'Modern Professional',
-    description: 'Contemporary design for professional businesses',
+    description: 'Corporate professional design with slate color scheme',
     tier: 'PREMIUM',
-    features: ['Modern layout', 'Smooth transitions', 'Contact section', 'Stats display'],
+    features: [
+      'Corporate slate theme',
+      'Professional layout',
+      'Trust badges',
+      'Comprehensive footer',
+      'Stats display',
+    ],
   },
   'bold-colorful': {
     id: 'bold-colorful',
     name: 'Bold & Colorful',
-    description: 'Eye-catching design with vibrant colors',
+    description: 'Eye-catching vibrant design with energetic colors',
     tier: 'PREMIUM',
-    features: ['Bold colors', 'Dynamic layout', 'Attention-grabbing', 'Energetic feel'],
+    features: [
+      'Vibrant gradients',
+      'Dynamic animations',
+      'Attention-grabbing CTAs',
+      'Energetic feel',
+      'Multiple color schemes',
+    ],
   },
   
   // UNLIMITED TIER
@@ -96,16 +113,30 @@ export const TEMPLATE_INFO: Record<StoreTemplateId, TemplateInfo> = {
   'royal-marketplace': {
     id: 'royal-marketplace',
     name: 'Royal Marketplace',
-    description: 'Regal design with gold accents and royal theme',
+    description: 'Regal purple & gold design with crown elements',
     tier: 'UNLIMITED',
-    features: ['Royal theme', 'Gold accents', 'Elegant animations', 'Premium feel'],
+    features: [
+      'Royal purple theme',
+      'Gold accents & borders',
+      'Crown elements',
+      'Elegant animations',
+      'Luxury feel',
+      'Hover glow effects',
+    ],
   },
   'futuristic-store': {
     id: 'futuristic-store',
     name: 'Futuristic Store',
-    description: 'Modern tech-inspired design with cutting-edge visuals',
+    description: 'Sci-fi tech design with neon colors and grid patterns',
     tier: 'UNLIMITED',
-    features: ['Futuristic design', 'Tech aesthetic', 'Advanced effects', 'Sci-fi inspired'],
+    features: [
+      'Neon cyan theme',
+      'Tech grid background',
+      'Mouse glow effect',
+      'Futuristic UI elements',
+      'Monospace fonts',
+      'Advanced animations',
+    ],
   },
   'artisan-craft': {
     id: 'artisan-craft',
