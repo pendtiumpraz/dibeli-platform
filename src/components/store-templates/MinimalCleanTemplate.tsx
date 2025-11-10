@@ -1,6 +1,7 @@
 'use client'
 
 import { StoreTemplateProps } from './types'
+import StoreFooter from './StoreFooter'
 import Link from 'next/link'
 
 /**
@@ -124,43 +125,13 @@ export default function MinimalCleanTemplate({ store, products }: StoreTemplateP
         )}
       </main>
 
-      {/* Minimal Footer */}
-      <footer className="border-t border-gray-100 mt-16">
-        <div className="max-w-5xl mx-auto px-4 py-8">
-          {(store.address || store.email || store.phone) && (
-            <div className="text-center text-sm text-gray-500 space-y-1 mb-6">
-              {store.address && <p>{store.address}</p>}
-              {store.email && <p>{store.email}</p>}
-              {store.phone && <p>{store.phone}</p>}
-            </div>
-          )}
-          
-          {/* Social Links - Minimal */}
-          {(store.instagramUrl || store.facebookUrl || store.tiktokUrl) && (
-            <div className="flex justify-center gap-6 mb-6 text-sm">
-              {store.instagramUrl && (
-                <a href={store.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900">
-                  Instagram
-                </a>
-              )}
-              {store.facebookUrl && (
-                <a href={store.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900">
-                  Facebook
-                </a>
-              )}
-              {store.tiktokUrl && (
-                <a href={store.tiktokUrl} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900">
-                  TikTok
-                </a>
-              )}
-            </div>
-          )}
-
-          <p className="text-center text-xs text-gray-400">
-            © {new Date().getFullYear()} {store.name}
-          </p>
-        </div>
-      </footer>
+      {/* Universal Footer with Maps & Complete Store Data */}
+      <StoreFooter 
+        store={store}
+        bgColor="bg-white"
+        textColor="text-gray-500"
+        accentColor="text-gray-900"
+      />
     </div>
   )
 }

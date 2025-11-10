@@ -1,6 +1,7 @@
 'use client'
 
 import { StoreTemplateProps } from './types'
+import StoreFooter from './StoreFooter'
 import Link from 'next/link'
 import { useState } from 'react'
 
