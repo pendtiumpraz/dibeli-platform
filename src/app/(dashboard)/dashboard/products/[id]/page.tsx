@@ -157,8 +157,15 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     setUploading(true)
 
     try {
-      // If there are new images, use FormData
-      if (newImages.length > 0) {
+      // Check if there are any files to upload (main images OR section photos)
+      const hasBenefitPhotos = formData.benefits.some(b => typeof b === 'object' && b.imageFile)
+      const hasFeaturePhotos = formData.features.some(f => typeof f === 'object' && f.imageFile)
+      const hasTestimonialPhotos = formData.testimonials.some(t => t.photoFile)
+      const hasBonusImages = formData.bonuses.some(b => b.imageFile)
+      const hasAnyFiles = newImages.length > 0 || hasBenefitPhotos || hasFeaturePhotos || hasTestimonialPhotos || hasBonusImages
+      
+      // If there are new files, use FormData
+      if (hasAnyFiles) {
         const formDataToSend = new FormData()
         formDataToSend.append('name', formData.name)
         formDataToSend.append('description', formData.description)
@@ -215,6 +222,31 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         // Add new image files
         newImages.forEach((file) => {
           formDataToSend.append('images', file)
+        })
+        
+        // Add section photo files with index mapping
+        formData.benefits.forEach((benefit, index) => {
+          if (typeof benefit === 'object' && benefit.imageFile) {
+            formDataToSend.append(`benefitPhoto_${index}`, benefit.imageFile)
+          }
+        })
+        
+        formData.features.forEach((feature, index) => {
+          if (typeof feature === 'object' && feature.imageFile) {
+            formDataToSend.append(`featurePhoto_${index}`, feature.imageFile)
+          }
+        })
+        
+        formData.testimonials.forEach((testimonial, index) => {
+          if (testimonial.photoFile) {
+            formDataToSend.append(`testimonialPhoto_${index}`, testimonial.photoFile)
+          }
+        })
+        
+        formData.bonuses.forEach((bonus, index) => {
+          if (bonus.imageFile) {
+            formDataToSend.append(`bonusImage_${index}`, bonus.imageFile)
+          }
         })
 
         const res = await fetch(`/api/products/${params.id}`, {

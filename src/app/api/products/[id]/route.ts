@@ -117,6 +117,9 @@ export async function PUT(
       // Get new image files
       const images = formData.getAll('images')
       newImageFiles = images.filter((file): file is File => file instanceof File && file.size > 0)
+      
+      // Get photo files for benefits, features, testimonials, bonuses
+      // Note: These will be processed later when uploading
     } else {
       // Handle JSON (no new images)
       const body = await request.json()
@@ -189,6 +192,97 @@ export async function PUT(
 
     // Combine existing images (not deleted) with new images
     const finalImages = [...existingImages, ...newImageIds]
+
+    // Handle photo uploads for benefits, features, testimonials, bonuses
+    if (contentType?.includes('multipart/form-data')) {
+      try {
+        console.log('Processing section photos...')
+        const formData = await request.formData()
+        const { createFolderStructure, uploadImageToDrive } = await import('@/lib/google-drive')
+        
+        const productSlug = name.toLowerCase().replace(/\s+/g, '-')
+        const productFolderId = await createFolderStructure(product.store.name, productSlug)
+        
+        // Upload benefit icon photos
+        if (Array.isArray(benefits)) {
+          for (let i = 0; i < benefits.length; i++) {
+            const photoKey = `benefitPhoto_${i}`
+            const photoFile = formData.get(photoKey)
+            if (photoFile && photoFile instanceof File && photoFile.size > 0) {
+              console.log(`Uploading benefit icon ${i}...`)
+              const fileName = `benefit-${i}-${Date.now()}.${photoFile.name.split('.').pop()}`
+              const uploaded = await uploadImageToDrive(photoFile, productFolderId, fileName)
+              
+              // Update benefit object with imageUrl
+              if (typeof benefits[i] === 'object') {
+                benefits[i].imageUrl = uploaded.id
+                delete benefits[i].imageFile // Remove File reference
+              } else {
+                // Convert string to object
+                benefits[i] = { text: benefits[i], imageUrl: uploaded.id }
+              }
+            }
+          }
+        }
+        
+        // Upload feature icon photos
+        if (Array.isArray(features)) {
+          for (let i = 0; i < features.length; i++) {
+            const photoKey = `featurePhoto_${i}`
+            const photoFile = formData.get(photoKey)
+            if (photoFile && photoFile instanceof File && photoFile.size > 0) {
+              console.log(`Uploading feature icon ${i}...`)
+              const fileName = `feature-${i}-${Date.now()}.${photoFile.name.split('.').pop()}`
+              const uploaded = await uploadImageToDrive(photoFile, productFolderId, fileName)
+              
+              if (typeof features[i] === 'object') {
+                features[i].imageUrl = uploaded.id
+                delete features[i].imageFile
+              } else {
+                features[i] = { text: features[i], imageUrl: uploaded.id }
+              }
+            }
+          }
+        }
+        
+        // Upload testimonial photos
+        if (Array.isArray(testimonials)) {
+          for (let i = 0; i < testimonials.length; i++) {
+            const photoKey = `testimonialPhoto_${i}`
+            const photoFile = formData.get(photoKey)
+            if (photoFile && photoFile instanceof File && photoFile.size > 0) {
+              console.log(`Uploading testimonial photo ${i}...`)
+              const fileName = `testimonial-${i}-${Date.now()}.${photoFile.name.split('.').pop()}`
+              const uploaded = await uploadImageToDrive(photoFile, productFolderId, fileName)
+              
+              testimonials[i].photoUrl = uploaded.id
+              delete testimonials[i].photoFile // Remove File reference
+            }
+          }
+        }
+        
+        // Upload bonus images
+        if (Array.isArray(bonuses)) {
+          for (let i = 0; i < bonuses.length; i++) {
+            const photoKey = `bonusImage_${i}`
+            const photoFile = formData.get(photoKey)
+            if (photoFile && photoFile instanceof File && photoFile.size > 0) {
+              console.log(`Uploading bonus image ${i}...`)
+              const fileName = `bonus-${i}-${Date.now()}.${photoFile.name.split('.').pop()}`
+              const uploaded = await uploadImageToDrive(photoFile, productFolderId, fileName)
+              
+              bonuses[i].imageUrl = uploaded.id
+              delete bonuses[i].imageFile // Remove File reference
+            }
+          }
+        }
+        
+        console.log('✅ Section photos processed')
+      } catch (photoError) {
+        console.error('❌ Photo upload error:', photoError)
+        // Continue without photos
+      }
+    }
 
     const updatedProduct = await prisma.product.update({
       where: { id: params.id },
