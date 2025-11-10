@@ -183,9 +183,22 @@ export default function CreateProductPage() {
       
       const generated = await res.json()
       
-      // Apply generated data
+      // Generate slug from product name
+      const autoSlug = formData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim()
+      
+      // Apply generated data + ENABLE conversion page!
       setFormData({
         ...formData,
+        // Enable conversion page (CRITICAL FIX!)
+        hasConversionPage: true,
+        conversionPageSlug: formData.conversionPageSlug || autoSlug,
+        conversionTemplate: formData.conversionTemplate || 'red-urgency',
+        // Generated content
         headline: generated.headline || '',
         subheadline: generated.subheadline || '',
         description: generated.description || formData.description,

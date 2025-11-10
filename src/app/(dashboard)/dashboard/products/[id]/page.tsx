@@ -50,15 +50,30 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [deletedImages, setDeletedImages] = useState<string[]>([])
   
   // AI Auto-Generate States (UNLIMITED only)
-  const [aiProvider, setAiProvider] = useState('gemini')
-  const [aiApiKey, setAiApiKey] = useState('')
+  const [aiProvider, setAiProvider] = useState('groq') // Default to Groq (works better!)
+  const [hasGeminiKey, setHasGeminiKey] = useState(false)
+  const [hasGroqKey, setHasGroqKey] = useState(false)
   const [aiGenerating, setAiGenerating] = useState(false)
   const [session, setSession] = useState<any>(null)
 
   useEffect(() => {
     fetchProduct()
     fetchSession()
+    fetchApiKeys()
   }, [params.id])
+  
+  const fetchApiKeys = async () => {
+    try {
+      const res = await fetch('/api/user/profile')
+      if (res.ok) {
+        const data = await res.json()
+        setHasGeminiKey(!!data.geminiApiKey)
+        setHasGroqKey(!!data.groqApiKey)
+      }
+    } catch (error) {
+      console.error('Failed to fetch API keys:', error)
+    }
+  }
   
   const fetchSession = async () => {
     try {
@@ -333,8 +348,14 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       return
     }
     
-    if (!aiApiKey) {
-      alert('⚠️ Masukkan API key dulu!')
+    // Check if API key exists for selected provider
+    if (aiProvider === 'gemini' && !hasGeminiKey) {
+      alert('⚠️ Gemini API key belum disimpan!\n\nSave dulu di Settings → API Keys Management')
+      return
+    }
+    
+    if (aiProvider === 'groq' && !hasGroqKey) {
+      alert('⚠️ Groq API key belum disimpan!\n\nSave dulu di Settings → API Keys Management')
       return
     }
     
@@ -365,19 +386,32 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           provider: aiProvider,
-          apiKey: aiApiKey,
           productName: formData.name,
           price: formData.price,
           description: formData.description || '',
+          // API key will be fetched from database automatically
         })
       })
       
       if (res.ok) {
         const generated = await res.json()
         
-        // Auto-fill ALL fields
+        // Generate slug if not exists
+        const autoSlug = formData.name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim()
+        
+        // Auto-fill ALL fields + ENABLE conversion page
         setFormData({
           ...formData,
+          // Enable conversion page (CRITICAL FIX!)
+          hasConversionPage: true,
+          conversionPageSlug: formData.conversionPageSlug || autoSlug,
+          conversionTemplate: formData.conversionTemplate || 'red-urgency',
+          // Generated content
           headline: generated.headline || formData.headline,
           subheadline: generated.subheadline || formData.subheadline,
           description: generated.description || formData.description,
@@ -594,39 +628,37 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   onChange={(e) => setAiProvider(e.target.value)}
                   className="w-full px-4 py-2 border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
                 >
-                  <option value="gemini">Google Gemini</option>
-                  <option value="groq">Groq (Llama 3.1)</option>
+                  <option value="groq">⚡ Groq (Llama 3.1) - RECOMMENDED {hasGroqKey ? '✅' : '❌'}</option>
+                  <option value="gemini">Google Gemini 2.0 {hasGeminiKey ? '✅' : '❌'}</option>
                 </select>
                 <p className="mt-1 text-xs text-gray-600">
-                  💡 Gemini: Lebih kreatif | Groq: Lebih cepat
+                  💡 Groq: Super cepat (134ms avg) | Gemini: Perlu setup API key
                 </p>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  🔑 API Key
-                </label>
-                <input
-                  type="password"
-                  value={aiApiKey}
-                  onChange={(e) => setAiApiKey(e.target.value)}
-                  className="w-full px-4 py-2 border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="Masukkan API key"
-                />
-                <p className="mt-1 text-xs text-gray-600">
-                  {aiProvider === 'gemini' ? (
-                    <>Get key: <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener" className="text-purple-600 hover:underline">Google AI Studio</a></>
-                  ) : (
-                    <>Get key: <a href="https://console.groq.com/keys" target="_blank" rel="noopener" className="text-purple-600 hover:underline">Groq Console</a></>
-                  )}
-                </p>
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={() => window.open('/dashboard/settings', '_blank')}
+                  className="w-full px-4 py-2 border-2 border-purple-300 hover:border-purple-400 rounded-lg text-sm font-medium text-purple-700 transition-colors"
+                >
+                  ⚙️ Kelola API Keys
+                </button>
               </div>
             </div>
+            
+            {!hasGeminiKey && !hasGroqKey && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ Belum ada API key tersimpan. Simpan dulu di Settings untuk 1-click generate!
+                </p>
+              </div>
+            )}
             
             <button
               type="button"
               onClick={handleAiGenerate}
-              disabled={!formData.name || !aiApiKey || aiGenerating}
+              disabled={!formData.name || aiGenerating || (aiProvider === 'gemini' ? !hasGeminiKey : !hasGroqKey)}
               className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] shadow-lg"
             >
               {aiGenerating ? (
