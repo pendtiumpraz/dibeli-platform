@@ -2,9 +2,8 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import AdminLayout from '@/components/AdminLayout'
-import { TEMPLATE_INFO } from '@/components/store-templates/registry'
-import type { StoreTemplateId } from '@/components/store-templates/registry'
-import Link from 'next/link'
+import { TEMPLATE_PACKAGES, type TemplatePackage } from '@/lib/template-combiner'
+import Image from 'next/image'
 
 export default async function AdminTemplatesPage() {
   const session = await getServerSession(authOptions)
@@ -13,11 +12,8 @@ export default async function AdminTemplatesPage() {
     redirect('/dashboard')
   }
 
-  // Get ACTUAL store templates being used (not database templates)
-  const templates = Object.entries(TEMPLATE_INFO).map(([templateId, info]) => ({
-    templateId,
-    ...info,
-  }))
+  // Get ACTUAL templates (same as user dashboard/templates)
+  const templates: TemplatePackage[] = TEMPLATE_PACKAGES
 
   // Stats based on ACTUAL templates
   const totalTemplates = templates.length
@@ -73,73 +69,66 @@ export default async function AdminTemplatesPage() {
       {/* Templates Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {templates.map((template) => (
-          <div key={template.templateId} className="bg-white rounded-lg shadow-sm border-2 border-gray-200 overflow-hidden hover:border-blue-400 transition-all">
+          <div key={template.id} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl border-2 border-gray-200 hover:border-blue-400">
             {/* Thumbnail */}
-            <div className="relative aspect-video bg-gray-100">
-              {template.thumbnail ? (
-                <img
-                  src={template.thumbnail}
-                  alt={template.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
-                  </svg>
-                </div>
-              )}
+            <div className="relative h-48 bg-gray-200">
+              <Image
+                src={template.thumbnail}
+                alt={template.name}
+                fill
+                className="object-cover"
+              />
               
               {/* Tier Badge */}
               <div className="absolute top-3 right-3">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  template.tier === 'FREE' ? 'bg-blue-100 text-blue-800' :
-                  template.tier === 'PREMIUM' ? 'bg-purple-100 text-purple-800' :
-                  'bg-pink-100 text-pink-800'
-                }`}>
-                  {template.tier}
-                </span>
+                {template.tier === 'PREMIUM' && (
+                  <div className="px-3 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full">
+                    PREMIUM
+                  </div>
+                )}
+                {template.tier === 'UNLIMITED' && (
+                  <div className="px-3 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold rounded-full">
+                    UNLIMITED
+                  </div>
+                )}
+                {template.tier === 'FREE' && (
+                  <div className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
+                    FREE
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Info */}
-            <div className="p-5">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
                 {template.name}
               </h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+              <p className="text-gray-600 text-sm mb-4">
                 {template.description}
               </p>
 
-              {/* Features */}
-              <div className="mb-4">
-                <p className="text-xs font-semibold text-gray-700 mb-2">Features:</p>
-                <div className="flex flex-wrap gap-1">
-                  {template.features.slice(0, 3).map((feature, idx) => (
-                    <span key={idx} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                      {feature}
-                    </span>
-                  ))}
-                  {template.features.length > 3 && (
-                    <span className="text-xs text-gray-500">+{template.features.length - 3} more</span>
-                  )}
-                </div>
-              </div>
+              {/* Template ID */}
+              <p className="text-xs text-gray-500 mb-4">
+                ID: <code className="bg-gray-100 px-2 py-1 rounded">{template.id}</code>
+              </p>
 
               {/* Actions */}
               <div className="flex gap-2">
-                <Link
-                  href={`/dashboard/store/template`}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg font-medium text-sm transition-colors"
+                <a
+                  href={`/api/template-render-test?templateId=${template.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 px-4 py-2 border-2 border-purple-600 text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-all text-center"
                 >
-                  Preview
-                </Link>
-                <Link
-                  href={`/dashboard/store/template`}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-center py-2 rounded-lg font-medium text-sm transition-colors"
+                  👁️ Preview
+                </a>
+                <a
+                  href="/dashboard/templates"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-center"
                 >
-                  Apply
-                </Link>
+                  📋 Details
+                </a>
               </div>
             </div>
           </div>
@@ -149,8 +138,9 @@ export default async function AdminTemplatesPage() {
       {/* Note */}
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-sm text-blue-800">
-          <strong>ℹ️ Note:</strong> These are the ACTUAL store templates being used in production. 
-          To change templates, go to <Link href="/dashboard/store/template" className="underline font-semibold">Store Settings → Template</Link>.
+          <strong>ℹ️ Note:</strong> These are the ACTUAL store templates from template-combiner system. 
+          Same templates shown in user <a href="/dashboard/templates" className="underline font-semibold">Dashboard → Templates</a>.
+          Total: {totalTemplates} templates ({freeTemplates} FREE, {premiumTemplates} PREMIUM, {unlimitedTemplates} UNLIMITED)
         </p>
       </div>
       </div>
