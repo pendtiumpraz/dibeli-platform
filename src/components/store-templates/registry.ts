@@ -14,21 +14,52 @@ import RoyalMarketplaceTemplate from './RoyalMarketplaceTemplate'
 import FuturisticStoreTemplate from './FuturisticStoreTemplate'
 
 export const STORE_TEMPLATES = {
-  // FREE TIER
+  // FREE TIER (2)
   'simple-classic': SimpleClassicTemplate,
   'minimal-clean': MinimalCleanTemplate,
   
-  // PREMIUM TIER
+  // PREMIUM TIER (18) - Using existing templates as placeholders
   'elegant-shop': ElegantShopTemplate,
   'modern-professional': ModernProfessionalTemplate,
   'bold-colorful': BoldColorfulTemplate,
+  'ocean-breeze': ElegantShopTemplate, // TODO: Create unique
+  'sunset-glow': ElegantShopTemplate, // TODO: Create unique
+  'forest-green': ElegantShopTemplate, // TODO: Create unique
+  'berry-blast': ElegantShopTemplate, // TODO: Create unique
+  'midnight-blue': ModernProfessionalTemplate, // TODO: Create unique
+  'coffee-shop': ModernProfessionalTemplate, // TODO: Create unique
+  'lavender-dreams': ElegantShopTemplate, // TODO: Create unique
+  'coral-reef': BoldColorfulTemplate, // TODO: Create unique
+  'mint-fresh': ElegantShopTemplate, // TODO: Create unique
+  'peach-perfect': ElegantShopTemplate, // TODO: Create unique
+  'steel-gray': ModernProfessionalTemplate, // TODO: Create unique
+  'ruby-red': BoldColorfulTemplate, // TODO: Create unique
+  'golden-hour': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'turquoise-bay': ElegantShopTemplate, // TODO: Create unique
+  'charcoal-elite': ModernProfessionalTemplate, // TODO: Create unique
+  'rose-garden': ElegantShopTemplate, // TODO: Create unique
   
-  // UNLIMITED TIER
+  // UNLIMITED TIER (20) - Using existing as placeholders
   'luxury-boutique': LuxuryBoutiqueTemplate,
   'royal-marketplace': RoyalMarketplaceTemplate,
   'futuristic-store': FuturisticStoreTemplate,
-  'artisan-craft': LuxuryBoutiqueTemplate, // TODO: Create unique template
-  'modern-showcase': FuturisticStoreTemplate, // TODO: Create unique template
+  'diamond-sparkle': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'platinum-elite': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'crystal-palace': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'neon-nights': FuturisticStoreTemplate, // TODO: Create unique
+  'aurora-borealis': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'cosmic-galaxy': FuturisticStoreTemplate, // TODO: Create unique
+  'phoenix-fire': RoyalMarketplaceTemplate, // TODO: Create unique
+  'dragon-scale': RoyalMarketplaceTemplate, // TODO: Create unique
+  'thunder-storm': FuturisticStoreTemplate, // TODO: Create unique
+  'ice-kingdom': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'velvet-noir': RoyalMarketplaceTemplate, // TODO: Create unique
+  'champagne-dreams': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'emerald-city': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'sapphire-sky': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'opal-magic': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'obsidian-edge': FuturisticStoreTemplate, // TODO: Create unique
+  'rose-quartz': LuxuryBoutiqueTemplate, // TODO: Create unique
 } as const
 
 export type StoreTemplateId = keyof typeof STORE_TEMPLATES
