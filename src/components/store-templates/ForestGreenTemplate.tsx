@@ -29,7 +29,7 @@ export default function ForestGreenTemplate({ store, products }: StoreTemplatePr
                 {store.tagline && <p className="text-sm text-emerald-100">{store.tagline}</p>}
               </div>
             </div>
-            <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="bg-white hover:bg-emerald-50 text-emerald-700 px-6 py-3 rounded-full font-semibold shadow-lg transition-all">
+            <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" rel="noopener noreferrer" rel="noopener noreferrer" className="bg-white hover:bg-emerald-50 text-emerald-700 px-6 py-3 rounded-full font-semibold shadow-lg transition-all">
               Hubungi
             </a>
           </div>

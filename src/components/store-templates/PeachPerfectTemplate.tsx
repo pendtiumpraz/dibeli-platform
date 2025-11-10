@@ -8,7 +8,7 @@ export default function PeachPerfectTemplate({ store, products }: StoreTemplateP
       <nav className="bg-gradient-to-r from-orange-400 to-pink-400 text-white shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">{store.logoUrl ? <img src={store.logoUrl} alt={store.name} className="h-12 w-12 rounded-full"/> : <div className="h-12 w-12 bg-orange-500 rounded-full flex items-center justify-center font-bold text-xl">{store.name[0]}</div>}<h1 className="text-2xl font-bold">{store.name}</h1></div>
-          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" className="bg-white text-orange-500 px-6 py-3 rounded-full font-semibold">Chat</a>
+          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="bg-white text-orange-500 px-6 py-3 rounded-full font-semibold">Chat</a>
         </div>
       </nav>
       <header className="bg-gradient-to-b from-orange-300 to-pink-400 text-white py-20 text-center"><h2 className="text-5xl font-bold">{store.name}</h2></header>

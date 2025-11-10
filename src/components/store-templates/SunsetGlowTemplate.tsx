@@ -40,7 +40,7 @@ export default function SunsetGlowTemplate({ store, products }: StoreTemplatePro
             </div>
             <a
               href={`https://wa.me/${store.whatsappNumber}`}
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               rel="noopener noreferrer"
               className="bg-white hover:bg-orange-50 text-orange-600 px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
             >

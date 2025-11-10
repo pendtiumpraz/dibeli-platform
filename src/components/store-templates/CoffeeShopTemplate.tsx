@@ -12,7 +12,7 @@ export default function CoffeeShopTemplate({ store, products }: StoreTemplatePro
             {store.logoUrl ? <img src={store.logoUrl} alt={store.name} className="h-12 w-12 rounded-full ring-2 ring-amber-400/50"/> : <div className="h-12 w-12 bg-amber-700 rounded-full flex items-center justify-center font-bold text-xl">{store.name[0]}</div>}
             <h1 className="text-2xl font-bold">{store.name}</h1>
           </div>
-          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" className="bg-white text-amber-800 px-6 py-3 rounded-full font-semibold">Chat</a>
+          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="bg-white text-amber-800 px-6 py-3 rounded-full font-semibold">Chat</a>
         </div>
       </nav>
       <header className="bg-gradient-to-b from-amber-700 to-orange-800 text-white py-20 text-center">

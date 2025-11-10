@@ -11,7 +11,7 @@ export default function CoralReefTemplate({ store, products }: StoreTemplateProp
             {store.logoUrl ? <img src={store.logoUrl} alt={store.name} className="h-12 w-12 rounded-full"/> : <div className="h-12 w-12 bg-orange-600 rounded-full flex items-center justify-center font-bold text-xl">{store.name[0]}</div>}
             <h1 className="text-2xl font-bold">{store.name}</h1>
           </div>
-          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold">Chat</a>
+          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="bg-white text-orange-600 px-6 py-3 rounded-full font-semibold">Chat</a>
         </div>
       </nav>
       <header className="bg-gradient-to-b from-orange-400 to-pink-600 text-white py-20 text-center"><h2 className="text-5xl font-bold">{store.name}</h2></header>

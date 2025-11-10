@@ -40,7 +40,7 @@ export default function OceanBreezeTemplate({ store, products }: StoreTemplatePr
             </div>
             <a
               href={`https://wa.me/${store.whatsappNumber}`}
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               rel="noopener noreferrer"
               className="bg-white hover:bg-cyan-50 text-cyan-600 px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
             >
