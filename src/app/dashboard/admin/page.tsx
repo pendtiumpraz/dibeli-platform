@@ -223,7 +223,7 @@ export default async function AdminPage() {
       {/* Quick Actions */}
       <div className="mt-8 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <h2 className="text-xl font-bold text-gray-900 mb-4">⚡ Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <a
             href="/dashboard/admin/templates"
             className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition-colors"
@@ -249,6 +249,15 @@ export default async function AdminPage() {
             <div className="text-2xl mb-2">📊</div>
             <div className="font-semibold">Analytics</div>
             <div className="text-sm text-gray-600">Platform statistics</div>
+          </a>
+
+          <a
+            href="/dashboard/admin/settings"
+            className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition-colors"
+          >
+            <div className="text-2xl mb-2">⚙️</div>
+            <div className="font-semibold">Settings</div>
+            <div className="text-sm text-gray-600">API keys & configuration</div>
           </a>
         </div>
       </div>

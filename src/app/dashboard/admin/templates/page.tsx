@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import AdminLayout from '@/components/AdminLayout'
-import { DeleteTemplateButton } from '@/components/DeleteTemplateButton'
+import { TEMPLATE_INFO } from '@/components/store-templates/registry'
+import type { StoreTemplateId } from '@/components/store-templates/registry'
+import Link from 'next/link'
 
 export default async function AdminTemplatesPage() {
   const session = await getServerSession(authOptions)
@@ -12,25 +13,17 @@ export default async function AdminTemplatesPage() {
     redirect('/dashboard')
   }
 
-  // Get all templates
-  const templates = await prisma.template.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      creator: {
-        select: {
-          name: true,
-          email: true,
-        },
-      },
-    },
-  })
+  // Get ACTUAL store templates being used (not database templates)
+  const templates = Object.entries(TEMPLATE_INFO).map(([templateId, info]) => ({
+    templateId,
+    ...info,
+  }))
 
-  // Stats
+  // Stats based on ACTUAL templates
   const totalTemplates = templates.length
-  const publishedTemplates = templates.filter(t => t.status === 'PUBLISHED').length
-  const draftTemplates = templates.filter(t => t.status === 'DRAFT').length
-  const premiumTemplates = templates.filter(t => t.isPremium).length
-  const freeTemplates = templates.filter(t => !t.isPremium).length
+  const freeTemplates = templates.filter(t => t.tier === 'FREE').length
+  const premiumTemplates = templates.filter(t => t.tier === 'PREMIUM').length
+  const unlimitedTemplates = templates.filter(t => t.tier === 'UNLIMITED').length
 
   return (
     <AdminLayout user={session.user}>
@@ -58,144 +51,107 @@ export default async function AdminTemplatesPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="text-sm text-gray-600">Total</div>
+          <div className="text-sm text-gray-600">Total Templates</div>
           <div className="text-2xl font-bold text-gray-900">{totalTemplates}</div>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="text-sm text-gray-600">Published</div>
-          <div className="text-2xl font-bold text-green-600">{publishedTemplates}</div>
+          <div className="text-sm text-gray-600">FREE Tier</div>
+          <div className="text-2xl font-bold text-blue-600">{freeTemplates}</div>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="text-sm text-gray-600">Draft</div>
-          <div className="text-2xl font-bold text-gray-600">{draftTemplates}</div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="text-sm text-gray-600">Premium</div>
+          <div className="text-sm text-gray-600">PREMIUM Tier</div>
           <div className="text-2xl font-bold text-purple-600">{premiumTemplates}</div>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="text-sm text-gray-600">Free</div>
-          <div className="text-2xl font-bold text-blue-600">{freeTemplates}</div>
+          <div className="text-sm text-gray-600">UNLIMITED Tier</div>
+          <div className="text-2xl font-bold text-pink-600">{unlimitedTemplates}</div>
         </div>
       </div>
 
-      {/* Templates Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Template
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Creator
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Rating
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {templates.map((template) => (
-                <tr key={template.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <img
-                        src={template.thumbnailImage}
-                        alt={template.name}
-                        className="w-12 h-12 rounded object-cover mr-3"
-                      />
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {template.name}
-                        </div>
-                        <div className="text-xs text-gray-500">{template.slug}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{template.category}</div>
-                    {template.subcategory && (
-                      <div className="text-xs text-gray-500">{template.subcategory}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{template.creator.name}</div>
-                    <div className="text-xs text-gray-500">{template.creator.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        template.status === 'PUBLISHED'
-                          ? 'bg-green-100 text-green-800'
-                          : template.status === 'DRAFT'
-                          ? 'bg-gray-100 text-gray-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {template.status}
+      {/* Templates Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {templates.map((template) => (
+          <div key={template.templateId} className="bg-white rounded-lg shadow-sm border-2 border-gray-200 overflow-hidden hover:border-blue-400 transition-all">
+            {/* Thumbnail */}
+            <div className="relative aspect-video bg-gray-100">
+              {template.thumbnail ? (
+                <img
+                  src={template.thumbnail}
+                  alt={template.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+                  </svg>
+                </div>
+              )}
+              
+              {/* Tier Badge */}
+              <div className="absolute top-3 right-3">
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  template.tier === 'FREE' ? 'bg-blue-100 text-blue-800' :
+                  template.tier === 'PREMIUM' ? 'bg-purple-100 text-purple-800' :
+                  'bg-pink-100 text-pink-800'
+                }`}>
+                  {template.tier}
+                </span>
+              </div>
+            </div>
+
+            {/* Info */}
+            <div className="p-5">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                {template.name}
+              </h3>
+              <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                {template.description}
+              </p>
+
+              {/* Features */}
+              <div className="mb-4">
+                <p className="text-xs font-semibold text-gray-700 mb-2">Features:</p>
+                <div className="flex flex-wrap gap-1">
+                  {template.features.slice(0, 3).map((feature, idx) => (
+                    <span key={idx} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                      {feature}
                     </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        template.isPremium
-                          ? 'bg-purple-100 text-purple-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}
-                    >
-                      {template.isPremium ? 'Premium' : 'Free'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {template.price ? `Rp ${template.price.toLocaleString('id-ID')}` : 'Free'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      ⭐ {template.rating || 0}/5
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {template.reviewCount} reviews
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <a
-                      href={`/dashboard/admin/templates/${template.id}/edit`}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      Edit
-                    </a>
-                    <a
-                      href={`/dashboard/admin/templates/${template.id}`}
-                      className="text-green-600 hover:text-green-900"
-                    >
-                      View
-                    </a>
-                    <DeleteTemplateButton templateId={template.id} templateName={template.name} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  ))}
+                  {template.features.length > 3 && (
+                    <span className="text-xs text-gray-500">+{template.features.length - 3} more</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2">
+                <Link
+                  href={`/dashboard/store/template`}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg font-medium text-sm transition-colors"
+                >
+                  Preview
+                </Link>
+                <Link
+                  href={`/dashboard/store/template`}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-center py-2 rounded-lg font-medium text-sm transition-colors"
+                >
+                  Apply
+                </Link>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Note */}
+      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="text-sm text-blue-800">
+          <strong>ℹ️ Note:</strong> These are the ACTUAL store templates being used in production. 
+          To change templates, go to <Link href="/dashboard/store/template" className="underline font-semibold">Store Settings → Template</Link>.
+        </p>
       </div>
       </div>
     </AdminLayout>
