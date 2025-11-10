@@ -64,14 +64,18 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   
   const fetchApiKeys = async () => {
     try {
-      const res = await fetch('/api/user/profile')
+      // Use same endpoint as create page
+      const res = await fetch('/api/user/check-api-keys')
       if (res.ok) {
         const data = await res.json()
-        setHasGeminiKey(!!data.geminiApiKey)
-        setHasGroqKey(!!data.groqApiKey)
+        console.log('📡 API Keys Check:', data)
+        setHasGeminiKey(data.hasGeminiKey)
+        setHasGroqKey(data.hasGroqKey)
+      } else {
+        console.error('Failed to fetch API keys:', await res.text())
       }
     } catch (error) {
-      console.error('Failed to fetch API keys:', error)
+      console.error('Error fetching API keys:', error)
     }
   }
   

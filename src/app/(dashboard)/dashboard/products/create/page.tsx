@@ -191,8 +191,11 @@ export default function CreateProductPage() {
         .replace(/-+/g, '-')
         .trim()
       
+      console.log('🔧 AI Generate - Auto Slug:', autoSlug)
+      console.log('🔧 Current conversionPageSlug:', formData.conversionPageSlug)
+      
       // Apply generated data + ENABLE conversion page!
-      setFormData({
+      const updatedFormData = {
         ...formData,
         // Enable conversion page (CRITICAL FIX!)
         hasConversionPage: true,
@@ -211,9 +214,18 @@ export default function CreateProductPage() {
         socialProof: generated.socialProof || '',
         urgencyText: generated.urgencyText || '',
         ctaText: generated.ctaText || '',
-      })
+      }
       
-      alert('✅ AI berhasil generate semua konten! Scroll kebawah untuk lihat hasilnya.')
+      console.log('✅ Updated Form Data:', updatedFormData)
+      console.log('✅ hasConversionPage:', updatedFormData.hasConversionPage)
+      console.log('✅ conversionPageSlug:', updatedFormData.conversionPageSlug)
+      
+      setFormData(updatedFormData)
+      
+      alert('✅ AI berhasil generate semua konten!\n\n' +
+            `📄 Conversion Page: ${updatedFormData.hasConversionPage ? 'ENABLED ✅' : 'DISABLED ❌'}\n` +
+            `🔗 Slug: /p/${updatedFormData.conversionPageSlug}\n\n` +
+            'Scroll kebawah untuk lihat hasilnya.')
       
     } catch (error: any) {
       console.error(error)
