@@ -255,19 +255,34 @@ PENTING:
       return NextResponse.json({ error: 'AI returned empty response' }, { status: 500 })
     }
     
-    // Parse JSON response - handle markdown code blocks
-    const cleanText = generatedText
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim()
+    // Parse JSON response - ROBUST cleanup for various AI response formats
+    let cleanText = generatedText.trim()
+    
+    // Remove markdown code blocks
+    cleanText = cleanText.replace(/```json\n?/gi, '').replace(/```\n?/g, '').trim()
+    
+    // Try to extract JSON if text before/after
+    const jsonMatch = cleanText.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      cleanText = jsonMatch[0]
+    }
+    
+    // Remove any BOM or zero-width characters
+    cleanText = cleanText.replace(/^\uFEFF/, '').replace(/\u200B/g, '')
     
     let generated
     try {
       generated = JSON.parse(cleanText)
     } catch (parseError) {
       console.error('JSON parse error:', parseError)
-      console.error('Response text:', cleanText)
-      return NextResponse.json({ error: 'AI returned invalid JSON format' }, { status: 500 })
+      console.error('AI Provider:', provider)
+      console.error('Raw response (first 500 chars):', generatedText.substring(0, 500))
+      console.error('Cleaned text (first 500 chars):', cleanText.substring(0, 500))
+      return NextResponse.json({ 
+        error: 'AI returned invalid JSON format',
+        details: 'Response could not be parsed. Try again or switch provider.',
+        preview: cleanText.substring(0, 200)
+      }, { status: 500 })
     }
     
     // Increment usage counters (only on success)
