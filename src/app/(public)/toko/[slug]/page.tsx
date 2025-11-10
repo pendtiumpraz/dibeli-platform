@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { getDefaultTheme, formatPriceRupiah } from '@/lib/template-renderer'
-import { combineTemplate, getTemplatePackage } from '@/lib/template-combiner'
-import { getDriveImageUrl } from '@/lib/google-drive'
+import { getStoreTemplate } from '@/components/store-templates/registry'
+import type { StoreTemplateStore, StoreTemplateProduct } from '@/components/store-templates/types'
 
 interface PageProps {
   params: {
@@ -41,7 +40,7 @@ export default async function PublicStorePage({ params }: PageProps) {
     notFound()
   }
 
-  // Get published products separately
+  // Get published products
   const products = await prisma.product.findMany({
     where: {
       storeId: store.id,
@@ -53,68 +52,61 @@ export default async function PublicStorePage({ params }: PageProps) {
     take: 50,
   })
 
-  // Get template from store settings
-  const templateId = store.templateId || 'modern-minimal'
-  const templatePackage = getTemplatePackage(templateId)
-
-  if (!templatePackage) {
-    return <div>Template not found</div>
+  // Prepare store data for template
+  const storeData: StoreTemplateStore = {
+    id: store.id,
+    name: store.name,
+    slug: store.slug,
+    description: store.description,
+    tagline: store.tagline,
+    logoUrl: store.logoUrl,
+    whatsappNumber: store.whatsappNumber,
+    email: store.email,
+    phone: store.phone,
+    address: store.address,
+    city: store.city,
+    province: store.province,
+    instagramUrl: store.instagramUrl,
+    facebookUrl: store.facebookUrl,
+    tiktokUrl: store.tiktokUrl,
+    twitterUrl: store.twitterUrl,
+    youtubeUrl: store.youtubeUrl,
+    productCount: products.length,
+    rating: store.rating ? Number(store.rating) : null,
+    reviewCount: store.reviewCount,
   }
 
-  // Prepare template data
-  const data = {
-    store: {
-      name: store.name,
-      logo: undefined,
-      badge: `${products.length}+ Produk Tersedia`,
-      heroTitle: `Selamat Datang di ${store.name}`,
-      heroSubtitle: store.description || 'Temukan produk berkualitas dengan harga terbaik. Belanja sekarang dan dapatkan penawaran spesial!',
-      tagline: store.description || 'Produk Berkualitas Terbaik',
-      description: store.description || undefined,
-      whatsappNumber: store.whatsappNumber,
-      address: store.address || undefined,
-      showStats: true,
-      stats: {
-        products: products.length,
-        customers: 100,
-        rating: '4.9',
-      },
-    },
-    products: products.map((product) => {
-      const images = Array.isArray(product.images) ? (product.images as string[]) : []
-      const isNew = new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // New if created in last 7 days
-      
-      return {
-        id: product.id,
-        name: product.name,
-        slug: product.slug,
-        price: formatPriceRupiah(product.price),
-        priceRaw: product.price,
-        description: product.description || undefined,
-        image: images.length > 0 ? getDriveImageUrl(images[0]) : 'https://via.placeholder.com/500',
-        images: images.map((id) => getDriveImageUrl(id)),
-        isAvailable: product.isAvailable,
-        stock: product.stock || undefined,
-        isNew,
-        category: 'Produk',
-        rating: 5,
-        reviewCount: 0,
-        features: undefined, // TODO: Add features field to product model
-        // Conversion landing page data
-        hasConversionPage: product.hasConversionPage || false,
-        conversionPageSlug: product.conversionPageSlug || undefined,
-      }
-    }),
-    theme: getDefaultTheme(),
-  }
+  // Prepare products data for template
+  const productsData: StoreTemplateProduct[] = products.map((product) => {
+    const images = Array.isArray(product.images) ? (product.images as string[]) : []
+    const isNew = new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    
+    return {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      discountPercent: product.discountPercent,
+      description: product.description,
+      images: images,
+      isAvailable: product.isAvailable,
+      stock: product.stock,
+      isNew,
+      category: 'Produk',
+      rating: 5,
+      reviewCount: 0,
+      hasConversionPage: product.hasConversionPage || false,
+      conversionPageSlug: product.conversionPageSlug,
+    }
+  })
 
-  // Render template
-  const renderedHtml = combineTemplate(templatePackage.config, data)
+  // Get template component
+  const templateId = store.templateId || 'simple-classic'
+  const TemplateComponent = getStoreTemplate(templateId)
 
-  // Return as HTML
-  return (
-    <div dangerouslySetInnerHTML={{ __html: renderedHtml }} />
-  )
+  // Render React template
+  return <TemplateComponent store={storeData} products={productsData} />
 }
 
 export const dynamic = 'force-dynamic'
