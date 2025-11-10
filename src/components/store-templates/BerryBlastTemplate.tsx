@@ -27,7 +27,7 @@ export default function BerryBlastTemplate({ store, products }: StoreTemplatePro
               {store.tagline && <p className="text-sm text-pink-100">{store.tagline}</p>}
             </div>
           </div>
-          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" rel="noopener noreferrer" rel="noopener noreferrer" className="bg-white hover:bg-pink-50 text-pink-600 px-6 py-3 rounded-full font-semibold shadow-lg transition-all">
+          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="bg-white hover:bg-pink-50 text-pink-600 px-6 py-3 rounded-full font-semibold shadow-lg transition-all">
             Chat
           </a>
         </div>

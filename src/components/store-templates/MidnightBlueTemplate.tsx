@@ -22,7 +22,7 @@ export default function MidnightBlueTemplate({ store, products }: StoreTemplateP
             )}
             <h1 className="text-2xl font-bold text-white">{store.name}</h1>
           </div>
-          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" rel="noopener noreferrer" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-semibold">
+          <a href={`https://wa.me/${store.whatsappNumber}`} target="_blank" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-semibold">
             Chat
           </a>
         </div>

@@ -40,7 +40,7 @@ export default function SunsetGlowTemplate({ store, products }: StoreTemplatePro
             </div>
             <a
               href={`https://wa.me/${store.whatsappNumber}`}
-              target="_blank" rel="noopener noreferrer"
+              target="_blank"
               rel="noopener noreferrer"
               className="bg-white hover:bg-orange-50 text-orange-600 px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
             >
@@ -120,33 +120,16 @@ export default function SunsetGlowTemplate({ store, products }: StoreTemplatePro
                     </p>
                   )}
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <div className="text-2xl font-bold text-orange-600">
-                        Rp {product.price.toLocaleString('id-ID')}
-                      </div>
-                      {product.stock !== undefined && product.stock > 0 && (
-                        <div className="text-sm text-gray-500">Stok: {product.stock}</div>
-                      )}
-                    </div>
+                  <div className="text-2xl font-bold text-orange-600 mb-4">
+                    Rp {product.price.toLocaleString('id-ID')}
                   </div>
 
-                  {product.productDetailUrl ? (
-                    <Link
-                      href={product.productDetailUrl}
-                      className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-lg"
-                    >
-                      Lihat Detail
-                    </Link>
-                  ) : (
-                    <button
-                      onClick={() => handleWhatsAppOrder(product.name, product.price)}
-                      disabled={product.stock === 0}
-                      className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 text-white py-3 rounded-xl font-semibold transition-all shadow-lg disabled:cursor-not-allowed"
-                    >
-                      Pesan via WhatsApp
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleWhatsAppOrder(product.name, product.price)}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 rounded-xl font-semibold transition-all shadow-lg"
+                  >
+                    Pesan via WhatsApp
+                  </button>
                 </div>
               </div>
             ))}
