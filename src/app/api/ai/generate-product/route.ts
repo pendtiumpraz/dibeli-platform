@@ -156,9 +156,10 @@ PENTING:
 - Return HANYA JSON, tanpa markdown atau teks tambahan`
     
     if (provider === 'gemini') {
-      // Call Google Gemini API - Using latest model: gemini-2.0-flash
-      // Note: FREE tier = 15 req/min, 32K tokens/min. Use Groq for better limits!
-      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${finalApiKey}`, {
+      // Call Google Gemini API - Using STABLE model: gemini-2.0-flash
+      // TESTED WORKING: gemini-2.0-flash, gemini-2.5-flash, gemini-2.5-pro
+      // FREE tier = 15 req/min, 32K tokens/min. Use Groq for better limits!
+      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${finalApiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
