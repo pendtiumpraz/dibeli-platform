@@ -16,11 +16,11 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-pink-50/30">
       <DashboardNav />
-      <div className="lg:pl-64">
+      <div className="lg:pl-72">
         <DashboardHeader user={session.user} />
-        <main className="py-8 px-4 sm:px-6 lg:px-8">
+        <main className="py-6 px-4 sm:px-6 lg:px-8">
           {children}
         </main>
       </div>
