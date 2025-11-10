@@ -76,14 +76,14 @@ export default function SimpleClassicTemplate({ store, products }: StoreTemplate
       </header>
 
       {/* Product Grid */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 py-8">
         {products.length === 0 ? (
           <div className="text-center py-16 text-gray-500">
             <p className="text-lg mb-2">Belum ada produk</p>
             <p className="text-sm">Produk akan segera ditambahkan</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {products.map((product) => (
               <div key={product.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                 {/* Product Image */}
@@ -117,17 +117,17 @@ export default function SimpleClassicTemplate({ store, products }: StoreTemplate
                 </div>
 
                 {/* Product Info */}
-                <div className="p-3">
-                  <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-2 min-h-[2.5rem]">
+                <div className="p-4 md:p-5">
+                  <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-2 line-clamp-2 min-h-[2.5rem]">
                     {product.name}
                   </h3>
-                  <div className="mb-3">
+                  <div className="mb-4">
                     {product.originalPrice && product.originalPrice > product.price && (
-                      <p className="text-xs text-gray-400 line-through">
+                      <p className="text-xs text-gray-400 line-through mb-1">
                         Rp {product.originalPrice.toLocaleString('id-ID')}
                       </p>
                     )}
-                    <p className="text-lg font-bold text-blue-600">
+                    <p className="text-xl md:text-2xl font-bold text-blue-600">
                       Rp {product.price.toLocaleString('id-ID')}
                     </p>
                   </div>
@@ -135,14 +135,14 @@ export default function SimpleClassicTemplate({ store, products }: StoreTemplate
                   {product.hasConversionPage && product.conversionPageSlug ? (
                     <Link
                       href={`/p/${product.conversionPageSlug}`}
-                      className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded text-sm font-medium transition-colors"
+                      className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
                     >
                       Lihat Detail
                     </Link>
                   ) : (
                     <button
                       onClick={() => handleWhatsAppOrder(product.name, product.price)}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded text-sm font-medium transition-colors"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
                     >
                       Pesan via WA
                     </button>
