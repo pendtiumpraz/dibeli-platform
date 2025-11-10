@@ -65,6 +65,7 @@ export async function PUT(
     const contentType = request.headers.get('content-type')
     let name, description, price, stock, isAvailable, existingImages, deletedImages
     let videoUrl, originalPrice, discountPercent, discountValidUntil // Phase 1
+    let hasConversionPage, conversionPageSlug, conversionTemplate, headline, subheadline // Phase 2
     let newImageFiles: File[] = []
 
     if (contentType?.includes('multipart/form-data')) {
@@ -83,6 +84,13 @@ export async function PUT(
       originalPrice = formData.get('originalPrice') ? parseFloat(formData.get('originalPrice') as string) : null
       discountPercent = formData.get('discountPercent') ? parseInt(formData.get('discountPercent') as string) : null
       discountValidUntil = formData.get('discountValidUntil') as string || null
+      
+      // Phase 2: Conversion Page
+      hasConversionPage = formData.get('hasConversionPage') === 'true'
+      conversionPageSlug = formData.get('conversionPageSlug') as string || null
+      conversionTemplate = formData.get('conversionTemplate') as string || 'red-urgency'
+      headline = formData.get('headline') as string || null
+      subheadline = formData.get('subheadline') as string || null
 
       // Get new image files
       const images = formData.getAll('images')
@@ -103,6 +111,13 @@ export async function PUT(
       originalPrice = body.originalPrice || null
       discountPercent = body.discountPercent || null
       discountValidUntil = body.discountValidUntil || null
+      
+      // Phase 2: Conversion Page
+      hasConversionPage = body.hasConversionPage || false
+      conversionPageSlug = body.conversionPageSlug || null
+      conversionTemplate = body.conversionTemplate || 'red-urgency'
+      headline = body.headline || null
+      subheadline = body.subheadline || null
     }
 
     // Upload new images to Drive
@@ -149,6 +164,12 @@ export async function PUT(
         originalPrice,
         discountPercent,
         discountValidUntil: discountValidUntil ? new Date(discountValidUntil) : null,
+        // Phase 2: Conversion Page
+        hasConversionPage,
+        conversionPageSlug,
+        conversionTemplate,
+        headline,
+        subheadline,
       },
     })
 

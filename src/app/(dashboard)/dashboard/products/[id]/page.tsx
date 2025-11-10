@@ -21,6 +21,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     originalPrice: '',
     discountPercent: '',
     discountValidUntil: '',
+    // Phase 2: Conversion Page
+    hasConversionPage: false,
+    conversionPageSlug: '',
+    conversionTemplate: 'red-urgency',
+    headline: '',
+    subheadline: '',
   })
   const [newImages, setNewImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -48,6 +54,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           originalPrice: data.originalPrice?.toString() || '',
           discountPercent: data.discountPercent?.toString() || '',
           discountValidUntil: data.discountValidUntil ? new Date(data.discountValidUntil).toISOString().split('T')[0] : '',
+          // Phase 2: Conversion Page
+          hasConversionPage: data.hasConversionPage || false,
+          conversionPageSlug: data.conversionPageSlug || '',
+          conversionTemplate: data.conversionTemplate || 'red-urgency',
+          headline: data.headline || '',
+          subheadline: data.subheadline || '',
         })
         // Set existing images
         if (data.images && Array.isArray(data.images)) {
@@ -110,6 +122,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         if (formData.originalPrice) formDataToSend.append('originalPrice', formData.originalPrice)
         if (formData.discountPercent) formDataToSend.append('discountPercent', formData.discountPercent)
         if (formData.discountValidUntil) formDataToSend.append('discountValidUntil', formData.discountValidUntil)
+        
+        // Phase 2: Conversion Page
+        formDataToSend.append('hasConversionPage', formData.hasConversionPage.toString())
+        if (formData.conversionPageSlug) formDataToSend.append('conversionPageSlug', formData.conversionPageSlug)
+        if (formData.conversionTemplate) formDataToSend.append('conversionTemplate', formData.conversionTemplate)
+        if (formData.headline) formDataToSend.append('headline', formData.headline)
+        if (formData.subheadline) formDataToSend.append('subheadline', formData.subheadline)
 
         // Add new image files
         newImages.forEach((file) => {
@@ -142,6 +161,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
             discountPercent: formData.discountPercent ? parseInt(formData.discountPercent) : null,
             discountValidUntil: formData.discountValidUntil || null,
+            // Phase 2: Conversion Page
+            hasConversionPage: formData.hasConversionPage,
+            conversionPageSlug: formData.conversionPageSlug || null,
+            conversionTemplate: formData.conversionTemplate || 'red-urgency',
+            headline: formData.headline || null,
+            subheadline: formData.subheadline || null,
             existingImages,
             deletedImages,
           }),
@@ -476,6 +501,214 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             />
             <span className="ml-2 text-sm text-gray-700">Produk tersedia</span>
           </label>
+        </div>
+
+        {/* Phase 2: Conversion Landing Page Section */}
+        <div className="border-t pt-6">
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 border-2 border-green-200">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white text-2xl">
+                  🚀
+                </div>
+              </div>
+              <div className="flex-1">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasConversionPage}
+                    onChange={(e) => {
+                      const enabled = e.target.checked
+                      setFormData({ 
+                        ...formData, 
+                        hasConversionPage: enabled,
+                        // Auto-generate slug if enabling for first time
+                        conversionPageSlug: enabled && !formData.conversionPageSlug 
+                          ? formData.name.toLowerCase().replace(/\s+/g, '-') 
+                          : formData.conversionPageSlug
+                      })
+                    }}
+                    className="w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                  />
+                  <span className="ml-3">
+                    <span className="text-lg font-bold text-gray-900">Enable Conversion Landing Page</span>
+                    <span className="block text-sm text-gray-600 mt-1">
+                      Buat halaman khusus yang dioptimalkan untuk penjualan maksimal!
+                    </span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            {formData.hasConversionPage && (
+              <div className="mt-6 space-y-6 pt-6 border-t border-green-200">
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <p className="text-sm text-gray-700 mb-2">
+                    ✨ <strong>Landing page akan tersedia di:</strong>
+                  </p>
+                  <div className="flex items-center gap-2 text-sm">
+                    <code className="bg-gray-100 px-3 py-2 rounded text-purple-600 font-mono">
+                      /p/{formData.conversionPageSlug || 'produk-slug'}
+                    </code>
+                    <span className="text-gray-500">← URL khusus untuk promosi!</span>
+                  </div>
+                </div>
+
+                {/* Template Selector */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    🎨 Template Style
+                  </label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <label className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all ${
+                      formData.conversionTemplate === 'red-urgency' 
+                        ? 'border-red-500 bg-red-50' 
+                        : 'border-gray-200 hover:border-red-300'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="template"
+                        value="red-urgency"
+                        checked={formData.conversionTemplate === 'red-urgency'}
+                        onChange={(e) => setFormData({ ...formData, conversionTemplate: e.target.value })}
+                        className="sr-only"
+                      />
+                      <div className="text-center">
+                        <div className="text-3xl mb-2">🔥</div>
+                        <div className="font-bold text-gray-900">Red Urgency</div>
+                        <div className="text-xs text-gray-600 mt-1">FOMO & Scarcity</div>
+                      </div>
+                      {formData.conversionTemplate === 'red-urgency' && (
+                        <div className="absolute top-2 right-2 text-red-600">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                          </svg>
+                        </div>
+                      )}
+                    </label>
+
+                    <label className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all ${
+                      formData.conversionTemplate === 'green-trust' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-green-300'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="template"
+                        value="green-trust"
+                        checked={formData.conversionTemplate === 'green-trust'}
+                        onChange={(e) => setFormData({ ...formData, conversionTemplate: e.target.value })}
+                        className="sr-only"
+                      />
+                      <div className="text-center">
+                        <div className="text-3xl mb-2">🌿</div>
+                        <div className="font-bold text-gray-900">Green Trust</div>
+                        <div className="text-xs text-gray-600 mt-1">Safety & Trust</div>
+                      </div>
+                      {formData.conversionTemplate === 'green-trust' && (
+                        <div className="absolute top-2 right-2 text-green-600">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                          </svg>
+                        </div>
+                      )}
+                    </label>
+
+                    <label className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all ${
+                      formData.conversionTemplate === 'yellow-energy' 
+                        ? 'border-yellow-500 bg-yellow-50' 
+                        : 'border-gray-200 hover:border-yellow-300'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="template"
+                        value="yellow-energy"
+                        checked={formData.conversionTemplate === 'yellow-energy'}
+                        onChange={(e) => setFormData({ ...formData, conversionTemplate: e.target.value })}
+                        className="sr-only"
+                      />
+                      <div className="text-center">
+                        <div className="text-3xl mb-2">⚡</div>
+                        <div className="font-bold text-gray-900">Yellow Energy</div>
+                        <div className="text-xs text-gray-600 mt-1">Excitement & Action</div>
+                      </div>
+                      {formData.conversionTemplate === 'yellow-energy' && (
+                        <div className="absolute top-2 right-2 text-yellow-600">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                          </svg>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                </div>
+
+                {/* Custom Slug */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    🔗 Custom URL Slug
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.conversionPageSlug}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      conversionPageSlug: e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+                    })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="produk-amazing-murah"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    💡 URL yang mudah dibagikan di WhatsApp, Instagram, dll.
+                  </p>
+                </div>
+
+                {/* Headline */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    🎯 Headline (Judul Besar)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.headline}
+                    onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg font-bold"
+                    placeholder="RAHASIA KULIT GLOWING DALAM 7 HARI!"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    💡 Headline yang menarik perhatian & menjanjikan hasil spesifik
+                  </p>
+                </div>
+
+                {/* Subheadline */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    📝 Subheadline (Penjelasan Singkat)
+                  </label>
+                  <textarea
+                    value={formData.subheadline}
+                    onChange={(e) => setFormData({ ...formData, subheadline: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Tanpa efek samping, teruji klinis, dan sudah dipercaya 10,000+ pelanggan di seluruh Indonesia!"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    💡 Jelaskan benefit utama & bangun kepercayaan
+                  </p>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-bold text-blue-900 mb-2">💡 Tips Conversion Page:</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>✅ Headline harus spesifik & menjanjikan hasil</li>
+                    <li>✅ Gunakan kata-kata yang memicu emosi (RAHASIA, TERBUKTI, MUDAH)</li>
+                    <li>✅ Tambahkan social proof di subheadline (10,000+ pelanggan)</li>
+                    <li>✅ Fase 3-5 akan menambahkan Benefits, Testimonials, dll!</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex gap-4">
