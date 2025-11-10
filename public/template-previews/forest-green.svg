@@ -1,0 +1,51 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="forest-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fdf4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#dcfce7;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="forest-nav" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#047857;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#forest-bg)"/>
+  <rect width="800" height="60" fill="url(#forest-nav)"/>
+  <circle cx="35" cy="30" r="16" fill="#10b981" stroke="#ffffff" stroke-width="3"/>
+  <rect x="60" y="22" width="120" height="16" rx="2" fill="#ffffff"/>
+  <rect x="670" y="20" width="100" height="20" rx="10" fill="#ffffff"/>
+  <rect x="0" y="60" width="800" height="120" fill="#059669"/>
+  <rect x="250" y="95" width="300" height="20" rx="4" fill="#ffffff"/>
+  <g transform="translate(350, 130)">
+    <rect width="100" height="35" rx="8" fill="rgba(255,255,255,0.2)"/>
+    <text x="50" y="23" font-family="Arial" font-size="16" font-weight="bold" fill="#fff" text-anchor="middle">5</text>
+  </g>
+  <g transform="translate(50, 205)">
+    <rect width="220" height="280" rx="16" fill="#fff"/>
+    <rect x="10" y="10" width="200" height="150" rx="12" fill="#d1fae5"/>
+    <text x="110" y="95" font-family="Arial" font-size="30" text-anchor="middle">🌲</text>
+    <rect x="10" y="170" width="160" height="12" rx="2" fill="#1e293b"/>
+    <rect x="10" y="190" width="120" height="16" rx="2" fill="#10b981"/>
+    <rect x="10" y="220" width="200" height="40" rx="10" fill="#10b981"/>
+  </g>
+  <g transform="translate(290, 205)">
+    <rect width="220" height="280" rx="16" fill="#fff"/>
+    <rect x="10" y="10" width="200" height="150" rx="12" fill="#d1fae5"/>
+    <text x="110" y="95" font-family="Arial" font-size="30" text-anchor="middle">🌿</text>
+    <rect x="10" y="170" width="170" height="12" rx="2" fill="#1e293b"/>
+    <rect x="10" y="190" width="130" height="16" rx="2" fill="#10b981"/>
+    <rect x="10" y="220" width="200" height="40" rx="10" fill="#10b981"/>
+  </g>
+  <g transform="translate(530, 205)">
+    <rect width="220" height="280" rx="16" fill="#fff"/>
+    <rect x="10" y="10" width="200" height="150" rx="12" fill="#d1fae5"/>
+    <text x="110" y="95" font-family="Arial" font-size="30" text-anchor="middle">🍃</text>
+    <rect x="10" y="170" width="150" height="12" rx="2" fill="#1e293b"/>
+    <rect x="10" y="190" width="110" height="16" rx="2" fill="#10b981"/>
+    <rect x="10" y="220" width="200" height="40" rx="10" fill="#10b981"/>
+  </g>
+  <rect x="0" y="500" width="800" height="100" fill="url(#forest-nav)"/>
+  <circle cx="360" cy="565" r="12" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="400" cy="565" r="12" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="440" cy="565" r="12" fill="rgba(255,255,255,0.2)"/>
+</svg>

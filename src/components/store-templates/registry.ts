@@ -12,54 +12,87 @@ import BoldColorfulTemplate from './BoldColorfulTemplate'
 import LuxuryBoutiqueTemplate from './LuxuryBoutiqueTemplate'
 import RoyalMarketplaceTemplate from './RoyalMarketplaceTemplate'
 import FuturisticStoreTemplate from './FuturisticStoreTemplate'
+import OceanBreezeTemplate from './OceanBreezeTemplate'
+import SunsetGlowTemplate from './SunsetGlowTemplate'
+import ForestGreenTemplate from './ForestGreenTemplate'
+import BerryBlastTemplate from './BerryBlastTemplate'
+import MidnightBlueTemplate from './MidnightBlueTemplate'
+import CoffeeShopTemplate from './CoffeeShopTemplate'
+import LavenderDreamsTemplate from './LavenderDreamsTemplate'
+import CoralReefTemplate from './CoralReefTemplate'
+import MintFreshTemplate from './MintFreshTemplate'
+import PeachPerfectTemplate from './PeachPerfectTemplate'
+import SteelGrayTemplate from './SteelGrayTemplate'
+import RubyRedTemplate from './RubyRedTemplate'
+import GoldenHourTemplate from './GoldenHourTemplate'
+import TurquoiseBayTemplate from './TurquoiseBayTemplate'
+import CharcoalEliteTemplate from './CharcoalEliteTemplate'
+import RoseGardenTemplate from './RoseGardenTemplate'
+import DiamondSparkleTemplate from './DiamondSparkleTemplate'
+import PlatinumEliteTemplate from './PlatinumEliteTemplate'
+import CrystalPalaceTemplate from './CrystalPalaceTemplate'
+import NeonNightsTemplate from './NeonNightsTemplate'
+import AuroraBorealisTemplate from './AuroraBorealisTemplate'
+import CosmicGalaxyTemplate from './CosmicGalaxyTemplate'
+import PhoenixFireTemplate from './PhoenixFireTemplate'
+import DragonScaleTemplate from './DragonScaleTemplate'
+import ThunderStormTemplate from './ThunderStormTemplate'
+import IceKingdomTemplate from './IceKingdomTemplate'
+import VelvetNoirTemplate from './VelvetNoirTemplate'
+import ChampagneDreamsTemplate from './ChampagneDreamsTemplate'
+import EmeraldCityTemplate from './EmeraldCityTemplate'
+import SapphireSkyTemplate from './SapphireSkyTemplate'
+import OpalMagicTemplate from './OpalMagicTemplate'
+import ObsidianEdgeTemplate from './ObsidianEdgeTemplate'
+import RoseQuartzTemplate from './RoseQuartzTemplate'
 
 export const STORE_TEMPLATES = {
   // FREE TIER (2)
   'simple-classic': SimpleClassicTemplate,
   'minimal-clean': MinimalCleanTemplate,
   
-  // PREMIUM TIER (18) - Using existing templates as placeholders
+  // PREMIUM TIER (18)
   'elegant-shop': ElegantShopTemplate,
   'modern-professional': ModernProfessionalTemplate,
   'bold-colorful': BoldColorfulTemplate,
-  'ocean-breeze': ElegantShopTemplate, // TODO: Create unique
-  'sunset-glow': ElegantShopTemplate, // TODO: Create unique
-  'forest-green': ElegantShopTemplate, // TODO: Create unique
-  'berry-blast': ElegantShopTemplate, // TODO: Create unique
-  'midnight-blue': ModernProfessionalTemplate, // TODO: Create unique
-  'coffee-shop': ModernProfessionalTemplate, // TODO: Create unique
-  'lavender-dreams': ElegantShopTemplate, // TODO: Create unique
-  'coral-reef': BoldColorfulTemplate, // TODO: Create unique
-  'mint-fresh': ElegantShopTemplate, // TODO: Create unique
-  'peach-perfect': ElegantShopTemplate, // TODO: Create unique
-  'steel-gray': ModernProfessionalTemplate, // TODO: Create unique
-  'ruby-red': BoldColorfulTemplate, // TODO: Create unique
-  'golden-hour': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'turquoise-bay': ElegantShopTemplate, // TODO: Create unique
-  'charcoal-elite': ModernProfessionalTemplate, // TODO: Create unique
-  'rose-garden': ElegantShopTemplate, // TODO: Create unique
+  'ocean-breeze': OceanBreezeTemplate,
+  'sunset-glow': SunsetGlowTemplate,
+  'forest-green': ForestGreenTemplate,
+  'berry-blast': BerryBlastTemplate,
+  'midnight-blue': MidnightBlueTemplate,
+  'coffee-shop': CoffeeShopTemplate,
+  'lavender-dreams': LavenderDreamsTemplate,
+  'coral-reef': CoralReefTemplate,
+  'mint-fresh': MintFreshTemplate,
+  'peach-perfect': PeachPerfectTemplate,
+  'steel-gray': SteelGrayTemplate,
+  'ruby-red': RubyRedTemplate,
+  'golden-hour': GoldenHourTemplate,
+  'turquoise-bay': TurquoiseBayTemplate,
+  'charcoal-elite': CharcoalEliteTemplate,
+  'rose-garden': RoseGardenTemplate,
   
-  // UNLIMITED TIER (20) - Using existing as placeholders
+  // UNLIMITED TIER (20)
   'luxury-boutique': LuxuryBoutiqueTemplate,
   'royal-marketplace': RoyalMarketplaceTemplate,
   'futuristic-store': FuturisticStoreTemplate,
-  'diamond-sparkle': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'platinum-elite': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'crystal-palace': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'neon-nights': FuturisticStoreTemplate, // TODO: Create unique
-  'aurora-borealis': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'cosmic-galaxy': FuturisticStoreTemplate, // TODO: Create unique
-  'phoenix-fire': RoyalMarketplaceTemplate, // TODO: Create unique
-  'dragon-scale': RoyalMarketplaceTemplate, // TODO: Create unique
-  'thunder-storm': FuturisticStoreTemplate, // TODO: Create unique
-  'ice-kingdom': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'velvet-noir': RoyalMarketplaceTemplate, // TODO: Create unique
-  'champagne-dreams': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'emerald-city': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'sapphire-sky': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'opal-magic': LuxuryBoutiqueTemplate, // TODO: Create unique
-  'obsidian-edge': FuturisticStoreTemplate, // TODO: Create unique
-  'rose-quartz': LuxuryBoutiqueTemplate, // TODO: Create unique
+  'diamond-sparkle': DiamondSparkleTemplate,
+  'platinum-elite': PlatinumEliteTemplate,
+  'crystal-palace': CrystalPalaceTemplate,
+  'neon-nights': NeonNightsTemplate,
+  'aurora-borealis': AuroraBorealisTemplate,
+  'cosmic-galaxy': CosmicGalaxyTemplate,
+  'phoenix-fire': PhoenixFireTemplate,
+  'dragon-scale': DragonScaleTemplate,
+  'thunder-storm': ThunderStormTemplate,
+  'ice-kingdom': IceKingdomTemplate,
+  'velvet-noir': VelvetNoirTemplate,
+  'champagne-dreams': ChampagneDreamsTemplate,
+  'emerald-city': EmeraldCityTemplate,
+  'sapphire-sky': SapphireSkyTemplate,
+  'opal-magic': OpalMagicTemplate,
+  'obsidian-edge': ObsidianEdgeTemplate,
+  'rose-quartz': RoseQuartzTemplate,
 } as const
 
 export type StoreTemplateId = keyof typeof STORE_TEMPLATES
