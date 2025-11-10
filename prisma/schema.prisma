@@ -49,6 +49,12 @@ model User {
   geminiApiKey String? @db.Text
   groqApiKey   String? @db.Text
 
+  // AI Usage Tracking
+  aiGenerationsTotal      Int      @default(0) // Total lifetime generations
+  aiGenerationsThisMonth  Int      @default(0) // Current month counter
+  lastAiGenerationAt      DateTime?            // Last generation timestamp
+  aiMonthlyResetDate      DateTime @default(now()) // Next reset date
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

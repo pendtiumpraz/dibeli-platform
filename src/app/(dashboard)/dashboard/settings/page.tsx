@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import ApiKeysManager from './ApiKeysManager'
+import AiUsageDisplay from './AiUsageDisplay'
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions)
@@ -25,6 +26,11 @@ export default async function SettingsPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Pengaturan</h1>
 
       <div className="space-y-6">
+        {/* AI Usage Statistics (UNLIMITED Only) */}
+        {session.user.tier === 'UNLIMITED' && (
+          <AiUsageDisplay />
+        )}
+
         {/* AI API Keys Section (UNLIMITED Only) */}
         {session.user.tier === 'UNLIMITED' && (
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 shadow rounded-lg p-6">

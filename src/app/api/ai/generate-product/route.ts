@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { isOverQuota, getQuotaForTier, getRemainingQuota, shouldResetMonthlyQuota, getNextResetDate } from '@/lib/ai-quota'
 
 export async function POST(request: Request) {
   try {
@@ -13,6 +14,47 @@ export async function POST(request: Request) {
     // Check UNLIMITED tier
     if (session.user.tier !== 'UNLIMITED') {
       return NextResponse.json({ error: 'Feature ini hanya untuk UNLIMITED users' }, { status: 403 })
+    }
+    
+    // Get user's current usage
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        tier: true,
+        aiGenerationsThisMonth: true,
+        aiMonthlyResetDate: true,
+      },
+    })
+    
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+    
+    // Check if need to reset monthly counter
+    let currentUsage = user.aiGenerationsThisMonth
+    if (user.aiMonthlyResetDate && shouldResetMonthlyQuota(user.aiMonthlyResetDate)) {
+      // Reset counter
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          aiGenerationsThisMonth: 0,
+          aiMonthlyResetDate: getNextResetDate(user.aiMonthlyResetDate),
+        },
+      })
+      currentUsage = 0
+    }
+    
+    // Check quota
+    if (isOverQuota(currentUsage, user.tier)) {
+      const quota = getQuotaForTier(user.tier)
+      const nextReset = user.aiMonthlyResetDate ? getNextResetDate(user.aiMonthlyResetDate) : new Date()
+      return NextResponse.json({ 
+        error: `Quota AI generation habis! Limit: ${quota} generations/bulan. Reset: ${nextReset.toLocaleDateString('id-ID')}`,
+        quotaExceeded: true,
+        quota,
+        used: currentUsage,
+        nextReset,
+      }, { status: 429 })
     }
     
     const { provider, apiKey, productName, price, description } = await request.json()
@@ -158,7 +200,11 @@ PENTING:
       if (!groqRes.ok) {
         const error = await groqRes.text()
         console.error('Groq API error:', error)
-        return NextResponse.json({ error: 'Groq API failed. Check your API key.' }, { status: 500 })
+        console.error('API Key used:', finalApiKey.substring(0, 10) + '...')
+        return NextResponse.json({ 
+          error: 'Groq API failed. Check your API key at https://console.groq.com/keys',
+          details: error
+        }, { status: 500 })
       }
       
       const groqData = await groqRes.json()
@@ -186,7 +232,29 @@ PENTING:
       return NextResponse.json({ error: 'AI returned invalid JSON format' }, { status: 500 })
     }
     
-    return NextResponse.json(generated)
+    // Increment usage counters (only on success)
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        aiGenerationsTotal: { increment: 1 },
+        aiGenerationsThisMonth: { increment: 1 },
+        lastAiGenerationAt: new Date(),
+      },
+    })
+    
+    // Add usage info to response
+    const newUsage = currentUsage + 1
+    const quota = getQuotaForTier(user.tier)
+    const remaining = getRemainingQuota(newUsage, user.tier)
+    
+    return NextResponse.json({
+      ...generated,
+      _usage: {
+        used: newUsage,
+        quota,
+        remaining,
+      },
+    })
     
   } catch (error: any) {
     console.error('AI generation error:', error)
