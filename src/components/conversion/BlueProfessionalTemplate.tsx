@@ -15,8 +15,8 @@ interface Product {
   stock: number | null
   limitedStock: number | null
   // Phase 3
-  benefits: string[]
-  features: string[]
+  benefits: Array<{text: string, imageUrl?: string}>
+  features: Array<{text: string, imageUrl?: string}>
   // Phase 4
   hasCountdown: boolean
   countdownEnd: Date | null
@@ -24,8 +24,8 @@ interface Product {
   ctaText: string | null
   ctaColor: string | null
   // Phase 5
-  testimonials: Array<{name: string, rating: number, text: string, role: string}>
-  bonuses: Array<{title: string, description: string, value: string}>
+  testimonials: Array<{name: string, rating: number, text: string, role: string, photoUrl?: string}>
+  bonuses: Array<{title: string, description: string, value: string, imageUrl?: string}>
   faqs: Array<{question: string, answer: string}>
   guarantee: string | null
   socialProof: string | null
@@ -160,6 +160,230 @@ export default function BlueProfessionalTemplate({ product, store }: BlueProfess
           </div>
         </div>
       )}
+
+      {/* Video */}
+      {product.videoUrl && (
+        <div className="bg-blue-900 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-white text-center mb-8">
+              🎥 VIDEO PRODUK
+            </h2>
+            <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-400">
+              <iframe
+                src={product.videoUrl.replace('watch?v=', 'embed/')}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Description */}
+      {product.description && (
+        <div className="max-w-4xl mx-auto px-4 py-12">
+          <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-blue-200">
+            <h2 className="text-3xl font-black text-gray-900 mb-6">
+              📝 DETAIL PRODUK
+            </h2>
+            <div className="prose prose-lg max-w-none text-gray-700">
+              {product.description}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Benefits Section */}
+      {product.benefits && product.benefits.length > 0 && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+              ✨ KEUNGGULAN PRODUK
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {product.benefits.map((benefit, index) => (
+                <div key={index} className="flex items-start gap-3 bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500">
+                  {benefit.imageUrl ? (
+                    <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden">
+                      <img src={`https://drive.google.com/thumbnail?id=${benefit.imageUrl}&sz=w100`} alt={benefit.text} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <span className="text-blue-600 text-2xl flex-shrink-0 font-bold">✓</span>
+                  )}
+                  <p className="text-gray-800 font-medium flex-1">{typeof benefit === 'string' ? benefit : benefit.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Features Section */}
+      {product.features && product.features.length > 0 && (
+        <div className="bg-white py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+              ⚙️ SPESIFIKASI TEKNIS
+            </h2>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-lg border-2 border-blue-200">
+              <ul className="space-y-3">
+                {product.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    {typeof feature === 'object' && feature.imageUrl ? (
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden">
+                        <img src={`https://drive.google.com/thumbnail?id=${feature.imageUrl}&sz=w80`} alt={feature.text} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <span className="text-blue-600 font-black text-lg">•</span>
+                    )}
+                    <span className="text-gray-700">{typeof feature === 'string' ? feature : feature.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Testimonials Section */}
+      {product.testimonials && product.testimonials.length > 0 && (
+        <div className="bg-gray-50 py-12">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+              💼 TESTIMONI PROFESIONAL
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {product.testimonials.map((testimonial, index) => (
+                <div key={index} className="bg-white p-6 rounded-xl shadow-lg border-2 border-blue-100">
+                  <div className="flex items-center gap-3 mb-4">
+                    {testimonial.photoUrl ? (
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden border-2 border-blue-200">
+                        <img src={`https://drive.google.com/thumbnail?id=${testimonial.photoUrl}&sz=w100`} alt={testimonial.name} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+                        {testimonial.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-bold text-gray-900">{testimonial.name}</p>
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <svg key={i} className={`w-4 h-4 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-gray-700 mb-4 italic">"{testimonial.text}"</p>
+                  {testimonial.role && (
+                    <p className="text-sm text-gray-600 border-t pt-3">{testimonial.role}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bonuses Section */}
+      {product.bonuses && product.bonuses.length > 0 && (
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-white mb-8">
+              🎁 BONUS EKSKLUSIF
+            </h2>
+            <div className="space-y-4">
+              {product.bonuses.map((bonus, index) => (
+                <div key={index} className="bg-white rounded-xl p-6 shadow-xl border-l-4 border-blue-600">
+                  <div className="flex items-start gap-4">
+                    {bonus.imageUrl && (
+                      <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-blue-300">
+                        <img src={`https://drive.google.com/thumbnail?id=${bonus.imageUrl}&sz=w200`} alt={bonus.title} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">🎁 {bonus.title}</h3>
+                          <p className="text-gray-700">{bonus.description}</p>
+                        </div>
+                        <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap self-start">
+                          {bonus.value}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Guarantee Section */}
+      {product.guarantee && (
+        <div className="bg-blue-600 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">
+              <div className="text-6xl mb-4">🛡️</div>
+              <h2 className="text-3xl font-black text-gray-900 mb-4">
+                GARANSI PROFESIONAL
+              </h2>
+              <p className="text-lg text-gray-700 leading-relaxed">
+                {product.guarantee}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FAQs Section */}
+      {product.faqs && product.faqs.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 py-12">
+          <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+            ❓ PERTANYAAN UMUM
+          </h2>
+          <div className="space-y-4">
+            {product.faqs.map((faq, index) => (
+              <div key={index} className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-blue-500">
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  Q: {faq.question}
+                </h3>
+                <p className="text-gray-700 pl-4 border-l-2 border-gray-300">
+                  A: {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Final CTA */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+            HUBUNGI KAMI SEKARANG
+          </h2>
+          <p className="text-xl text-white mb-8 opacity-95">
+            Solusi Profesional untuk Kebutuhan Anda
+          </p>
+          <button
+            onClick={handleOrder}
+            className={`px-12 py-5 text-xl font-black rounded-xl shadow-2xl transition-all transform hover:scale-105 ${
+              product.ctaColor === 'red' ? 'bg-red-600 hover:bg-red-700' :
+              product.ctaColor === 'green' ? 'bg-green-600 hover:bg-green-700' :
+              product.ctaColor === 'yellow' ? 'bg-yellow-500 hover:bg-yellow-600 text-black' :
+              product.ctaColor === 'orange' ? 'bg-orange-600 hover:bg-orange-700' :
+              'bg-white hover:bg-gray-100 text-blue-600'
+            } text-white`}
+          >
+            {product.ctaText || '💬 PESAN SEKARANG'}
+          </button>
+        </div>
+      </div>
 
       {/* Footer */}
       <div className="bg-gray-900 text-white py-8">

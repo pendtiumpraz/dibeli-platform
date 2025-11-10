@@ -15,8 +15,8 @@ interface Product {
   stock: number | null
   limitedStock: number | null
   // Phase 3
-  benefits: string[]
-  features: string[]
+  benefits: Array<{text: string, imageUrl?: string}>
+  features: Array<{text: string, imageUrl?: string}>
   // Phase 4
   hasCountdown: boolean
   countdownEnd: Date | null
@@ -24,8 +24,8 @@ interface Product {
   ctaText: string | null
   ctaColor: string | null
   // Phase 5
-  testimonials: Array<{name: string, rating: number, text: string, role: string}>
-  bonuses: Array<{title: string, description: string, value: string}>
+  testimonials: Array<{name: string, rating: number, text: string, role: string, photoUrl?: string}>
+  bonuses: Array<{title: string, description: string, value: string, imageUrl?: string}>
   faqs: Array<{question: string, answer: string}>
   guarantee: string | null
   socialProof: string | null
@@ -220,8 +220,14 @@ export default function GreenTrustTemplate({ product, store }: GreenTrustTemplat
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {product.benefits.map((benefit, index) => (
                 <div key={index} className="flex items-start gap-3 bg-white p-4 rounded-lg shadow-md border-l-4 border-green-500">
-                  <span className="text-green-600 text-2xl flex-shrink-0 font-bold">✓</span>
-                  <p className="text-gray-800 font-medium">{benefit}</p>
+                  {benefit.imageUrl ? (
+                    <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden">
+                      <img src={`https://drive.google.com/thumbnail?id=${benefit.imageUrl}&sz=w100`} alt={benefit.text} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <span className="text-green-600 text-2xl flex-shrink-0 font-bold">✓</span>
+                  )}
+                  <p className="text-gray-800 font-medium flex-1">{typeof benefit === 'string' ? benefit : benefit.text}</p>
                 </div>
               ))}
             </div>
@@ -240,8 +246,14 @@ export default function GreenTrustTemplate({ product, store }: GreenTrustTemplat
               <ul className="space-y-3">
                 {product.features.map((feature, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <span className="text-green-600 font-black text-lg">•</span>
-                    <span className="text-gray-700">{feature}</span>
+                    {typeof feature === 'object' && feature.imageUrl ? (
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden">
+                        <img src={`https://drive.google.com/thumbnail?id=${feature.imageUrl}&sz=w80`} alt={feature.text} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <span className="text-green-600 font-black text-lg">•</span>
+                    )}
+                    <span className="text-gray-700">{typeof feature === 'string' ? feature : feature.text}</span>
                   </li>
                 ))}
               </ul>
