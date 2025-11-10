@@ -28,8 +28,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     headline: '',
     subheadline: '',
     // Phase 3: Benefits & Features
-    benefits: [] as string[],
-    features: [] as string[],
+    benefits: [] as Array<string | {text: string, imageUrl?: string, imageFile?: File}>,
+    features: [] as Array<string | {text: string, imageUrl?: string, imageFile?: File}>,
     // Phase 4: Urgency Settings
     hasCountdown: false,
     countdownEnd: '',
@@ -38,8 +38,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     ctaText: '',
     ctaColor: '',
     // Phase 5: Social Proof & Trust Builders
-    testimonials: [] as Array<{name: string, rating: number, text: string, role: string}>,
-    bonuses: [] as Array<{title: string, description: string, value: string}>,
+    testimonials: [] as Array<{name: string, rating: number, text: string, role: string, photoUrl?: string, photoFile?: File}>,
+    bonuses: [] as Array<{title: string, description: string, value: string, imageUrl?: string, imageFile?: File}>,
     faqs: [] as Array<{question: string, answer: string}>,
     guarantee: '',
     socialProof: '',
@@ -182,8 +182,20 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         if (formData.subheadline) formDataToSend.append('subheadline', formData.subheadline)
         
         // Phase 3: Benefits & Features
-        if (formData.benefits.length > 0) formDataToSend.append('benefits', JSON.stringify(formData.benefits.filter(b => b.trim())))
-        if (formData.features.length > 0) formDataToSend.append('features', JSON.stringify(formData.features.filter(f => f.trim())))
+        if (formData.benefits.length > 0) {
+          const filteredBenefits = formData.benefits.filter(b => {
+            const text = typeof b === 'string' ? b : b.text
+            return text && text.trim()
+          })
+          formDataToSend.append('benefits', JSON.stringify(filteredBenefits))
+        }
+        if (formData.features.length > 0) {
+          const filteredFeatures = formData.features.filter(f => {
+            const text = typeof f === 'string' ? f : f.text
+            return text && text.trim()
+          })
+          formDataToSend.append('features', JSON.stringify(filteredFeatures))
+        }
         
         // Phase 4: Urgency Settings
         formDataToSend.append('hasCountdown', formData.hasCountdown.toString())
@@ -238,8 +250,14 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             headline: formData.headline || null,
             subheadline: formData.subheadline || null,
             // Phase 3: Benefits & Features
-            benefits: formData.benefits.filter(b => b.trim()),
-            features: formData.features.filter(f => f.trim()),
+            benefits: formData.benefits.filter(b => {
+              const text = typeof b === 'string' ? b : b.text
+              return text && text.trim()
+            }),
+            features: formData.features.filter(f => {
+              const text = typeof f === 'string' ? f : f.text
+              return text && text.trim()
+            }),
             // Phase 4: Urgency Settings
             hasCountdown: formData.hasCountdown,
             countdownEnd: formData.countdownEnd || null,
@@ -1024,35 +1042,83 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       💎 Benefits (Manfaat untuk Pembeli)
                     </label>
-                    <div className="space-y-2">
-                      {formData.benefits.map((benefit, index) => (
-                        <div key={index} className="flex gap-2">
-                          <input
-                            type="text"
-                            value={benefit}
-                            onChange={(e) => {
-                              const newBenefits = [...formData.benefits]
-                              newBenefits[index] = e.target.value
-                              setFormData({ ...formData, benefits: newBenefits })
-                            }}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="Contoh: Kulit lebih cerah dalam 7 hari"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newBenefits = formData.benefits.filter((_, i) => i !== index)
-                              setFormData({ ...formData, benefits: newBenefits })
-                            }}
-                            className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
-                            title="Hapus"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
+                    <div className="space-y-3">
+                      {formData.benefits.map((benefit, index) => {
+                        const benefitText = typeof benefit === 'string' ? benefit : benefit.text
+                        const benefitImageUrl = typeof benefit === 'object' ? benefit.imageUrl : undefined
+                        const benefitImageFile = typeof benefit === 'object' ? benefit.imageFile : undefined
+                        
+                        return (
+                          <div key={index} className="flex gap-2 items-start bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <input
+                              type="text"
+                              value={benefitText}
+                              onChange={(e) => {
+                                const newBenefits = [...formData.benefits]
+                                newBenefits[index] = typeof benefit === 'string' 
+                                  ? e.target.value
+                                  : {...benefit, text: e.target.value}
+                                setFormData({ ...formData, benefits: newBenefits })
+                              }}
+                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              placeholder="Contoh: Kulit lebih cerah dalam 7 hari"
+                            />
+                            
+                            {/* Photo Upload */}
+                            <div className="flex items-center gap-2">
+                              <label className="cursor-pointer bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded border border-blue-300 text-sm whitespace-nowrap">
+                                📸 Icon
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0]
+                                    if (file) {
+                                      const newBenefits = [...formData.benefits]
+                                      const benefitObj = typeof benefit === 'string' ? {text: benefit} : benefit
+                                      newBenefits[index] = {...benefitObj, imageFile: file}
+                                      setFormData({ ...formData, benefits: newBenefits })
+                                    }
+                                  }}
+                                />
+                              </label>
+                              
+                              {/* Preview */}
+                              {benefitImageFile && (
+                                <img 
+                                  src={URL.createObjectURL(benefitImageFile)} 
+                                  alt="Icon" 
+                                  className="w-10 h-10 rounded object-cover border-2 border-green-500"
+                                  title="New photo"
+                                />
+                              )}
+                              {benefitImageUrl && !benefitImageFile && (
+                                <img 
+                                  src={`https://drive.google.com/thumbnail?id=${benefitImageUrl}&sz=w100`}
+                                  alt="Icon" 
+                                  className="w-10 h-10 rounded object-cover border-2 border-blue-500"
+                                  title="Existing photo"
+                                />
+                              )}
+                            </div>
+                            
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newBenefits = formData.benefits.filter((_, i) => i !== index)
+                                setFormData({ ...formData, benefits: newBenefits })
+                              }}
+                              className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                              title="Hapus"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        )
+                      })}
                     </div>
                     <button
                       type="button"
@@ -1062,7 +1128,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                       + Tambah Benefit
                     </button>
                     <p className="mt-2 text-xs text-gray-600">
-                      💡 Benefits fokus pada HASIL yang didapat pembeli (bukan fitur teknis)
+                      💡 Benefits fokus pada HASIL yang didapat pembeli (bukan fitur teknis). Upload icon untuk visual yang lebih menarik!
                     </p>
                   </div>
 
@@ -1071,35 +1137,83 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       ⚙️ Features (Spesifikasi & Detail)
                     </label>
-                    <div className="space-y-2">
-                      {formData.features.map((feature, index) => (
-                        <div key={index} className="flex gap-2">
-                          <input
-                            type="text"
-                            value={feature}
-                            onChange={(e) => {
-                              const newFeatures = [...formData.features]
-                              newFeatures[index] = e.target.value
-                              setFormData({ ...formData, features: newFeatures })
-                            }}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="Contoh: Mengandung Vitamin C 1000mg"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newFeatures = formData.features.filter((_, i) => i !== index)
-                              setFormData({ ...formData, features: newFeatures })
-                            }}
-                            className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
-                            title="Hapus"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
+                    <div className="space-y-3">
+                      {formData.features.map((feature, index) => {
+                        const featureText = typeof feature === 'string' ? feature : feature.text
+                        const featureImageUrl = typeof feature === 'object' ? feature.imageUrl : undefined
+                        const featureImageFile = typeof feature === 'object' ? feature.imageFile : undefined
+                        
+                        return (
+                          <div key={index} className="flex gap-2 items-start bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <input
+                              type="text"
+                              value={featureText}
+                              onChange={(e) => {
+                                const newFeatures = [...formData.features]
+                                newFeatures[index] = typeof feature === 'string' 
+                                  ? e.target.value
+                                  : {...feature, text: e.target.value}
+                                setFormData({ ...formData, features: newFeatures })
+                              }}
+                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              placeholder="Contoh: Mengandung Vitamin C 1000mg"
+                            />
+                            
+                            {/* Photo Upload */}
+                            <div className="flex items-center gap-2">
+                              <label className="cursor-pointer bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded border border-blue-300 text-sm whitespace-nowrap">
+                                📸 Icon
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0]
+                                    if (file) {
+                                      const newFeatures = [...formData.features]
+                                      const featureObj = typeof feature === 'string' ? {text: feature} : feature
+                                      newFeatures[index] = {...featureObj, imageFile: file}
+                                      setFormData({ ...formData, features: newFeatures })
+                                    }
+                                  }}
+                                />
+                              </label>
+                              
+                              {/* Preview */}
+                              {featureImageFile && (
+                                <img 
+                                  src={URL.createObjectURL(featureImageFile)} 
+                                  alt="Icon" 
+                                  className="w-10 h-10 rounded object-cover border-2 border-green-500"
+                                  title="New photo"
+                                />
+                              )}
+                              {featureImageUrl && !featureImageFile && (
+                                <img 
+                                  src={`https://drive.google.com/thumbnail?id=${featureImageUrl}&sz=w100`}
+                                  alt="Icon" 
+                                  className="w-10 h-10 rounded object-cover border-2 border-blue-500"
+                                  title="Existing photo"
+                                />
+                              )}
+                            </div>
+                            
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newFeatures = formData.features.filter((_, i) => i !== index)
+                                setFormData({ ...formData, features: newFeatures })
+                              }}
+                              className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                              title="Hapus"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        )
+                      })}
                     </div>
                     <button
                       type="button"
@@ -1109,7 +1223,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                       + Tambah Feature
                     </button>
                     <p className="mt-2 text-xs text-gray-600">
-                      💡 Features adalah spesifikasi teknis, komposisi, ukuran, dll
+                      💡 Features adalah spesifikasi teknis, komposisi, ukuran, dll. Upload icon untuk visual lebih menarik!
                     </p>
                   </div>
                 </div>
@@ -1267,6 +1381,49 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     <div className="space-y-4">
                       {formData.testimonials.map((testimonial, index) => (
                         <div key={index} className="bg-white p-4 rounded-lg border-2 border-teal-200">
+                          {/* Photo Upload */}
+                          <div className="flex items-center gap-4 mb-4 pb-3 border-b border-teal-100">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-2">
+                                Foto Testimoni (Avatar)
+                              </label>
+                              <label className="cursor-pointer bg-teal-50 hover:bg-teal-100 px-4 py-2 rounded border border-teal-300 inline-block text-sm">
+                                📸 Upload Foto
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0]
+                                    if (file) {
+                                      const newTestimonials = [...formData.testimonials]
+                                      newTestimonials[index] = {...testimonial, photoFile: file}
+                                      setFormData({ ...formData, testimonials: newTestimonials })
+                                    }
+                                  }}
+                                />
+                              </label>
+                            </div>
+                            
+                            {/* Photo Preview */}
+                            {testimonial.photoFile && (
+                              <img 
+                                src={URL.createObjectURL(testimonial.photoFile)} 
+                                alt={testimonial.name} 
+                                className="w-16 h-16 rounded-full object-cover border-4 border-green-500"
+                                title="New photo"
+                              />
+                            )}
+                            {testimonial.photoUrl && !testimonial.photoFile && (
+                              <img 
+                                src={`https://drive.google.com/thumbnail?id=${testimonial.photoUrl}&sz=w200`}
+                                alt={testimonial.name} 
+                                className="w-16 h-16 rounded-full object-cover border-4 border-teal-500"
+                                title="Existing photo"
+                              />
+                            )}
+                          </div>
+                          
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                             <input
                               type="text"
@@ -1356,6 +1513,49 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     <div className="space-y-4">
                       {formData.bonuses.map((bonus, index) => (
                         <div key={index} className="bg-white p-4 rounded-lg border-2 border-teal-200">
+                          {/* Image Upload */}
+                          <div className="flex items-center gap-4 mb-4 pb-3 border-b border-teal-100">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-2">
+                                Gambar Bonus
+                              </label>
+                              <label className="cursor-pointer bg-teal-50 hover:bg-teal-100 px-4 py-2 rounded border border-teal-300 inline-block text-sm">
+                                🖼️ Upload Gambar
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0]
+                                    if (file) {
+                                      const newBonuses = [...formData.bonuses]
+                                      newBonuses[index] = {...bonus, imageFile: file}
+                                      setFormData({ ...formData, bonuses: newBonuses })
+                                    }
+                                  }}
+                                />
+                              </label>
+                            </div>
+                            
+                            {/* Image Preview */}
+                            {bonus.imageFile && (
+                              <img 
+                                src={URL.createObjectURL(bonus.imageFile)} 
+                                alt={bonus.title} 
+                                className="w-20 h-20 rounded-lg object-cover border-2 border-green-500"
+                                title="New image"
+                              />
+                            )}
+                            {bonus.imageUrl && !bonus.imageFile && (
+                              <img 
+                                src={`https://drive.google.com/thumbnail?id=${bonus.imageUrl}&sz=w200`}
+                                alt={bonus.title} 
+                                className="w-20 h-20 rounded-lg object-cover border-2 border-teal-500"
+                                title="Existing image"
+                              />
+                            )}
+                          </div>
+                          
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                             <input
                               type="text"
