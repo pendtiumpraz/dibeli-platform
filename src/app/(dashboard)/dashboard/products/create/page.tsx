@@ -51,6 +51,7 @@ export default function CreateProductPage() {
   
   // AI Auto-Generate States (UNLIMITED only)
   const [aiProvider, setAiProvider] = useState('gemini')
+  const [productCategory, setProductCategory] = useState('')
   const [hasGeminiKey, setHasGeminiKey] = useState(false)
   const [hasGroqKey, setHasGroqKey] = useState(false)
   const [aiGenerating, setAiGenerating] = useState(false)
@@ -155,12 +156,28 @@ export default function CreateProductPage() {
           productName: formData.name,
           price: formData.price,
           description: formData.description,
+          category: productCategory || null,
           // API key will be fetched from database automatically
         }),
       })
       
       if (!res.ok) {
         const error = await res.json()
+        console.error('AI Generation Error:', error)
+        
+        // Special handling for rate limit (429)
+        if (error.rateLimitExceeded) {
+          const providerName = error.provider === 'gemini' ? 'Gemini' : 'Groq'
+          const otherProvider = error.provider === 'gemini' ? 'Groq' : 'Gemini'
+          
+          if (confirm(`⚠️ ${providerName} Quota Habis!\n\n${error.error}\n\nMau switch ke ${otherProvider}?`)) {
+            setAiProvider(error.provider === 'gemini' ? 'groq' : 'gemini')
+            alert(`✅ Switched ke ${otherProvider}! Coba generate lagi.`)
+            return
+          }
+        }
+        
+        // Other error handling...
         throw new Error(error.error || 'AI generation failed')
       }
       
@@ -437,6 +454,33 @@ export default function CreateProductPage() {
                   API key sudah tersimpan, jadi tinggal 1 klik! ✨
                 </p>
               </div>
+            </div>
+            
+            {/* Category Selector */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                📦 Kategori Produk (Opsional - untuk hasil AI lebih baik)
+              </label>
+              <select
+                value={productCategory}
+                onChange={(e) => setProductCategory(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white text-base"
+              >
+                <option value="">Pilih kategori... (atau skip untuk generic)</option>
+                <option value="ecommerce">🛍️ E-commerce - Fashion, Electronics, Accessories</option>
+                <option value="services">💼 Services - Konsultan, Cleaning, Repair</option>
+                <option value="digital">📱 Digital Products - Course, Ebook, Software</option>
+                <option value="fnb">🍔 F&B - Cafe, Restaurant, Catering</option>
+                <option value="homeLiving">🏠 Home & Living - Furniture, Decor</option>
+                <option value="beauty">💄 Beauty & Health - Skincare, Makeup</option>
+                <option value="entertainment">🎮 Entertainment - Games, Toys</option>
+                <option value="education">📚 Education - Books, Courses</option>
+              </select>
+              {productCategory && (
+                <p className="mt-2 text-xs text-green-700 bg-green-50 p-2 rounded">
+                  ✨ AI akan generate dengan context khusus untuk kategori ini!
+                </p>
+              )}
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-4">

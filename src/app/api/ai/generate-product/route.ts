@@ -59,7 +59,8 @@ export async function POST(request: Request) {
       }, { status: 429 })
     }
     
-    const { provider, apiKey, productName, price, description } = await request.json()
+    const body = await request.json()
+    const { provider, apiKey, productName, price, description, category } = body
     
     if (!provider || !productName) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -90,11 +91,19 @@ export async function POST(request: Request) {
     
     let generatedText = ''
     
-    const prompt = `Kamu adalah copywriter expert untuk e-commerce Indonesia. Generate konten lengkap untuk landing page produk berikut:
+    // Import category utilities
+    const { buildCategoryPrompt } = await import('@/lib/product-categories')
+    
+    // Build context-aware prompt based on category
+    const baseContext = category 
+      ? buildCategoryPrompt(category, productName, price || '0', description)
+      : `Kamu adalah copywriter expert untuk e-commerce Indonesia. Generate konten lengkap untuk landing page produk berikut:
 
 Produk: ${productName}
 Harga: Rp ${price || '0'}
-Deskripsi singkat: ${description || 'Tidak ada deskripsi'}
+Deskripsi singkat: ${description || 'Tidak ada deskripsi'}`
+    
+    const prompt = baseContext + `
 
 Buatkan dalam format JSON dengan struktur:
 {
@@ -148,6 +157,7 @@ PENTING:
     
     if (provider === 'gemini') {
       // Call Google Gemini API - Using latest model: gemini-2.0-flash
+      // Note: FREE tier = 15 req/min, 32K tokens/min. Use Groq for better limits!
       const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${finalApiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -168,6 +178,22 @@ PENTING:
         const error = await geminiRes.text()
         console.error('Gemini API error:', error)
         console.error('API Key used:', finalApiKey.substring(0, 10) + '...')
+        
+        // Parse error untuk detect rate limit
+        try {
+          const errorData = JSON.parse(error)
+          if (errorData.error?.code === 429 || errorData.error?.status === 'RESOURCE_EXHAUSTED') {
+            return NextResponse.json({ 
+              error: '⚠️ Gemini Quota Habis! FREE tier = 15 req/menit.\n\n💡 SOLUSI:\n1. Tunggu 1 menit, lalu retry\n2. Switch ke Groq (30 req/menit, lebih cepat!)\n3. Upgrade Gemini ke paid plan',
+              rateLimitExceeded: true,
+              retryAfter: errorData.error?.details?.find((d: any) => d.retryDelay)?.retryDelay || '60s',
+              provider: 'gemini',
+            }, { status: 429 })
+          }
+        } catch (parseError) {
+          // Fallback jika error bukan JSON
+        }
+        
         return NextResponse.json({ 
           error: 'Gemini API failed. Check your API key and ensure Gemini API is enabled in Google Cloud Console.',
           details: error
@@ -178,7 +204,7 @@ PENTING:
       generatedText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || ''
       
     } else if (provider === 'groq') {
-      // Call Groq API
+      // Call Groq API - FREE tier = 30 req/min, 14,400 req/day (VERY GENEROUS!)
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -200,6 +226,17 @@ PENTING:
         const error = await groqRes.text()
         console.error('Groq API error:', error)
         console.error('API Key used:', finalApiKey.substring(0, 10) + '...')
+        
+        // Check for rate limit
+        if (groqRes.status === 429) {
+          return NextResponse.json({ 
+            error: '⚠️ Groq Rate Limit!\n\nFREE tier = 30 req/menit.\nTunggu sebentar lalu retry.',
+            rateLimitExceeded: true,
+            retryAfter: groqRes.headers.get('retry-after') || '60s',
+            provider: 'groq',
+          }, { status: 429 })
+        }
+        
         return NextResponse.json({ 
           error: 'Groq API failed. Check your API key at https://console.groq.com/keys',
           details: error
