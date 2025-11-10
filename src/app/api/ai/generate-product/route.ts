@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 export async function POST(request: Request) {
   try {
@@ -16,8 +17,34 @@ export async function POST(request: Request) {
     
     const { provider, apiKey, productName, price, description } = await request.json()
     
-    if (!provider || !apiKey || !productName) {
+    if (!provider || !productName) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+    
+    // Get API key from request OR from user's saved keys
+    let finalApiKey = apiKey
+    
+    if (!finalApiKey) {
+      // Try to get from database
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          geminiApiKey: true,
+          groqApiKey: true,
+        },
+      })
+      
+      if (provider === 'gemini' && user?.geminiApiKey) {
+        finalApiKey = user.geminiApiKey
+      } else if (provider === 'groq' && user?.groqApiKey) {
+        finalApiKey = user.groqApiKey
+      }
+    }
+    
+    if (!finalApiKey) {
+      return NextResponse.json({ 
+        error: 'API key not found. Please provide API key or save it in settings.' 
+      }, { status: 400 })
     }
     
     let generatedText = ''
@@ -79,8 +106,8 @@ PENTING:
 - Return HANYA JSON, tanpa markdown atau teks tambahan`
     
     if (provider === 'gemini') {
-      // Call Google Gemini API
-      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+      // Call Google Gemini API - Using latest model: gemini-2.0-flash
+      const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${finalApiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -88,14 +115,22 @@ PENTING:
             parts: [{
               text: prompt
             }]
-          }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
+          }
         })
       })
       
       if (!geminiRes.ok) {
         const error = await geminiRes.text()
         console.error('Gemini API error:', error)
-        return NextResponse.json({ error: 'Gemini API failed. Check your API key.' }, { status: 500 })
+        console.error('API Key used:', finalApiKey.substring(0, 10) + '...')
+        return NextResponse.json({ 
+          error: 'Gemini API failed. Check your API key and ensure Gemini API is enabled in Google Cloud Console.',
+          details: error
+        }, { status: 500 })
       }
       
       const geminiData = await geminiRes.json()
@@ -107,7 +142,7 @@ PENTING:
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${finalApiKey}`
         },
         body: JSON.stringify({
           model: 'llama-3.1-70b-versatile',

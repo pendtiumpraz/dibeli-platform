@@ -45,6 +45,10 @@ model User {
   // SuperAdmin
   isSuperAdmin Boolean @default(false)
 
+  // AI API Keys (for auto-generate features)
+  geminiApiKey String? @db.Text
+  groqApiKey   String? @db.Text
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

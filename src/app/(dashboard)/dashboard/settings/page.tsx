@@ -1,6 +1,8 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
+import ApiKeysManager from './ApiKeysManager'
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions)
@@ -9,11 +11,42 @@ export default async function SettingsPage() {
     redirect('/auth/signin')
   }
 
+  // Fetch user's API keys
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      geminiApiKey: true,
+      groqApiKey: true,
+    },
+  })
+
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Pengaturan</h1>
 
       <div className="space-y-6">
+        {/* AI API Keys Section (UNLIMITED Only) */}
+        {session.user.tier === 'UNLIMITED' && (
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 shadow rounded-lg p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-shrink-0 text-4xl">🤖</div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-purple-900 mb-2">
+                  AI API Keys
+                </h2>
+                <p className="text-sm text-gray-700">
+                  Simpan API keys sekali, lalu 1-click generate dengan AI! Digunakan untuk fitur Auto-Generate produk.
+                </p>
+              </div>
+            </div>
+            
+            <ApiKeysManager 
+              initialGeminiKey={user?.geminiApiKey || ''}
+              initialGroqKey={user?.groqApiKey || ''}
+            />
+          </div>
+        )}
+
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Informasi Akun
