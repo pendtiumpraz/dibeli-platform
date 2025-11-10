@@ -12,42 +12,42 @@ datasource db {
 
 // ============ USER & AUTHENTICATION ============
 model User {
-  id                  String    @id @default(cuid())
-  email               String    @unique
-  name                String?
-  
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
+
   // Google OAuth
-  googleId            String?   @unique
-  googleAccessToken   String?   @db.Text
-  googleRefreshToken  String?   @db.Text
-  image               String?
-  
+  googleId           String? @unique
+  googleAccessToken  String? @db.Text
+  googleRefreshToken String? @db.Text
+  image              String?
+
   // Subscription & Tier
-  tier                UserTier  @default(TRIAL)
-  trialStartDate      DateTime  @default(now())
-  trialEndDate        DateTime  // Auto-calculated: trialStartDate + 14 days
-  premiumStartDate    DateTime?
-  premiumEndDate      DateTime?
-  
+  tier             UserTier  @default(TRIAL)
+  trialStartDate   DateTime  @default(now())
+  trialEndDate     DateTime // Auto-calculated: trialStartDate + 14 days
+  premiumStartDate DateTime?
+  premiumEndDate   DateTime?
+
   // Payment tracking
-  lastPaymentDate     DateTime?
-  nextBillingDate     DateTime?
-  paymentMethod       String?
-  
+  lastPaymentDate DateTime?
+  nextBillingDate DateTime?
+  paymentMethod   String?
+
   // Status
-  isActive            Boolean   @default(true)
-  isSuspended         Boolean   @default(false)
-  suspendReason       String?
-  
+  isActive      Boolean @default(true)
+  isSuspended   Boolean @default(false)
+  suspendReason String?
+
   // Template Creator
-  isTemplateCreator   Boolean   @default(false)
-  
+  isTemplateCreator Boolean @default(false)
+
   // SuperAdmin
-  isSuperAdmin        Boolean   @default(false)
-  
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  
+  isSuperAdmin Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
   accounts            Account[]
   sessions            Session[]
@@ -61,7 +61,7 @@ model User {
   templateAccess      UserTemplateAccess[]
   uploadRequests      TemplateUploadRequest[]
   creatorProfile      CreatorProfile?
-  
+
   @@index([email])
   @@index([tier])
   @@index([isSuperAdmin])
@@ -88,12 +88,12 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-  
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@unique([provider, providerAccountId])
   @@index([userId])
 }
@@ -104,10 +104,10 @@ model Session {
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expires      DateTime
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId])
 }
 
@@ -115,34 +115,34 @@ model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
-  
+
   @@unique([identifier, token])
 }
 
 // ============ ACTIVATION REQUESTS ============
 model ActivationRequest {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  requestedTier   UserTier
-  currentTier     UserTier
-  
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  requestedTier UserTier
+  currentTier   UserTier
+
   // Payment proof
-  paymentProof    String?
-  paymentAmount   Int?
-  paymentMethod   String?
-  paymentDate     DateTime?
-  
+  paymentProof  String?
+  paymentAmount Int?
+  paymentMethod String?
+  paymentDate   DateTime?
+
   // Admin review
-  status          RequestStatus @default(PENDING)
-  reviewedBy      String?
-  reviewedAt      DateTime?
-  reviewNotes     String?
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
+  status      RequestStatus @default(PENDING)
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  reviewNotes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([status])
   @@index([userId])
 }
@@ -155,82 +155,91 @@ enum RequestStatus {
 
 // ============ STORE ============
 model Store {
-  id              String    @id @default(cuid())
-  userId          String    @unique
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Store Info
-  name            String
-  slug            String    @unique
-  tagline         String?
-  description     String?   @db.Text
-  whatsappNumber  String
-  logoUrl         String?
-  
+  name           String
+  slug           String  @unique
+  tagline        String?
+  description    String? @db.Text
+  whatsappNumber String
+  logoUrl        String?
+
+  // Contact Info
+  email   String?
+  phone   String?
+  address String? @db.Text
+
   // Location
-  city            String?
-  province        String?
-  address         String?   @db.Text
-  
+  city       String?
+  province   String?
+  country    String? @default("Indonesia")
+  postalCode String?
+
   // Categories for discovery
-  categories      String[]
-  
+  categories String[]
+
   // Templates applied
-  templates       StoreTemplate[]
-  
+  templates StoreTemplate[]
+
   // Color customization (Premium feature)
-  customColors    Json?
-  
+  customColors Json?
+
   // SEO
   metaTitle       String?
   metaDescription String?
   keywords        String[]
-  
+
   // Settings
-  templateId      String    @default("modern-minimal")
-  isPublished     Boolean   @default(false)
-  isPubliclyListed Boolean  @default(true)
-  isFeatured      Boolean   @default(false)
-  featuredAt      DateTime?
-  featuredOrder   Int?
-  customDomain    String?   @unique
-  removeBranding  Boolean   @default(false)
-  
+  templateId       String    @default("modern-minimal")
+  isPublished      Boolean   @default(false)
+  isPubliclyListed Boolean   @default(true)
+  isFeatured       Boolean   @default(false)
+  featuredAt       DateTime?
+  featuredOrder    Int?
+  customDomain     String?   @unique
+  removeBranding   Boolean   @default(false)
+
   // Social Links
-  instagramUrl    String?
-  facebookUrl     String?
-  tiktokUrl       String?
-  
+  instagramUrl String?
+  facebookUrl  String?
+  tiktokUrl    String?
+  twitterUrl   String?
+  youtubeUrl   String?
+  linkedinUrl  String?
+
   // Hero section
-  heroImage       String?
-  heroScreenshot  String?
-  
+  heroImage      String?
+  heroScreenshot String?
+
   // Stats
-  viewCount       Int       @default(0)
-  viewCountWeek   Int       @default(0)
-  viewCountMonth  Int       @default(0)
-  clickCount      Int       @default(0)
-  productCount    Int       @default(0)
-  
+  viewCount      Int @default(0)
+  viewCountWeek  Int @default(0)
+  viewCountMonth Int @default(0)
+  clickCount     Int @default(0)
+  productCount   Int @default(0)
+
   // Ratings
-  rating          Float?    @default(0)
-  reviewCount     Int       @default(0)
-  
+  rating      Float? @default(0)
+  reviewCount Int    @default(0)
+
   // Discovery badges
-  badges          Json?
-  
+  badges Json?
+
   // Last activity
   lastProductAdded DateTime?
-  lastUpdated     DateTime  @updatedAt
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
+  lastUpdated      DateTime  @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  products        Product[]
+  products          Product[]
   productCategories Category[]
-  storeViews      StoreView[]
-  
+  storeViews        StoreView[]
+
   @@index([slug])
   @@index([isPublished, isPubliclyListed])
   @@index([isFeatured])
@@ -238,134 +247,134 @@ model Store {
 
 // ============ STORE VIEWS TRACKING ============
 model StoreView {
-  id          String   @id @default(cuid())
-  storeId     String
-  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  
-  ipAddress   String?
-  userAgent   String?
-  referer     String?
-  
-  country     String?
-  city        String?
-  
-  viewedAt    DateTime @default(now())
-  
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  ipAddress String?
+  userAgent String?
+  referer   String?
+
+  country String?
+  city    String?
+
+  viewedAt DateTime @default(now())
+
   @@index([storeId, viewedAt])
 }
 
 // ============ STORE TEMPLATES ============
 model StoreTemplate {
-  id         String   @id @default(cuid())
-  storeId    String
-  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
   templateId String
   template   Template @relation(fields: [templateId], references: [id])
-  
-  category   String   // "header", "product_card", etc.
-  
+
+  category String // "header", "product_card", etc.
+
   // Custom overrides (Premium only)
   customColors Json?
   customFonts  Json?
   customConfig Json?
-  
-  isActive   Boolean  @default(true)
-  
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([storeId, category])
   @@index([storeId])
 }
 
 // ============ TEMPLATES ============
 model Template {
-  id          String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   name        String
-  slug        String   @unique
-  description String?  @db.Text
+  slug        String  @unique
+  description String? @db.Text
   category    String
   subcategory String?
-  
+
   // Template files
-  htmlContent String   @db.Text
-  cssContent  String   @db.Text
-  jsContent   String?  @db.Text
-  
+  htmlContent String  @db.Text
+  cssContent  String  @db.Text
+  jsContent   String? @db.Text
+
   // Preview
-  previewImage String
+  previewImage   String
   thumbnailImage String
-  demoUrl     String?
-  videoUrl    String?
-  screenshots Json?
-  
+  demoUrl        String?
+  videoUrl       String?
+  screenshots    Json?
+
   // Metadata
-  version     String   @default("1.0.0")
-  tags        String[]
-  features    Json
-  
+  version  String   @default("1.0.0")
+  tags     String[]
+  features Json
+
   // Customization
   customizable Json
   colorVars    Json?
   fontVars     Json?
   configSchema Json?
-  
+
   // Technical
-  dependencies String[]
+  dependencies   String[]
   browserSupport Json
-  responsive   Boolean @default(true)
-  accessibility Boolean @default(false)
-  
+  responsive     Boolean  @default(true)
+  accessibility  Boolean  @default(false)
+
   // Access
-  visibility  TemplateVisibility @default(PUBLIC)
-  isPremium   Boolean @default(false)
-  price       Int?
-  
+  visibility TemplateVisibility @default(PUBLIC)
+  isPremium  Boolean            @default(false)
+  price      Int?
+
   // Status
-  status      TemplateStatus @default(DRAFT)
-  isApproved  Boolean @default(false)
-  approvedBy  String?
-  approvedAt  DateTime?
+  status         TemplateStatus @default(DRAFT)
+  isApproved     Boolean        @default(false)
+  approvedBy     String?
+  approvedAt     DateTime?
   rejectedReason String?
-  
-  quality     TemplateQuality?
-  
+
+  quality TemplateQuality?
+
   // Creator
   creatorId   String
-  creator     User    @relation(fields: [creatorId], references: [id])
+  creator     User        @relation(fields: [creatorId], references: [id])
   creatorType CreatorType @default(USER)
-  
+
   // Marketplace
-  isForSale   Boolean @default(false)
-  salePrice   Int?
-  commission  Int?
-  
+  isForSale  Boolean @default(false)
+  salePrice  Int?
+  commission Int?
+
   // Stats
-  viewCount   Int     @default(0)
-  useCount    Int     @default(0)
-  downloadCount Int   @default(0)
-  favoriteCount Int   @default(0)
-  rating      Float?  @default(0)
-  reviewCount Int     @default(0)
-  
+  viewCount     Int    @default(0)
+  useCount      Int    @default(0)
+  downloadCount Int    @default(0)
+  favoriteCount Int    @default(0)
+  rating        Float? @default(0)
+  reviewCount   Int    @default(0)
+
   // SEO
-  metaTitle   String?
+  metaTitle       String?
   metaDescription String?
-  
+
   // Timestamps
   publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
   // Relations
   storeTemplates StoreTemplate[]
-  reviews     TemplateReview[]
-  purchases   TemplatePurchase[]
-  favorites   TemplateFavorite[]
-  versions    TemplateVersion[]
-  
+  reviews        TemplateReview[]
+  purchases      TemplatePurchase[]
+  favorites      TemplateFavorite[]
+  versions       TemplateVersion[]
+
   @@index([category, status])
   @@index([creatorId])
   @@index([isPremium, isForSale])
@@ -403,66 +412,66 @@ enum CreatorType {
 
 // ============ TEMPLATE VERSIONS ============
 model TemplateVersion {
-  id          String   @id @default(cuid())
-  templateId  String
-  template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  
+  id         String   @id @default(cuid())
+  templateId String
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
   version     String
-  htmlContent String   @db.Text
-  cssContent  String   @db.Text
-  jsContent   String?  @db.Text
-  changelog   String?  @db.Text
-  
-  createdAt   DateTime @default(now())
-  
+  htmlContent String  @db.Text
+  cssContent  String  @db.Text
+  jsContent   String? @db.Text
+  changelog   String? @db.Text
+
+  createdAt DateTime @default(now())
+
   @@index([templateId, version])
 }
 
 // ============ TEMPLATE REVIEWS ============
 model TemplateReview {
-  id          String   @id @default(cuid())
-  templateId  String
-  template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  
-  rating      Int
-  review      String?  @db.Text
-  
+  id         String   @id @default(cuid())
+  templateId String
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  rating Int
+  review String? @db.Text
+
   isVerifiedPurchase Boolean @default(false)
-  isApproved  Boolean  @default(true)
-  flaggedCount Int     @default(0)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  isApproved         Boolean @default(true)
+  flaggedCount       Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([templateId, userId])
   @@index([templateId, rating])
 }
 
 // ============ TEMPLATE PURCHASES ============
 model TemplatePurchase {
-  id          String   @id @default(cuid())
-  
-  templateId  String
-  template    Template @relation(fields: [templateId], references: [id])
-  
-  buyerId     String
-  buyer       User     @relation(fields: [buyerId], references: [id])
-  
-  price       Int
-  commission  Int
+  id String @id @default(cuid())
+
+  templateId String
+  template   Template @relation(fields: [templateId], references: [id])
+
+  buyerId String
+  buyer   User   @relation(fields: [buyerId], references: [id])
+
+  price           Int
+  commission      Int
   creatorEarnings Int
-  
+
   paymentMethod String?
   paymentProof  String?
   paymentStatus PaymentStatus @default(PENDING)
-  
+
   licenseType LicenseType @default(SINGLE_SITE)
-  
+
   purchasedAt DateTime @default(now())
-  
+
   @@index([buyerId])
   @@index([templateId])
 }
@@ -482,86 +491,86 @@ enum LicenseType {
 
 // ============ TEMPLATE FAVORITES ============
 model TemplateFavorite {
-  id          String   @id @default(cuid())
-  
-  templateId  String
-  template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  
-  createdAt   DateTime @default(now())
-  
+  id String @id @default(cuid())
+
+  templateId String
+  template   Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
   @@unique([templateId, userId])
   @@index([userId])
 }
 
 // ============ TEMPLATE UPLOAD REQUESTS ============
 model TemplateUploadRequest {
-  id          String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   name        String
-  description String?  @db.Text
+  description String? @db.Text
   category    String
-  
-  htmlContent String   @db.Text
-  cssContent  String   @db.Text
-  jsContent   String?  @db.Text
-  
+
+  htmlContent String  @db.Text
+  cssContent  String  @db.Text
+  jsContent   String? @db.Text
+
   previewImage String
-  
-  creatorId   String
-  creator     User     @relation(fields: [creatorId], references: [id])
-  
+
+  creatorId String
+  creator   User   @relation(fields: [creatorId], references: [id])
+
   status      RequestStatus @default(PENDING)
   reviewedBy  String?
   reviewedAt  DateTime?
   reviewNotes String?
-  
+
   approvedTemplateId String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([creatorId, status])
 }
 
 // ============ TEMPLATE COLLECTIONS ============
 model TemplateCollection {
-  id          String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   name        String
   description String?
-  slug        String   @unique
-  
-  creatorId   String
-  creator     User     @relation(fields: [creatorId], references: [id])
-  
-  templates   Json
-  
-  isPublic    Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  slug        String  @unique
+
+  creatorId String
+  creator   User   @relation(fields: [creatorId], references: [id])
+
+  templates Json
+
+  isPublic Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([creatorId])
 }
 
 // ============ USER TEMPLATE ACCESS ============
 model UserTemplateAccess {
-  id          String   @id @default(cuid())
-  
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  
-  templateId  String
-  
-  accessType  AccessType
-  purchaseId  String?
-  expiresAt   DateTime?
-  
-  grantedAt   DateTime @default(now())
-  
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  templateId String
+
+  accessType AccessType
+  purchaseId String?
+  expiresAt  DateTime?
+
+  grantedAt DateTime @default(now())
+
   @@unique([userId, templateId])
   @@index([userId])
 }
@@ -576,66 +585,109 @@ enum AccessType {
 
 // ============ CREATOR PROFILE ============
 model CreatorProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id])
-  
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
   displayName String
-  bio         String?  @db.Text
+  bio         String? @db.Text
   avatar      String?
   coverImage  String?
   website     String?
-  
-  twitter     String?
-  instagram   String?
-  dribbble    String?
-  behance     String?
-  github      String?
-  
-  totalTemplates  Int @default(0)
-  totalSales      Int @default(0)
-  totalEarnings   Int @default(0)
-  rating          Float? @default(0)
-  followerCount   Int @default(0)
-  
-  isVerified  Boolean @default(false)
-  badges      Json?
-  
+
+  twitter   String?
+  instagram String?
+  dribbble  String?
+  behance   String?
+  github    String?
+
+  totalTemplates Int    @default(0)
+  totalSales     Int    @default(0)
+  totalEarnings  Int    @default(0)
+  rating         Float? @default(0)
+  followerCount  Int    @default(0)
+
+  isVerified Boolean @default(false)
+  badges     Json?
+
   bankAccount String?
   paypalEmail String?
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ============ PRODUCTS ============
 model Product {
-  id              String    @id @default(cuid())
-  storeId         String
-  store           Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  
-  name            String
-  slug            String
-  description     String?   @db.Text
-  price           Int
-  
-  images          Json
-  
-  categoryId      String?
-  category        Category? @relation(fields: [categoryId], references: [id])
-  
-  isAvailable     Boolean   @default(true)
-  isFeatured      Boolean   @default(false)
-  stock           Int?
-  
-  hasVariants     Boolean   @default(false)
-  variants        Json?
-  
-  sortOrder       Int       @default(0)
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  name        String
+  slug        String
+  description String? @db.Text
+  price       Int
+
+  // Media
+  images   String[] @default([])
+  videoUrl String?
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  isAvailable Boolean @default(true)
+  isFeatured  Boolean @default(false)
+  stock       Int?
+
+  hasVariants Boolean @default(false)
+  variants    Json?
+
+  sortOrder Int @default(0)
+
+  // Conversion Page Data (for landing pages)
+  hasConversionPage  Boolean @default(false)
+  conversionPageSlug String?
+  conversionTemplate String? @default("red-urgency")
+
+  // Conversion Page Content
+  headline    String?
+  subheadline String?  @db.Text
+  benefits    String[] @default([])
+  features    String[] @default([])
+
+  // Social Proof
+  testimonials Json? // [{name, text, rating, image, date}]
+  socialProof  String? // "1000+ pelanggan puas"
+
+  // Bonuses & Offers
+  bonuses   Json? // [{title, description, image}]
+  guarantee String? @db.Text
+
+  // Urgency
+  hasCountdown Boolean   @default(false)
+  countdownEnd DateTime?
+  urgencyText  String?
+  limitedStock Int?
+
+  // Pricing & Discount
+  originalPrice      Int? // Harga coret (sebelum diskon)
+  discountPercent    Int? // Persentase diskon (misal: 50 untuk 50%)
+  discountValidUntil DateTime? // Diskon berlaku sampai tanggal ini
+
+  // FAQs
+  faqs Json? // [{question, answer}]
+
+  // CTA
+  ctaText  String? @default("BELI SEKARANG!")
+  ctaColor String? @default("#dc2626")
+
+  // SEO for conversion page
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([storeId, slug])
   @@index([storeId, categoryId])
   @@index([storeId, isFeatured])
@@ -643,21 +695,21 @@ model Product {
 
 // ============ PRODUCT CATEGORIES ============
 model Category {
-  id          String    @id @default(cuid())
-  storeId     String
-  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
   name        String
   slug        String
   description String?
   imageUrl    String?
-  sortOrder   Int       @default(0)
-  
-  products    Product[]
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  sortOrder   Int     @default(0)
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([storeId, slug])
   @@index([storeId])
 }
