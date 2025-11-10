@@ -16,6 +16,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     price: '',
     stock: '',
     isAvailable: true,
+    // Phase 1: Video + Discount
+    videoUrl: '',
+    originalPrice: '',
+    discountPercent: '',
+    discountValidUntil: '',
   })
   const [newImages, setNewImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -38,6 +43,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           price: data.price.toString(),
           stock: data.stock?.toString() || '',
           isAvailable: data.isAvailable,
+          // Phase 1: Video + Discount
+          videoUrl: data.videoUrl || '',
+          originalPrice: data.originalPrice?.toString() || '',
+          discountPercent: data.discountPercent?.toString() || '',
+          discountValidUntil: data.discountValidUntil ? new Date(data.discountValidUntil).toISOString().split('T')[0] : '',
         })
         // Set existing images
         if (data.images && Array.isArray(data.images)) {
@@ -94,6 +104,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         formDataToSend.append('isAvailable', formData.isAvailable.toString())
         formDataToSend.append('existingImages', JSON.stringify(existingImages))
         formDataToSend.append('deletedImages', JSON.stringify(deletedImages))
+        
+        // Phase 1: Video + Discount
+        if (formData.videoUrl) formDataToSend.append('videoUrl', formData.videoUrl)
+        if (formData.originalPrice) formDataToSend.append('originalPrice', formData.originalPrice)
+        if (formData.discountPercent) formDataToSend.append('discountPercent', formData.discountPercent)
+        if (formData.discountValidUntil) formDataToSend.append('discountValidUntil', formData.discountValidUntil)
 
         // Add new image files
         newImages.forEach((file) => {
@@ -122,6 +138,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             ...formData,
             price: parseFloat(formData.price),
             stock: formData.stock ? parseInt(formData.stock) : null,
+            // Phase 1: Video + Discount
+            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
+            discountPercent: formData.discountPercent ? parseInt(formData.discountPercent) : null,
+            discountValidUntil: formData.discountValidUntil || null,
             existingImages,
             deletedImages,
           }),
@@ -306,35 +326,144 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Harga *
-            </label>
-            <input
-              type="number"
-              required
-              min="0"
-              step="1000"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
+        {/* Video URL */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Video URL (YouTube/Vimeo) 🎥
+          </label>
+          <input
+            type="url"
+            value={formData.videoUrl}
+            onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            💡 Video demo produk meningkatkan konversi hingga 80%!
+          </p>
+        </div>
+
+        {/* Pricing Section */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">💰 Harga & Diskon</h3>
+          
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Harga Jual * 💵
+              </label>
+              <input
+                type="number"
+                required
+                min="0"
+                step="1000"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="150000"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Harga Coret (Original) ✨
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1000"
+                value={formData.originalPrice}
+                onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="300000"
+              />
+              <p className="mt-1 text-xs text-gray-500">Harga sebelum diskon</p>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Stok
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={formData.stock}
-              onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Kosongkan untuk unlimited"
-            />
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Diskon (%) 🔥
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={formData.discountPercent}
+                onChange={(e) => setFormData({ ...formData, discountPercent: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="50"
+              />
+              <p className="mt-1 text-xs text-gray-500">Contoh: 50 untuk 50%</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Diskon Berlaku Sampai ⏰
+              </label>
+              <input
+                type="date"
+                value={formData.discountValidUntil}
+                onChange={(e) => setFormData({ ...formData, discountValidUntil: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+              <p className="mt-1 text-xs text-gray-500">Buat urgency!</p>
+            </div>
           </div>
+
+          {/* Discount Preview */}
+          {formData.price && formData.originalPrice && formData.discountPercent && (
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-lg p-4">
+              <h4 className="font-bold text-gray-900 mb-2">👁️ Preview Harga:</h4>
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-sm text-gray-600">Harga Coret:</p>
+                  <p className="text-xl text-gray-400 line-through">
+                    Rp {parseFloat(formData.originalPrice).toLocaleString('id-ID')}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Harga Jual:</p>
+                  <p className="text-3xl font-bold text-green-600">
+                    Rp {parseFloat(formData.price).toLocaleString('id-ID')}
+                  </p>
+                </div>
+                <div className="ml-auto">
+                  <div className="bg-red-600 text-white px-4 py-2 rounded-full text-center">
+                    <p className="text-sm font-bold">HEMAT</p>
+                    <p className="text-2xl font-black">{formData.discountPercent}%</p>
+                  </div>
+                </div>
+              </div>
+              {formData.discountValidUntil && (
+                <p className="mt-3 text-sm text-red-700 font-semibold">
+                  ⚠️ Diskon berlaku sampai: {new Date(formData.discountValidUntil).toLocaleDateString('id-ID', { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                  })}
+                </p>
+              )}
+              <p className="mt-2 text-xs text-gray-600">
+                💡 Penghematan: Rp {(parseFloat(formData.originalPrice) - parseFloat(formData.price)).toLocaleString('id-ID')}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Stok
+          </label>
+          <input
+            type="number"
+            min="0"
+            value={formData.stock}
+            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            placeholder="Kosongkan untuk unlimited"
+          />
         </div>
 
         <div>

@@ -64,6 +64,7 @@ export async function PUT(
 
     const contentType = request.headers.get('content-type')
     let name, description, price, stock, isAvailable, existingImages, deletedImages
+    let videoUrl, originalPrice, discountPercent, discountValidUntil // Phase 1
     let newImageFiles: File[] = []
 
     if (contentType?.includes('multipart/form-data')) {
@@ -76,6 +77,12 @@ export async function PUT(
       isAvailable = formData.get('isAvailable') === 'true'
       existingImages = JSON.parse(formData.get('existingImages') as string || '[]')
       deletedImages = JSON.parse(formData.get('deletedImages') as string || '[]')
+      
+      // Phase 1: Video + Discount
+      videoUrl = formData.get('videoUrl') as string || null
+      originalPrice = formData.get('originalPrice') ? parseFloat(formData.get('originalPrice') as string) : null
+      discountPercent = formData.get('discountPercent') ? parseInt(formData.get('discountPercent') as string) : null
+      discountValidUntil = formData.get('discountValidUntil') as string || null
 
       // Get new image files
       const images = formData.getAll('images')
@@ -90,6 +97,12 @@ export async function PUT(
       isAvailable = body.isAvailable
       existingImages = body.existingImages || []
       deletedImages = body.deletedImages || []
+      
+      // Phase 1: Video + Discount
+      videoUrl = body.videoUrl || null
+      originalPrice = body.originalPrice || null
+      discountPercent = body.discountPercent || null
+      discountValidUntil = body.discountValidUntil || null
     }
 
     // Upload new images to Drive
@@ -131,6 +144,11 @@ export async function PUT(
         isAvailable,
         slug: name.toLowerCase().replace(/\s+/g, '-'),
         images: finalImages,
+        // Phase 1: Video + Discount
+        videoUrl,
+        originalPrice,
+        discountPercent,
+        discountValidUntil: discountValidUntil ? new Date(discountValidUntil) : null,
       },
     })
 
