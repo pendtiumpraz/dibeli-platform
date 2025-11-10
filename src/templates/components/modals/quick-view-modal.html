@@ -1,0 +1,22 @@
+<!-- Quick View Modal -->
+<div id="quickViewModal" class="quick-view-modal" style="display: none;">
+  <div class="modal-backdrop" onclick="closeQuickView()"></div>
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeQuickView()">&times;</button>
+    <div class="modal-body">
+      <div class="modal-image">
+        <img id="modalProductImage" src="" alt="Product Image">
+      </div>
+      <div class="modal-details">
+        <h2 id="modalProductName"></h2>
+        <p class="modal-price" id="modalProductPrice"></p>
+        <p class="modal-description" id="modalProductDescription"></p>
+        <div class="modal-actions">
+          <button class="btn-wa-modal" onclick="orderFromModal()">
+            <i class="fab fa-whatsapp"></i> Pesan via WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -27,6 +27,22 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     conversionTemplate: 'red-urgency',
     headline: '',
     subheadline: '',
+    // Phase 3: Benefits & Features
+    benefits: [] as string[],
+    features: [] as string[],
+    // Phase 4: Urgency Settings
+    hasCountdown: false,
+    countdownEnd: '',
+    limitedStock: '',
+    urgencyText: '',
+    ctaText: '',
+    ctaColor: '',
+    // Phase 5: Social Proof & Trust Builders
+    testimonials: [] as Array<{name: string, rating: number, text: string, role: string}>,
+    bonuses: [] as Array<{title: string, description: string, value: string}>,
+    faqs: [] as Array<{question: string, answer: string}>,
+    guarantee: '',
+    socialProof: '',
   })
   const [newImages, setNewImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -60,6 +76,22 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           conversionTemplate: data.conversionTemplate || 'red-urgency',
           headline: data.headline || '',
           subheadline: data.subheadline || '',
+          // Phase 3: Benefits & Features
+          benefits: data.benefits || [],
+          features: data.features || [],
+          // Phase 4: Urgency Settings
+          hasCountdown: data.hasCountdown || false,
+          countdownEnd: data.countdownEnd ? new Date(data.countdownEnd).toISOString().slice(0, 16) : '',
+          limitedStock: data.limitedStock?.toString() || '',
+          urgencyText: data.urgencyText || '',
+          ctaText: data.ctaText || '',
+          ctaColor: data.ctaColor || '',
+          // Phase 5: Social Proof & Trust Builders
+          testimonials: data.testimonials || [],
+          bonuses: data.bonuses || [],
+          faqs: data.faqs || [],
+          guarantee: data.guarantee || '',
+          socialProof: data.socialProof || '',
         })
         // Set existing images
         if (data.images && Array.isArray(data.images)) {
@@ -129,6 +161,25 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         if (formData.conversionTemplate) formDataToSend.append('conversionTemplate', formData.conversionTemplate)
         if (formData.headline) formDataToSend.append('headline', formData.headline)
         if (formData.subheadline) formDataToSend.append('subheadline', formData.subheadline)
+        
+        // Phase 3: Benefits & Features
+        if (formData.benefits.length > 0) formDataToSend.append('benefits', JSON.stringify(formData.benefits.filter(b => b.trim())))
+        if (formData.features.length > 0) formDataToSend.append('features', JSON.stringify(formData.features.filter(f => f.trim())))
+        
+        // Phase 4: Urgency Settings
+        formDataToSend.append('hasCountdown', formData.hasCountdown.toString())
+        if (formData.countdownEnd) formDataToSend.append('countdownEnd', formData.countdownEnd)
+        if (formData.limitedStock) formDataToSend.append('limitedStock', formData.limitedStock)
+        if (formData.urgencyText) formDataToSend.append('urgencyText', formData.urgencyText)
+        if (formData.ctaText) formDataToSend.append('ctaText', formData.ctaText)
+        if (formData.ctaColor) formDataToSend.append('ctaColor', formData.ctaColor)
+        
+        // Phase 5: Social Proof & Trust Builders
+        if (formData.testimonials.length > 0) formDataToSend.append('testimonials', JSON.stringify(formData.testimonials.filter(t => t.name && t.text)))
+        if (formData.bonuses.length > 0) formDataToSend.append('bonuses', JSON.stringify(formData.bonuses.filter(b => b.title)))
+        if (formData.faqs.length > 0) formDataToSend.append('faqs', JSON.stringify(formData.faqs.filter(f => f.question && f.answer)))
+        if (formData.guarantee) formDataToSend.append('guarantee', formData.guarantee)
+        if (formData.socialProof) formDataToSend.append('socialProof', formData.socialProof)
 
         // Add new image files
         newImages.forEach((file) => {
@@ -167,6 +218,22 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             conversionTemplate: formData.conversionTemplate || 'red-urgency',
             headline: formData.headline || null,
             subheadline: formData.subheadline || null,
+            // Phase 3: Benefits & Features
+            benefits: formData.benefits.filter(b => b.trim()),
+            features: formData.features.filter(f => f.trim()),
+            // Phase 4: Urgency Settings
+            hasCountdown: formData.hasCountdown,
+            countdownEnd: formData.countdownEnd || null,
+            limitedStock: formData.limitedStock ? parseInt(formData.limitedStock) : null,
+            urgencyText: formData.urgencyText || null,
+            ctaText: formData.ctaText || null,
+            ctaColor: formData.ctaColor || null,
+            // Phase 5: Social Proof & Trust Builders
+            testimonials: formData.testimonials.filter(t => t.name && t.text),
+            bonuses: formData.bonuses.filter(b => b.title),
+            faqs: formData.faqs.filter(f => f.question && f.answer),
+            guarantee: formData.guarantee || null,
+            socialProof: formData.socialProof || null,
             existingImages,
             deletedImages,
           }),
@@ -697,13 +764,516 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   </p>
                 </div>
 
+                {/* Phase 3: Benefits & Features */}
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                  <h3 className="font-bold text-purple-900 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">✨</span>
+                    <span>Benefits & Features</span>
+                  </h3>
+
+                  {/* Benefits */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      💎 Benefits (Manfaat untuk Pembeli)
+                    </label>
+                    <div className="space-y-2">
+                      {formData.benefits.map((benefit, index) => (
+                        <div key={index} className="flex gap-2">
+                          <input
+                            type="text"
+                            value={benefit}
+                            onChange={(e) => {
+                              const newBenefits = [...formData.benefits]
+                              newBenefits[index] = e.target.value
+                              setFormData({ ...formData, benefits: newBenefits })
+                            }}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="Contoh: Kulit lebih cerah dalam 7 hari"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newBenefits = formData.benefits.filter((_, i) => i !== index)
+                              setFormData({ ...formData, benefits: newBenefits })
+                            }}
+                            className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                            title="Hapus"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, benefits: [...formData.benefits, ''] })}
+                      className="mt-3 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      + Tambah Benefit
+                    </button>
+                    <p className="mt-2 text-xs text-gray-600">
+                      💡 Benefits fokus pada HASIL yang didapat pembeli (bukan fitur teknis)
+                    </p>
+                  </div>
+
+                  {/* Features */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      ⚙️ Features (Spesifikasi & Detail)
+                    </label>
+                    <div className="space-y-2">
+                      {formData.features.map((feature, index) => (
+                        <div key={index} className="flex gap-2">
+                          <input
+                            type="text"
+                            value={feature}
+                            onChange={(e) => {
+                              const newFeatures = [...formData.features]
+                              newFeatures[index] = e.target.value
+                              setFormData({ ...formData, features: newFeatures })
+                            }}
+                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="Contoh: Mengandung Vitamin C 1000mg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newFeatures = formData.features.filter((_, i) => i !== index)
+                              setFormData({ ...formData, features: newFeatures })
+                            }}
+                            className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                            title="Hapus"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, features: [...formData.features, ''] })}
+                      className="mt-3 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      + Tambah Feature
+                    </button>
+                    <p className="mt-2 text-xs text-gray-600">
+                      💡 Features adalah spesifikasi teknis, komposisi, ukuran, dll
+                    </p>
+                  </div>
+                </div>
+
+                {/* Phase 4: Urgency Settings */}
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+                  <h3 className="font-bold text-orange-900 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🔥</span>
+                    <span>Urgency & Scarcity Settings</span>
+                  </h3>
+
+                  {/* Countdown Timer */}
+                  <div className="mb-6">
+                    <label className="flex items-center cursor-pointer mb-3">
+                      <input
+                        type="checkbox"
+                        checked={formData.hasCountdown}
+                        onChange={(e) => setFormData({ ...formData, hasCountdown: e.target.checked })}
+                        className="w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      />
+                      <span className="ml-3">
+                        <span className="text-base font-bold text-gray-900">⏰ Enable Countdown Timer</span>
+                        <span className="block text-sm text-gray-600 mt-1">
+                          Tampilkan hitung mundur untuk meningkatkan urgency
+                        </span>
+                      </span>
+                    </label>
+
+                    {formData.hasCountdown && (
+                      <div className="ml-8 mt-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Countdown Berakhir Pada
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={formData.countdownEnd}
+                          onChange={(e) => setFormData({ ...formData, countdownEnd: e.target.value })}
+                          className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                          ⏳ Timer akan berhenti saat waktu tercapai
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Limited Stock */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      📦 Limited Stock (Stok Terbatas)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.limitedStock}
+                      onChange={(e) => setFormData({ ...formData, limitedStock: e.target.value })}
+                      className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="Contoh: 15"
+                    />
+                    <p className="mt-1 text-xs text-gray-600">
+                      💡 Tampilkan "Stok tinggal X pcs!" untuk menciptakan scarcity
+                    </p>
+                  </div>
+
+                  {/* Urgency Text */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      ⚠️ Urgency Text (Pesan Mendesak)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.urgencyText}
+                      onChange={(e) => setFormData({ ...formData, urgencyText: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="PROMO BERAKHIR HARI INI! BURUAN SEBELUM KEHABISAN!"
+                    />
+                    <p className="mt-1 text-xs text-gray-600">
+                      💡 Pesan yang mendorong pembeli untuk segera action
+                    </p>
+                  </div>
+
+                  {/* CTA Customization */}
+                  <div className="border-t border-orange-200 pt-6">
+                    <h4 className="font-bold text-gray-900 mb-4">🎯 CTA Button Customization</h4>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* CTA Text */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Button Text
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.ctaText}
+                          onChange={(e) => setFormData({ ...formData, ctaText: e.target.value })}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="BELI SEKARANG! / PESAN VIA WHATSAPP"
+                        />
+                      </div>
+
+                      {/* CTA Color */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Button Color
+                        </label>
+                        <select
+                          value={formData.ctaColor}
+                          onChange={(e) => setFormData({ ...formData, ctaColor: e.target.value })}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        >
+                          <option value="">Default (sesuai template)</option>
+                          <option value="red">🔴 Red (Urgency)</option>
+                          <option value="green">🟢 Green (Trust)</option>
+                          <option value="yellow">🟡 Yellow (Energy)</option>
+                          <option value="blue">🔵 Blue (Professional)</option>
+                          <option value="orange">🟠 Orange (Action)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* CTA Preview */}
+                    {formData.ctaText && (
+                      <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                        <p className="text-xs text-gray-600 mb-2">Preview:</p>
+                        <button 
+                          type="button"
+                          className={`px-6 py-3 rounded-lg font-bold text-white shadow-lg ${
+                            formData.ctaColor === 'red' ? 'bg-red-600' :
+                            formData.ctaColor === 'green' ? 'bg-green-600' :
+                            formData.ctaColor === 'yellow' ? 'bg-yellow-500 text-black' :
+                            formData.ctaColor === 'blue' ? 'bg-blue-600' :
+                            formData.ctaColor === 'orange' ? 'bg-orange-600' :
+                            'bg-purple-600'
+                          }`}
+                        >
+                          {formData.ctaText}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Phase 5: Social Proof & Trust Builders */}
+                <div className="bg-teal-50 border border-teal-200 rounded-lg p-6">
+                  <h3 className="font-bold text-teal-900 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">⭐</span>
+                    <span>Social Proof & Trust Builders</span>
+                  </h3>
+
+                  {/* Testimonials */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      💬 Testimonials (Testimoni Pelanggan)
+                    </label>
+                    <div className="space-y-4">
+                      {formData.testimonials.map((testimonial, index) => (
+                        <div key={index} className="bg-white p-4 rounded-lg border-2 border-teal-200">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                            <input
+                              type="text"
+                              value={testimonial.name}
+                              onChange={(e) => {
+                                const newTestimonials = [...formData.testimonials]
+                                newTestimonials[index].name = e.target.value
+                                setFormData({ ...formData, testimonials: newTestimonials })
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                              placeholder="Nama pelanggan"
+                            />
+                            <input
+                              type="text"
+                              value={testimonial.role}
+                              onChange={(e) => {
+                                const newTestimonials = [...formData.testimonials]
+                                newTestimonials[index].role = e.target.value
+                                setFormData({ ...formData, testimonials: newTestimonials })
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                              placeholder="Profesi/Role (opsional)"
+                            />
+                          </div>
+                          <div className="mb-3">
+                            <label className="text-xs text-gray-600 mb-1 block">Rating (1-5):</label>
+                            <select
+                              value={testimonial.rating}
+                              onChange={(e) => {
+                                const newTestimonials = [...formData.testimonials]
+                                newTestimonials[index].rating = parseInt(e.target.value)
+                                setFormData({ ...formData, testimonials: newTestimonials })
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                            >
+                              <option value={5}>⭐⭐⭐⭐⭐ (5 bintang)</option>
+                              <option value={4}>⭐⭐⭐⭐ (4 bintang)</option>
+                              <option value={3}>⭐⭐⭐ (3 bintang)</option>
+                              <option value={2}>⭐⭐ (2 bintang)</option>
+                              <option value={1}>⭐ (1 bintang)</option>
+                            </select>
+                          </div>
+                          <textarea
+                            value={testimonial.text}
+                            onChange={(e) => {
+                              const newTestimonials = [...formData.testimonials]
+                              newTestimonials[index].text = e.target.value
+                              setFormData({ ...formData, testimonials: newTestimonials })
+                            }}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                            placeholder="Testimoni lengkap..."
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newTestimonials = formData.testimonials.filter((_, i) => i !== index)
+                              setFormData({ ...formData, testimonials: newTestimonials })
+                            }}
+                            className="mt-2 px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded transition-colors"
+                          >
+                            Hapus Testimoni
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ 
+                        ...formData, 
+                        testimonials: [...formData.testimonials, {name: '', rating: 5, text: '', role: ''}] 
+                      })}
+                      className="mt-3 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      + Tambah Testimoni
+                    </button>
+                    <p className="mt-2 text-xs text-gray-600">
+                      💡 Testimoni real dari pelanggan meningkatkan trust hingga 70%!
+                    </p>
+                  </div>
+
+                  {/* Bonuses */}
+                  <div className="mb-6 border-t border-teal-200 pt-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      🎁 Bonuses (Bonus Gratis)
+                    </label>
+                    <div className="space-y-4">
+                      {formData.bonuses.map((bonus, index) => (
+                        <div key={index} className="bg-white p-4 rounded-lg border-2 border-teal-200">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                            <input
+                              type="text"
+                              value={bonus.title}
+                              onChange={(e) => {
+                                const newBonuses = [...formData.bonuses]
+                                newBonuses[index].title = e.target.value
+                                setFormData({ ...formData, bonuses: newBonuses })
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                              placeholder="Judul bonus"
+                            />
+                            <input
+                              type="text"
+                              value={bonus.value}
+                              onChange={(e) => {
+                                const newBonuses = [...formData.bonuses]
+                                newBonuses[index].value = e.target.value
+                                setFormData({ ...formData, bonuses: newBonuses })
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                              placeholder="Nilai (Senilai Rp 500,000)"
+                            />
+                          </div>
+                          <textarea
+                            value={bonus.description}
+                            onChange={(e) => {
+                              const newBonuses = [...formData.bonuses]
+                              newBonuses[index].description = e.target.value
+                              setFormData({ ...formData, bonuses: newBonuses })
+                            }}
+                            rows={2}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                            placeholder="Deskripsi bonus..."
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newBonuses = formData.bonuses.filter((_, i) => i !== index)
+                              setFormData({ ...formData, bonuses: newBonuses })
+                            }}
+                            className="mt-2 px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded transition-colors"
+                          >
+                            Hapus Bonus
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ 
+                        ...formData, 
+                        bonuses: [...formData.bonuses, {title: '', description: '', value: ''}] 
+                      })}
+                      className="mt-3 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      + Tambah Bonus
+                    </button>
+                    <p className="mt-2 text-xs text-gray-600">
+                      💡 Bonus gratis meningkatkan perceived value & conversion rate!
+                    </p>
+                  </div>
+
+                  {/* FAQs */}
+                  <div className="mb-6 border-t border-teal-200 pt-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      ❓ FAQs (Frequently Asked Questions)
+                    </label>
+                    <div className="space-y-4">
+                      {formData.faqs.map((faq, index) => (
+                        <div key={index} className="bg-white p-4 rounded-lg border-2 border-teal-200">
+                          <input
+                            type="text"
+                            value={faq.question}
+                            onChange={(e) => {
+                              const newFaqs = [...formData.faqs]
+                              newFaqs[index].question = e.target.value
+                              setFormData({ ...formData, faqs: newFaqs })
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 mb-3 font-semibold"
+                            placeholder="Pertanyaan..."
+                          />
+                          <textarea
+                            value={faq.answer}
+                            onChange={(e) => {
+                              const newFaqs = [...formData.faqs]
+                              newFaqs[index].answer = e.target.value
+                              setFormData({ ...formData, faqs: newFaqs })
+                            }}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                            placeholder="Jawaban lengkap..."
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newFaqs = formData.faqs.filter((_, i) => i !== index)
+                              setFormData({ ...formData, faqs: newFaqs })
+                            }}
+                            className="mt-2 px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded transition-colors"
+                          >
+                            Hapus FAQ
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ 
+                        ...formData, 
+                        faqs: [...formData.faqs, {question: '', answer: ''}] 
+                      })}
+                      className="mt-3 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      + Tambah FAQ
+                    </button>
+                    <p className="mt-2 text-xs text-gray-600">
+                      💡 FAQs mengurangi keraguan & meningkatkan konversi
+                    </p>
+                  </div>
+
+                  {/* Guarantee & Social Proof Text */}
+                  <div className="border-t border-teal-200 pt-6">
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        🛡️ Guarantee Text (Garansi)
+                      </label>
+                      <textarea
+                        value={formData.guarantee}
+                        onChange={(e) => setFormData({ ...formData, guarantee: e.target.value })}
+                        rows={3}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                        placeholder="Contoh: Garansi 100% uang kembali dalam 30 hari jika tidak puas. No questions asked!"
+                      />
+                      <p className="mt-1 text-xs text-gray-600">
+                        💡 Garansi yang kuat menghilangkan risk dan meningkatkan trust
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        📊 Social Proof Text
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.socialProof}
+                        onChange={(e) => setFormData({ ...formData, socialProof: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                        placeholder="Contoh: Dipercaya 10,000+ pelanggan di Indonesia | 4.9/5 rating"
+                      />
+                      <p className="mt-1 text-xs text-gray-600">
+                        💡 Tampilkan angka konkret untuk membangun kredibilitas
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <h4 className="font-bold text-blue-900 mb-2">💡 Tips Conversion Page:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>✅ Headline harus spesifik & menjanjikan hasil</li>
                     <li>✅ Gunakan kata-kata yang memicu emosi (RAHASIA, TERBUKTI, MUDAH)</li>
                     <li>✅ Tambahkan social proof di subheadline (10,000+ pelanggan)</li>
-                    <li>✅ Fase 3-5 akan menambahkan Benefits, Testimonials, dll!</li>
+                    <li>✅ Benefits fokus pada transformasi, Features pada detail teknis</li>
+                    <li>✅ Countdown + Limited stock = FOMO yang kuat!</li>
+                    <li>✅ Testimonials + Guarantee = Trust yang solid!</li>
                   </ul>
                 </div>
               </div>

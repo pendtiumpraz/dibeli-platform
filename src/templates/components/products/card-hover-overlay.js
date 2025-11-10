@@ -1,9 +1,5 @@
 // Card Hover Overlay JavaScript
-
-function quickView(productId) {
-  // TODO: Implement modal for quick view
-  alert('Quick View: ' + productId)
-}
+// Note: Quick view modal functions are in quick-view-modal.js
 
 function orderProduct(productName, price) {
   const whatsappNumber = '{{store.whatsappNumber}}'

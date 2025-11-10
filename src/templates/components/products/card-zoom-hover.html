@@ -9,9 +9,11 @@
       <button class="action-btn" onclick="toggleWishlist(this)" title="Wishlist">
         <i class="far fa-heart"></i>
       </button>
-      <button class="action-btn" onclick="quickView('{{this.id}}')" title="Quick View">
+      {{#unless this.hasConversionPage}}
+      <button class="action-btn" onclick='openQuickView({id: "{{this.id}}", name: "{{this.name}}", price: "{{this.price}}", description: "{{this.description}}", image: "{{this.image}}"})' title="Quick View">
         <i class="fas fa-eye"></i>
       </button>
+      {{/unless}}
       <button class="action-btn" onclick="shareProduct('{{this.name}}')" title="Share">
         <i class="fas fa-share-alt"></i>
       </button>
@@ -32,8 +34,16 @@
       <span class="card-stock">{{this.stock}} tersisa</span>
       {{/if}}
     </div>
+    {{#if this.hasConversionPage}}
+    <!-- Has landing page - redirect to detail -->
+    <a href="/p/{{this.conversionPageSlug}}" class="add-cart-btn detail-link" {{#unless this.isAvailable}}disabled{{/unless}}>
+      <i class="fas fa-info-circle"></i> View Detail
+    </a>
+    {{else}}
+    <!-- No landing page - direct WhatsApp -->
     <button class="add-cart-btn" onclick="orderProduct('{{this.name}}', '{{this.price}}')" {{#unless this.isAvailable}}disabled{{/unless}}>
       <i class="fab fa-whatsapp"></i> Beli Sekarang
     </button>
+    {{/if}}
   </div>
 </div>

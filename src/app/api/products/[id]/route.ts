@@ -66,6 +66,9 @@ export async function PUT(
     let name, description, price, stock, isAvailable, existingImages, deletedImages
     let videoUrl, originalPrice, discountPercent, discountValidUntil // Phase 1
     let hasConversionPage, conversionPageSlug, conversionTemplate, headline, subheadline // Phase 2
+    let benefits, features // Phase 3
+    let hasCountdown, countdownEnd, limitedStock, urgencyText, ctaText, ctaColor // Phase 4
+    let testimonials, bonuses, faqs, guarantee, socialProof // Phase 5
     let newImageFiles: File[] = []
 
     if (contentType?.includes('multipart/form-data')) {
@@ -91,6 +94,25 @@ export async function PUT(
       conversionTemplate = formData.get('conversionTemplate') as string || 'red-urgency'
       headline = formData.get('headline') as string || null
       subheadline = formData.get('subheadline') as string || null
+      
+      // Phase 3: Benefits & Features
+      benefits = formData.get('benefits') ? JSON.parse(formData.get('benefits') as string) : []
+      features = formData.get('features') ? JSON.parse(formData.get('features') as string) : []
+      
+      // Phase 4: Urgency Settings
+      hasCountdown = formData.get('hasCountdown') === 'true'
+      countdownEnd = formData.get('countdownEnd') as string || null
+      limitedStock = formData.get('limitedStock') ? parseInt(formData.get('limitedStock') as string) : null
+      urgencyText = formData.get('urgencyText') as string || null
+      ctaText = formData.get('ctaText') as string || null
+      ctaColor = formData.get('ctaColor') as string || null
+      
+      // Phase 5: Social Proof & Trust Builders
+      testimonials = formData.get('testimonials') ? JSON.parse(formData.get('testimonials') as string) : []
+      bonuses = formData.get('bonuses') ? JSON.parse(formData.get('bonuses') as string) : []
+      faqs = formData.get('faqs') ? JSON.parse(formData.get('faqs') as string) : []
+      guarantee = formData.get('guarantee') as string || null
+      socialProof = formData.get('socialProof') as string || null
 
       // Get new image files
       const images = formData.getAll('images')
@@ -118,6 +140,25 @@ export async function PUT(
       conversionTemplate = body.conversionTemplate || 'red-urgency'
       headline = body.headline || null
       subheadline = body.subheadline || null
+      
+      // Phase 3: Benefits & Features
+      benefits = body.benefits || []
+      features = body.features || []
+      
+      // Phase 4: Urgency Settings
+      hasCountdown = body.hasCountdown || false
+      countdownEnd = body.countdownEnd || null
+      limitedStock = body.limitedStock || null
+      urgencyText = body.urgencyText || null
+      ctaText = body.ctaText || null
+      ctaColor = body.ctaColor || null
+      
+      // Phase 5: Social Proof & Trust Builders
+      testimonials = body.testimonials || []
+      bonuses = body.bonuses || []
+      faqs = body.faqs || []
+      guarantee = body.guarantee || null
+      socialProof = body.socialProof || null
     }
 
     // Upload new images to Drive
@@ -170,6 +211,22 @@ export async function PUT(
         conversionTemplate,
         headline,
         subheadline,
+        // Phase 3: Benefits & Features
+        benefits,
+        features,
+        // Phase 4: Urgency Settings
+        hasCountdown,
+        countdownEnd: countdownEnd ? new Date(countdownEnd) : null,
+        limitedStock,
+        urgencyText,
+        ctaText,
+        ctaColor,
+        // Phase 5: Social Proof & Trust Builders
+        testimonials,
+        bonuses,
+        faqs,
+        guarantee,
+        socialProof,
       },
     })
 

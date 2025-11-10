@@ -7,12 +7,20 @@
         <h3>{{this.name}}</h3>
         <p>{{this.description}}</p>
         <div class="overlay-actions">
-          <button class="overlay-btn" onclick="quickView('{{this.id}}')">
+          {{#if this.hasConversionPage}}
+          <!-- Product has landing page - show View Detail button -->
+          <a href="/p/{{this.conversionPageSlug}}" class="overlay-btn detail-btn">
+            <i class="fas fa-info-circle"></i> View Detail
+          </a>
+          {{else}}
+          <!-- No landing page - show Quick View + WhatsApp -->
+          <button class="overlay-btn" onclick='openQuickView({id: "{{this.id}}", name: "{{this.name}}", price: "{{this.price}}", description: "{{this.description}}", image: "{{this.image}}"})'>
             <i class="fas fa-eye"></i> Quick View
           </button>
           <button class="overlay-btn primary" onclick="orderProduct('{{this.name}}', '{{this.price}}')">
             <i class="fab fa-whatsapp"></i> Beli Sekarang
           </button>
+          {{/if}}
         </div>
       </div>
     </div>

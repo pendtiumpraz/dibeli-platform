@@ -119,6 +119,23 @@
   border-color: var(--accent-color);
 }
 
+.overlay-btn.detail-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border: 2px solid #3b82f6;
+}
+
+.overlay-btn.detail-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: scale(1.05);
+}
+
 .card-badge {
   position: absolute;
   top: 12px;

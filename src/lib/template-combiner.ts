@@ -183,6 +183,15 @@ ${getComponentCSS('products', config.productCard)}
   css += productsCSS
   js += productsJS
 
+  // Add Quick View Modal (for products without landing page)
+  const modalHTML = getComponent('modals', 'quick-view-modal')
+  const modalCSS = getComponentCSS('modals', 'quick-view-modal')
+  const modalJS = getComponentJS('modals', 'quick-view-modal')
+  
+  html += modalHTML
+  css += modalCSS
+  js += modalJS
+
   // Add footer
   if (config.footer) {
     const footerHTML = getComponent('footers', config.footer)

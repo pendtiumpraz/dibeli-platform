@@ -100,6 +100,9 @@ export default async function PublicStorePage({ params }: PageProps) {
         rating: 5,
         reviewCount: 0,
         features: undefined, // TODO: Add features field to product model
+        // Conversion landing page data
+        hasConversionPage: product.hasConversionPage || false,
+        conversionPageSlug: product.conversionPageSlug || undefined,
       }
     }),
     theme: getDefaultTheme(),
