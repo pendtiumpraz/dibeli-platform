@@ -5,6 +5,7 @@ import RedUrgencyTemplate from '@/components/conversion/RedUrgencyTemplate'
 import GreenTrustTemplate from '@/components/conversion/GreenTrustTemplate'
 import YellowEnergyTemplate from '@/components/conversion/YellowEnergyTemplate'
 import BlueProfessionalTemplate from '@/components/conversion/BlueProfessionalTemplate'
+import PurpleRoyalTemplate from '@/components/conversion/PurpleRoyalTemplate'
 
 interface ConversionPageProps {
   params: { slug: string }
@@ -89,8 +90,7 @@ export default async function ConversionPage({ params }: ConversionPageProps) {
     case 'blue-professional':
       return <BlueProfessionalTemplate {...templateProps} />
     case 'purple-premium':
-      // TODO: Create PurplePremiumTemplate component
-      return <BlueProfessionalTemplate {...templateProps} />
+      return <PurpleRoyalTemplate {...templateProps} />
     default:
       return <RedUrgencyTemplate {...templateProps} />
   }
