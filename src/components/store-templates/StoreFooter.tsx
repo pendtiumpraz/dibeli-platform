@@ -39,10 +39,7 @@ export default function StoreFooter({
               {store.name}
             </h3>
             {store.tagline && (
-              <p className="text-sm mb-4 opacity-90">{store.tagline}</p>
-            )}
-            {store.description && (
-              <p className="text-sm opacity-75 line-clamp-3">{store.description}</p>
+              <p className="text-sm opacity-90">{store.tagline}</p>
             )}
           </div>
 
