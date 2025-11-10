@@ -14,6 +14,21 @@ interface Product {
   subheadline: string | null
   stock: number | null
   limitedStock: number | null
+  // Phase 3
+  benefits: string[]
+  features: string[]
+  // Phase 4
+  hasCountdown: boolean
+  countdownEnd: Date | null
+  urgencyText: string | null
+  ctaText: string | null
+  ctaColor: string | null
+  // Phase 5
+  testimonials: Array<{name: string, rating: number, text: string, role: string}>
+  bonuses: Array<{title: string, description: string, value: string}>
+  faqs: Array<{question: string, answer: string}>
+  guarantee: string | null
+  socialProof: string | null
 }
 
 interface Store {
@@ -195,17 +210,141 @@ export default function GreenTrustTemplate({ product, store }: GreenTrustTemplat
         </div>
       )}
 
+      {/* Benefits Section */}
+      {product.benefits && product.benefits.length > 0 && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+              ✨ MANFAAT YANG ANDA DAPATKAN
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {product.benefits.map((benefit, index) => (
+                <div key={index} className="flex items-start gap-3 bg-white p-4 rounded-lg shadow-md border-l-4 border-green-500">
+                  <span className="text-green-600 text-2xl flex-shrink-0 font-bold">✓</span>
+                  <p className="text-gray-800 font-medium">{benefit}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Features Section */}
+      {product.features && product.features.length > 0 && (
+        <div className="bg-white py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+              ⚙️ SPESIFIKASI LENGKAP
+            </h2>
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 shadow-lg border-2 border-green-200">
+              <ul className="space-y-3">
+                {product.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="text-green-600 font-black text-lg">•</span>
+                    <span className="text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Testimonials Section */}
+      {product.testimonials && product.testimonials.length > 0 && (
+        <div className="bg-gray-50 py-12">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+              💬 APA KATA PELANGGAN KAMI?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {product.testimonials.map((testimonial, index) => (
+                <div key={index} className="bg-white p-6 rounded-xl shadow-lg border-2 border-green-100">
+                  <div className="flex gap-1 mb-3">
+                    {[...Array(5)].map((_, i) => (
+                      <svg
+                        key={i}
+                        className={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-4 italic">"{testimonial.text}"</p>
+                  <div className="border-t pt-3">
+                    <p className="font-bold text-gray-900">{testimonial.name}</p>
+                    {testimonial.role && (
+                      <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bonuses Section */}
+      {product.bonuses && product.bonuses.length > 0 && (
+        <div className="bg-gradient-to-r from-green-400 to-emerald-500 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-white mb-8">
+              🎁 BONUS EKSKLUSIF UNTUK ANDA!
+            </h2>
+            <div className="space-y-4">
+              {product.bonuses.map((bonus, index) => (
+                <div key={index} className="bg-white rounded-xl p-6 shadow-xl border-l-4 border-green-600">
+                  <div className="flex items-start justify-between flex-wrap gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        {bonus.title}
+                      </h3>
+                      <p className="text-gray-700">{bonus.description}</p>
+                    </div>
+                    <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap">
+                      {bonus.value}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FAQs Section */}
+      {product.faqs && product.faqs.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 py-12">
+          <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+            ❓ PERTANYAAN YANG SERING DITANYAKAN
+          </h2>
+          <div className="space-y-4">
+            {product.faqs.map((faq, index) => (
+              <div key={index} className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-green-500">
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  Q: {faq.question}
+                </h3>
+                <p className="text-gray-700 pl-4 border-l-2 border-gray-300">
+                  A: {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Guarantee Section */}
       <div className="bg-green-600 py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">
             <div className="text-6xl mb-4">🛡️</div>
             <h2 className="text-3xl font-black text-gray-900 mb-4">
-              GARANSI 100% UANG KEMBALI
+              {product.guarantee ? 'GARANSI KAMI' : 'GARANSI 100% UANG KEMBALI'}
             </h2>
-            <p className="text-lg text-gray-700 mb-6">
-              Kami sangat yakin dengan kualitas produk ini. Jika Anda tidak puas dalam 30 hari, 
-              uang Anda akan dikembalikan 100% tanpa pertanyaan!
+            <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+              {product.guarantee || 'Kami sangat yakin dengan kualitas produk ini. Jika Anda tidak puas dalam 30 hari, uang Anda akan dikembalikan 100% tanpa pertanyaan!'}
             </p>
             <div className="flex justify-center gap-8 flex-wrap text-sm">
               <div className="text-center">

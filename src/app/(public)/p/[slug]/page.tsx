@@ -4,6 +4,7 @@ import { Metadata } from 'next'
 import RedUrgencyTemplate from '@/components/conversion/RedUrgencyTemplate'
 import GreenTrustTemplate from '@/components/conversion/GreenTrustTemplate'
 import YellowEnergyTemplate from '@/components/conversion/YellowEnergyTemplate'
+import BlueProfessionalTemplate from '@/components/conversion/BlueProfessionalTemplate'
 
 interface ConversionPageProps {
   params: { slug: string }
@@ -57,8 +58,16 @@ export default async function ConversionPage({ params }: ConversionPageProps) {
   // Render based on template
   const template = product.conversionTemplate || 'red-urgency'
 
+  // Cast JSON fields to proper types
   const templateProps = {
-    product,
+    product: {
+      ...product,
+      benefits: (product.benefits as string[]) || [],
+      features: (product.features as string[]) || [],
+      testimonials: (product.testimonials as Array<{name: string, rating: number, text: string, role: string}>) || [],
+      bonuses: (product.bonuses as Array<{title: string, description: string, value: string}>) || [],
+      faqs: (product.faqs as Array<{question: string, answer: string}>) || [],
+    },
     store: product.store,
   }
 
@@ -69,7 +78,15 @@ export default async function ConversionPage({ params }: ConversionPageProps) {
       return <GreenTrustTemplate {...templateProps} />
     case 'yellow-energy':
       return <YellowEnergyTemplate {...templateProps} />
+    case 'blue-professional':
+      return <BlueProfessionalTemplate {...templateProps} />
+    case 'purple-premium':
+      // TODO: Create PurplePremiumTemplate component
+      return <BlueProfessionalTemplate {...templateProps} />
     default:
       return <RedUrgencyTemplate {...templateProps} />
   }
 }
+
+export const dynamic = 'force-dynamic'
+

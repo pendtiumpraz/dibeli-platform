@@ -17,6 +17,21 @@ interface Product {
   subheadline: string | null
   stock: number | null
   limitedStock: number | null
+  // Phase 3
+  benefits: string[]
+  features: string[]
+  // Phase 4
+  hasCountdown: boolean
+  countdownEnd: Date | null
+  urgencyText: string | null
+  ctaText: string | null
+  ctaColor: string | null
+  // Phase 5
+  testimonials: Array<{name: string, rating: number, text: string, role: string}>
+  bonuses: Array<{title: string, description: string, value: string}>
+  faqs: Array<{question: string, answer: string}>
+  guarantee: string | null
+  socialProof: string | null
 }
 
 interface Store {
@@ -34,10 +49,15 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 })
   
   useEffect(() => {
-    if (!product.discountValidUntil) return
+    // Use countdownEnd if hasCountdown is enabled, otherwise use discountValidUntil
+    const targetDate = product.hasCountdown && product.countdownEnd 
+      ? product.countdownEnd 
+      : product.discountValidUntil
+    
+    if (!targetDate) return
 
     const calculateTimeLeft = () => {
-      const difference = +new Date(product.discountValidUntil!) - +new Date()
+      const difference = +new Date(targetDate) - +new Date()
       
       if (difference > 0) {
         setTimeLeft({
@@ -52,7 +72,7 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
     const timer = setInterval(calculateTimeLeft, 1000)
     
     return () => clearInterval(timer)
-  }, [product.discountValidUntil])
+  }, [product.hasCountdown, product.countdownEnd, product.discountValidUntil])
 
   const handleOrder = () => {
     const message = `Halo *${store.name}*!\n\n` +
@@ -87,12 +107,19 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative max-w-6xl mx-auto px-4 py-12 md:py-20">
           {/* Urgency Badge */}
-          {product.discountValidUntil && (
+          {(product.urgencyText || product.discountValidUntil) && (
             <div className="mb-6 flex justify-center">
               <div className="bg-yellow-400 text-red-900 px-6 py-3 rounded-full font-black text-sm md:text-base uppercase tracking-wider shadow-lg animate-pulse">
-                ⚠️ PROMO TERBATAS! SEGERA BERAKHIR!
+                ⚠️ {product.urgencyText || 'PROMO TERBATAS! SEGERA BERAKHIR!'} ⚠️
               </div>
             </div>
+          )}
+
+          {/* Social Proof */}
+          {product.socialProof && (
+            <p className="text-center text-red-100 mb-6 text-sm md:text-base font-semibold">
+              {product.socialProof}
+            </p>
           )}
 
           {/* Headline */}
@@ -108,10 +135,10 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
           )}
 
           {/* Countdown Timer */}
-          {product.discountValidUntil && (
+          {((product.hasCountdown && product.countdownEnd) || product.discountValidUntil) && (
             <div className="bg-black bg-opacity-30 backdrop-blur-sm rounded-2xl p-6 max-w-xl mx-auto mb-8">
               <p className="text-center text-yellow-300 font-bold mb-3 text-sm md:text-base">
-                ⏰ PROMO BERAKHIR DALAM:
+                ⏰ {product.hasCountdown ? 'BERAKHIR DALAM:' : 'PROMO BERAKHIR DALAM:'}
               </p>
               <div className="flex justify-center gap-4">
                 <div className="text-center">
@@ -171,9 +198,16 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
 
             <button
               onClick={handleOrder}
-              className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-black text-xl py-5 rounded-xl shadow-lg transition-all transform hover:scale-105 uppercase"
+              className={`w-full font-black text-xl py-5 rounded-xl shadow-lg transition-all transform hover:scale-105 uppercase ${
+                product.ctaColor === 'red' ? 'bg-red-600 hover:bg-red-700' :
+                product.ctaColor === 'green' ? 'bg-green-600 hover:bg-green-700' :
+                product.ctaColor === 'yellow' ? 'bg-yellow-500 hover:bg-yellow-600 text-black' :
+                product.ctaColor === 'blue' ? 'bg-blue-600 hover:bg-blue-700' :
+                product.ctaColor === 'orange' ? 'bg-orange-600 hover:bg-orange-700' :
+                'bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700'
+              } text-white`}
             >
-              🛒 BELI SEKARANG!
+              {product.ctaText || '🛒 BELI SEKARANG!'}
             </button>
             
             <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-600">
@@ -233,6 +267,148 @@ export default function RedUrgencyTemplate({ product, store }: RedUrgencyTemplat
             <div className="prose prose-lg max-w-none text-gray-700">
               {product.description}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Benefits Section */}
+      {product.benefits && product.benefits.length > 0 && (
+        <div className="bg-gradient-to-r from-red-50 to-orange-50 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+              ✨ MANFAAT YANG ANDA DAPATKAN
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {product.benefits.map((benefit, index) => (
+                <div key={index} className="flex items-start gap-3 bg-white p-4 rounded-lg shadow-md border-l-4 border-red-500">
+                  <span className="text-red-600 text-2xl flex-shrink-0 font-bold">✓</span>
+                  <p className="text-gray-800 font-medium">{benefit}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Features Section */}
+      {product.features && product.features.length > 0 && (
+        <div className="bg-white py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+              ⚙️ SPESIFIKASI LENGKAP
+            </h2>
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-6 shadow-lg border-2 border-red-200">
+              <ul className="space-y-3">
+                {product.features.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="text-red-600 font-black text-lg">•</span>
+                    <span className="text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Testimonials Section */}
+      {product.testimonials && product.testimonials.length > 0 && (
+        <div className="bg-gray-50 py-12">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+              💬 APA KATA MEREKA?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {product.testimonials.map((testimonial, index) => (
+                <div key={index} className="bg-white p-6 rounded-xl shadow-lg border-2 border-red-100">
+                  <div className="flex gap-1 mb-3">
+                    {[...Array(5)].map((_, i) => (
+                      <svg
+                        key={i}
+                        className={`w-5 h-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-4 italic">"{testimonial.text}"</p>
+                  <div className="border-t pt-3">
+                    <p className="font-bold text-gray-900">{testimonial.name}</p>
+                    {testimonial.role && (
+                      <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bonuses Section */}
+      {product.bonuses && product.bonuses.length > 0 && (
+        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-3xl font-black text-center text-white mb-8">
+              🎁 BONUS GRATIS UNTUK ANDA!
+            </h2>
+            <div className="space-y-4">
+              {product.bonuses.map((bonus, index) => (
+                <div key={index} className="bg-white rounded-xl p-6 shadow-xl border-l-4 border-red-600">
+                  <div className="flex items-start justify-between flex-wrap gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        {bonus.title}
+                      </h3>
+                      <p className="text-gray-700">{bonus.description}</p>
+                    </div>
+                    <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap">
+                      {bonus.value}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Guarantee Section */}
+      {product.guarantee && (
+        <div className="bg-red-600 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">
+              <div className="text-6xl mb-4">🛡️</div>
+              <h2 className="text-3xl font-black text-gray-900 mb-4">
+                GARANSI KAMI
+              </h2>
+              <p className="text-lg text-gray-700 leading-relaxed">
+                {product.guarantee}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FAQs Section */}
+      {product.faqs && product.faqs.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 py-12">
+          <h2 className="text-3xl font-black text-center text-gray-900 mb-8">
+            ❓ PERTANYAAN YANG SERING DITANYAKAN
+          </h2>
+          <div className="space-y-4">
+            {product.faqs.map((faq, index) => (
+              <div key={index} className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-red-500">
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  Q: {faq.question}
+                </h3>
+                <p className="text-gray-700 pl-4 border-l-2 border-gray-300">
+                  A: {faq.answer}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -209,6 +209,7 @@ model Store {
   twitterUrl   String?
   youtubeUrl   String?
   linkedinUrl  String?
+  googleMapsEmbed String? @db.Text
 
   // Hero section
   heroImage      String?

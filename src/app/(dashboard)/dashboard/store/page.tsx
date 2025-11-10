@@ -24,9 +24,14 @@ export default async function StorePage() {
     <div className="max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Toko Saya</h1>
-        <Link href={`/toko/${store.slug}`} target="_blank">
-          <Button variant="outline">👁️ Lihat Toko</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/dashboard/store/edit">
+            <Button>✏️ Edit Profil Toko</Button>
+          </Link>
+          <Link href={`/toko/${store.slug}`} target="_blank">
+            <Button variant="outline">👁️ Lihat Toko</Button>
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white shadow rounded-lg p-6 space-y-6">

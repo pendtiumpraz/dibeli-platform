@@ -6,13 +6,40 @@ import { Button } from '@/components/ui/button'
 
 export default function CreateProductPage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     stock: '',
     isAvailable: true,
+    // Phase 1: Video + Discount
+    videoUrl: '',
+    originalPrice: '',
+    discountPercent: '',
+    discountValidUntil: '',
+    // Phase 2: Conversion Page
+    hasConversionPage: false,
+    conversionPageSlug: '',
+    conversionTemplate: 'red-urgency',
+    headline: '',
+    subheadline: '',
+    // Phase 3: Benefits & Features
+    benefits: [] as string[],
+    features: [] as string[],
+    // Phase 4: Urgency Settings
+    hasCountdown: false,
+    countdownEnd: '',
+    limitedStock: '',
+    urgencyText: '',
+    ctaText: '',
+    ctaColor: '',
+    // Phase 5: Social Proof & Trust Builders
+    testimonials: [] as Array<{name: string, rating: number, text: string, role: string}>,
+    bonuses: [] as Array<{title: string, description: string, value: string}>,
+    faqs: [] as Array<{question: string, answer: string}>,
+    guarantee: '',
+    socialProof: '',
   })
   const [images, setImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -28,15 +55,59 @@ export default function CreateProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
+    setSaving(true)
 
     try {
       const formDataToSend = new FormData()
+      
+      // Basic fields
       formDataToSend.append('name', formData.name)
       formDataToSend.append('description', formData.description)
       formDataToSend.append('price', formData.price)
       if (formData.stock) formDataToSend.append('stock', formData.stock)
       formDataToSend.append('isAvailable', formData.isAvailable.toString())
+
+      // Phase 1: Video + Discount
+      if (formData.videoUrl) formDataToSend.append('videoUrl', formData.videoUrl)
+      if (formData.originalPrice) formDataToSend.append('originalPrice', formData.originalPrice)
+      if (formData.discountPercent) formDataToSend.append('discountPercent', formData.discountPercent)
+      if (formData.discountValidUntil) formDataToSend.append('discountValidUntil', formData.discountValidUntil)
+      
+      // Phase 2: Conversion Page
+      formDataToSend.append('hasConversionPage', formData.hasConversionPage.toString())
+      if (formData.conversionPageSlug) formDataToSend.append('conversionPageSlug', formData.conversionPageSlug)
+      if (formData.conversionTemplate) formDataToSend.append('conversionTemplate', formData.conversionTemplate)
+      if (formData.headline) formDataToSend.append('headline', formData.headline)
+      if (formData.subheadline) formDataToSend.append('subheadline', formData.subheadline)
+      
+      // Phase 3: Benefits & Features
+      if (formData.benefits.length > 0) {
+        formDataToSend.append('benefits', JSON.stringify(formData.benefits.filter(b => b.trim())))
+      }
+      if (formData.features.length > 0) {
+        formDataToSend.append('features', JSON.stringify(formData.features.filter(f => f.trim())))
+      }
+      
+      // Phase 4: Urgency Settings
+      formDataToSend.append('hasCountdown', formData.hasCountdown.toString())
+      if (formData.countdownEnd) formDataToSend.append('countdownEnd', formData.countdownEnd)
+      if (formData.limitedStock) formDataToSend.append('limitedStock', formData.limitedStock)
+      if (formData.urgencyText) formDataToSend.append('urgencyText', formData.urgencyText)
+      if (formData.ctaText) formDataToSend.append('ctaText', formData.ctaText)
+      if (formData.ctaColor) formDataToSend.append('ctaColor', formData.ctaColor)
+      
+      // Phase 5: Social Proof & Trust Builders
+      if (formData.testimonials.length > 0) {
+        formDataToSend.append('testimonials', JSON.stringify(formData.testimonials.filter(t => t.name && t.text)))
+      }
+      if (formData.bonuses.length > 0) {
+        formDataToSend.append('bonuses', JSON.stringify(formData.bonuses.filter(b => b.title)))
+      }
+      if (formData.faqs.length > 0) {
+        formDataToSend.append('faqs', JSON.stringify(formData.faqs.filter(f => f.question && f.answer)))
+      }
+      if (formData.guarantee) formDataToSend.append('guarantee', formData.guarantee)
+      if (formData.socialProof) formDataToSend.append('socialProof', formData.socialProof)
 
       // Add images
       images.forEach((image) => {
@@ -45,10 +116,11 @@ export default function CreateProductPage() {
 
       const res = await fetch('/api/products/create', {
         method: 'POST',
-        body: formDataToSend, // No Content-Type header, browser will set it
+        body: formDataToSend,
       })
 
       if (res.ok) {
+        alert('✅ Produk berhasil dibuat!')
         router.push('/dashboard/products')
         router.refresh()
       } else {
@@ -59,7 +131,7 @@ export default function CreateProductPage() {
       console.error(error)
       alert('Error creating product')
     } finally {
-      setLoading(false)
+      setSaving(false)
     }
   }
 
@@ -189,8 +261,8 @@ export default function CreateProductPage() {
         </div>
 
         <div className="flex gap-4">
-          <Button type="submit" disabled={loading} className="flex-1">
-            {loading ? 'Membuat...' : 'Tambah Produk'}
+          <Button type="submit" disabled={saving} className="flex-1">
+            {saving ? 'Membuat...' : 'Tambah Produk'}
           </Button>
           <Button type="button" variant="outline" onClick={() => router.back()}>
             Batal

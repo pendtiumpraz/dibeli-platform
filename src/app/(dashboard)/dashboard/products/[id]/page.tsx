@@ -624,9 +624,9 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                 {/* Template Selector */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">
-                    🎨 Template Style
+                    🎨 Template Style (5 Pilihan)
                   </label>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
                     <label className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all ${
                       formData.conversionTemplate === 'red-urgency' 
                         ? 'border-red-500 bg-red-50' 
@@ -701,6 +701,60 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                       </div>
                       {formData.conversionTemplate === 'yellow-energy' && (
                         <div className="absolute top-2 right-2 text-yellow-600">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                          </svg>
+                        </div>
+                      )}
+                    </label>
+
+                    <label className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all ${
+                      formData.conversionTemplate === 'blue-professional' 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-blue-300'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="template"
+                        value="blue-professional"
+                        checked={formData.conversionTemplate === 'blue-professional'}
+                        onChange={(e) => setFormData({ ...formData, conversionTemplate: e.target.value })}
+                        className="sr-only"
+                      />
+                      <div className="text-center">
+                        <div className="text-3xl mb-2">💼</div>
+                        <div className="font-bold text-gray-900">Blue Pro</div>
+                        <div className="text-xs text-gray-600 mt-1">Professional</div>
+                      </div>
+                      {formData.conversionTemplate === 'blue-professional' && (
+                        <div className="absolute top-2 right-2 text-blue-600">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                          </svg>
+                        </div>
+                      )}
+                    </label>
+
+                    <label className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all ${
+                      formData.conversionTemplate === 'purple-premium' 
+                        ? 'border-purple-500 bg-purple-50' 
+                        : 'border-gray-200 hover:border-purple-300'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="template"
+                        value="purple-premium"
+                        checked={formData.conversionTemplate === 'purple-premium'}
+                        onChange={(e) => setFormData({ ...formData, conversionTemplate: e.target.value })}
+                        className="sr-only"
+                      />
+                      <div className="text-center">
+                        <div className="text-3xl mb-2">👑</div>
+                        <div className="font-bold text-gray-900">Purple Premium</div>
+                        <div className="text-xs text-gray-600 mt-1">Luxury & Elite</div>
+                      </div>
+                      {formData.conversionTemplate === 'purple-premium' && (
+                        <div className="absolute top-2 right-2 text-purple-600">
                           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                           </svg>
