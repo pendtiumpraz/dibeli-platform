@@ -48,10 +48,29 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [existingImages, setExistingImages] = useState<string[]>([])
   const [deletedImages, setDeletedImages] = useState<string[]>([])
+  
+  // AI Auto-Generate States (UNLIMITED only)
+  const [aiProvider, setAiProvider] = useState('gemini')
+  const [aiApiKey, setAiApiKey] = useState('')
+  const [aiGenerating, setAiGenerating] = useState(false)
+  const [session, setSession] = useState<any>(null)
 
   useEffect(() => {
     fetchProduct()
+    fetchSession()
   }, [params.id])
+  
+  const fetchSession = async () => {
+    try {
+      const res = await fetch('/api/auth/session')
+      if (res.ok) {
+        const data = await res.json()
+        setSession(data)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const fetchProduct = async () => {
     try {
@@ -256,6 +275,86 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       setUploading(false)
     }
   }
+  
+  // AI Auto-Generate Handler
+  const handleAiGenerate = async () => {
+    if (!formData.name) {
+      alert('⚠️ Isi nama produk dulu sebelum generate dengan AI!')
+      return
+    }
+    
+    if (!aiApiKey) {
+      alert('⚠️ Masukkan API key dulu!')
+      return
+    }
+    
+    const confirmed = confirm(
+      '🤖 AI akan generate SEMUA detail produk berdasarkan nama dan harga yang sudah diisi.\n\n' +
+      'Data yang akan di-generate:\n' +
+      '• Headline & Subheadline\n' +
+      '• Deskripsi lengkap\n' +
+      '• 5 Benefits\n' +
+      '• 5 Features\n' +
+      '• 3 Testimonials\n' +
+      '• 2 Bonuses\n' +
+      '• 5 FAQs\n' +
+      '• Guarantee\n' +
+      '• Social Proof\n' +
+      '• Urgency Text\n' +
+      '• CTA Text\n\n' +
+      'Lanjutkan?'
+    )
+    
+    if (!confirmed) return
+    
+    setAiGenerating(true)
+    
+    try {
+      const res = await fetch('/api/ai/generate-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: aiProvider,
+          apiKey: aiApiKey,
+          productName: formData.name,
+          price: formData.price,
+          description: formData.description || '',
+        })
+      })
+      
+      if (res.ok) {
+        const generated = await res.json()
+        
+        // Auto-fill ALL fields
+        setFormData({
+          ...formData,
+          headline: generated.headline || formData.headline,
+          subheadline: generated.subheadline || formData.subheadline,
+          description: generated.description || formData.description,
+          benefits: generated.benefits || formData.benefits,
+          features: generated.features || formData.features,
+          testimonials: generated.testimonials || formData.testimonials,
+          bonuses: generated.bonuses || formData.bonuses,
+          faqs: generated.faqs || formData.faqs,
+          guarantee: generated.guarantee || formData.guarantee,
+          socialProof: generated.socialProof || formData.socialProof,
+          urgencyText: generated.urgencyText || formData.urgencyText,
+          ctaText: generated.ctaText || formData.ctaText,
+        })
+        
+        alert('✅ AI berhasil generate semua detail!\n\n' +
+          '📝 Silakan review dan edit jika perlu, lalu SAVE.')
+      } else {
+        const error = await res.json()
+        alert('❌ AI generation failed:\n\n' + (error.error || 'Unknown error'))
+      }
+    } catch (error: any) {
+      console.error(error)
+      alert('❌ Error calling AI:\n\n' + error.message)
+    } finally {
+      setAiGenerating(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -417,6 +516,101 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           />
         </div>
+
+        {/* AI Auto-Generate Section (UNLIMITED Only) */}
+        {session?.user?.tier === 'UNLIMITED' && (
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-lg p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-shrink-0 text-4xl">🤖</div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-purple-900 mb-2">
+                  AI AUTO-GENERATE (UNLIMITED EXCLUSIVE)
+                </h3>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  Biarkan AI mengisi <strong>SEMUA detail produk</strong> secara otomatis! 
+                  Cukup isi <strong>Nama Produk</strong> dan <strong>Harga</strong>, lalu klik Generate. 
+                  AI akan membuat Headlines, Benefits, Features, Testimonials, FAQs, dan semua konten lainnya dalam sekali klik! ✨
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  🔧 AI Provider
+                </label>
+                <select
+                  value={aiProvider}
+                  onChange={(e) => setAiProvider(e.target.value)}
+                  className="w-full px-4 py-2 border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                >
+                  <option value="gemini">Google Gemini</option>
+                  <option value="groq">Groq (Llama 3.1)</option>
+                </select>
+                <p className="mt-1 text-xs text-gray-600">
+                  💡 Gemini: Lebih kreatif | Groq: Lebih cepat
+                </p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  🔑 API Key
+                </label>
+                <input
+                  type="password"
+                  value={aiApiKey}
+                  onChange={(e) => setAiApiKey(e.target.value)}
+                  className="w-full px-4 py-2 border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="Masukkan API key"
+                />
+                <p className="mt-1 text-xs text-gray-600">
+                  {aiProvider === 'gemini' ? (
+                    <>Get key: <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener" className="text-purple-600 hover:underline">Google AI Studio</a></>
+                  ) : (
+                    <>Get key: <a href="https://console.groq.com/keys" target="_blank" rel="noopener" className="text-purple-600 hover:underline">Groq Console</a></>
+                  )}
+                </p>
+              </div>
+            </div>
+            
+            <button
+              type="button"
+              onClick={handleAiGenerate}
+              disabled={!formData.name || !aiApiKey || aiGenerating}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] shadow-lg"
+            >
+              {aiGenerating ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>🔄 Generating dengan AI...</span>
+                </span>
+              ) : (
+                '✨ Generate Seluruh Detail Dengan AI'
+              )}
+            </button>
+            
+            <div className="mt-4 bg-white rounded-lg p-4 border border-purple-200">
+              <p className="text-xs font-bold text-purple-900 mb-2">📦 Yang akan di-generate:</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-700">
+                <div>✓ Headline & Subheadline</div>
+                <div>✓ Deskripsi Lengkap</div>
+                <div>✓ 5 Benefit Produk</div>
+                <div>✓ 5 Fitur/Spesifikasi</div>
+                <div>✓ 3 Testimoni Pelanggan</div>
+                <div>✓ 2 Bonus Menarik</div>
+                <div>✓ 5 FAQ Lengkap</div>
+                <div>✓ Teks Garansi</div>
+                <div>✓ Social Proof</div>
+                <div>✓ Urgency Text</div>
+                <div>✓ CTA Button Text</div>
+                <div>✓ Dan lainnya!</div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Video URL */}
         <div>
