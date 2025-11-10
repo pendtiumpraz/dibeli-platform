@@ -44,10 +44,11 @@ export default function StoreFooter({
           </div>
 
           {/* Contact & Address */}
-          <div>
-            <h4 className={`font-semibold ${accentColor} mb-4`}>Hubungi Kami</h4>
-            <div className="space-y-3 text-sm">
-              {store.whatsappNumber && (
+          {(store.whatsappNumber || store.phone || store.email || store.address) && (
+            <div>
+              <h4 className={`font-semibold ${accentColor} mb-4`}>Hubungi Kami</h4>
+              <div className="space-y-3 text-sm">
+                {store.whatsappNumber && (
                 <a 
                   href={`https://wa.me/${store.whatsappNumber.replace(/[^0-9]/g, '')}`}
                   target="_blank"
@@ -85,13 +86,15 @@ export default function StoreFooter({
                   </span>
                 </p>
               )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Social Media */}
-          <div>
-            <h4 className={`font-semibold ${accentColor} mb-4`}>Ikuti Kami</h4>
-            {hasSocialLinks ? (
+          {hasSocialLinks && (
+            <div>
+              <h4 className={`font-semibold ${accentColor} mb-4`}>Ikuti Kami</h4>
+              {hasSocialLinks ? (
               <div className="flex flex-wrap gap-4">
                 {store.instagramUrl && (
                   <a 
@@ -162,7 +165,8 @@ export default function StoreFooter({
             ) : (
               <p className="text-sm opacity-75">Belum ada social media</p>
             )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Google Maps Link */}
