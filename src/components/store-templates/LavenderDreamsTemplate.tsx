@@ -21,7 +21,7 @@ export default function LavenderDreamsTemplate({ store, products }: StoreTemplat
       <main className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {products.map((p) => (
           <div key={p.id} className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all overflow-hidden">
-            <div className="aspect-square bg-gradient-to-br from-purple-100 to-violet-100">{p.images?.[0] ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-6xl">💜</div>}</div>
+            <div className="aspect-square bg-gradient-to-br from-purple-100 to-violet-100">{p.images?.[0] ? <img src={`https://drive.google.com/thumbnail?id=${p.images[0]}&sz=w400`} alt={p.name} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-6xl">💜</div>}</div>
             <div className="p-6"><h3 className="text-xl font-bold mb-2">{p.name}</h3><div className="text-2xl font-bold text-purple-600 mb-4">Rp {p.price.toLocaleString('id-ID')}</div><button onClick={() => window.open(`https://wa.me/${store.whatsappNumber}`, '_blank')} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold">Pesan</button></div>
           </div>
         ))}

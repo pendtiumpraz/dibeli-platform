@@ -18,7 +18,7 @@ export default function CoralReefTemplate({ store, products }: StoreTemplateProp
       <main className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-8">
         {products.map((p) => (
           <div key={p.id} className="bg-white rounded-3xl shadow-lg overflow-hidden">
-            <div className="aspect-square bg-gradient-to-br from-orange-100 to-pink-100">{p.images?.[0] ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-6xl">🐠</div>}</div>
+            <div className="aspect-square bg-gradient-to-br from-orange-100 to-pink-100">{p.images?.[0] ? <img src={`https://drive.google.com/thumbnail?id=${p.images[0]}&sz=w400`} alt={p.name} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-6xl">🐠</div>}</div>
             <div className="p-6"><h3 className="text-xl font-bold">{p.name}</h3><div className="text-2xl font-bold text-orange-600 my-4">Rp {p.price.toLocaleString('id-ID')}</div><button onClick={() => window.open(`https://wa.me/${store.whatsappNumber}`, '_blank')} className="w-full bg-orange-600 text-white py-3 rounded-xl font-semibold">Pesan</button></div>
           </div>
         ))}

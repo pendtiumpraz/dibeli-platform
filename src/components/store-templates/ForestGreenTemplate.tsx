@@ -61,7 +61,7 @@ export default function ForestGreenTemplate({ store, products }: StoreTemplatePr
               <div key={product.id} className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-2">
                 <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-emerald-100 to-green-100">
                   {product.images && product.images.length > 0 ? (
-                    <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"/>
+                    <img src={`https://drive.google.com/thumbnail?id=${product.images[0]}&sz=w400`} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"/>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-6xl">🌿</div>
                   )}

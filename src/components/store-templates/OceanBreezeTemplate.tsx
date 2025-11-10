@@ -115,7 +115,7 @@ export default function OceanBreezeTemplate({ store, products }: StoreTemplatePr
                 <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-cyan-100 to-blue-100">
                   {product.images && product.images.length > 0 ? (
                     <img
-                      src={product.images[0]}
+                      src={`https://drive.google.com/thumbnail?id=${product.images[0]}&sz=w400`}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />

@@ -51,7 +51,7 @@ export default function MidnightBlueTemplate({ store, products }: StoreTemplateP
               <div key={product.id} className="bg-slate-800 rounded-3xl shadow-2xl hover:shadow-blue-500/20 transition-all overflow-hidden hover:-translate-y-2">
                 <div className="relative aspect-square bg-gradient-to-br from-blue-900 to-indigo-900">
                   {product.images?.[0] ? (
-                    <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover"/>
+                    <img src={`https://drive.google.com/thumbnail?id=${product.images[0]}&sz=w400`} alt={product.name} className="w-full h-full object-cover"/>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-6xl">✨</div>
                   )}

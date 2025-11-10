@@ -54,7 +54,7 @@ export default function BerryBlastTemplate({ store, products }: StoreTemplatePro
               <div key={product.id} className="bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all overflow-hidden hover:-translate-y-2">
                 <div className="relative aspect-square bg-gradient-to-br from-pink-100 to-rose-100">
                   {product.images?.[0] ? (
-                    <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover"/>
+                    <img src={`https://drive.google.com/thumbnail?id=${product.images[0]}&sz=w400`} alt={product.name} className="w-full h-full object-cover"/>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-6xl">🍓</div>
                   )}
