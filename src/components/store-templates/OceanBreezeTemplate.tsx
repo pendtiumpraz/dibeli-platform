@@ -138,11 +138,6 @@ export default function OceanBreezeTemplate({ store, products }: StoreTemplatePr
                   <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-cyan-600 transition-colors">
                     {product.name}
                   </h3>
-                  {product.description && (
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {product.description}
-                    </p>
-                  )}
                   
                   <div className="text-2xl font-bold text-cyan-600 mb-4">
                     Rp {product.price.toLocaleString('id-ID')}
