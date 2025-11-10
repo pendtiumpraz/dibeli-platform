@@ -50,7 +50,7 @@ export default function CreateProductPage() {
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   
   // AI Auto-Generate States (UNLIMITED only)
-  const [aiProvider, setAiProvider] = useState('gemini')
+  const [aiProvider, setAiProvider] = useState('groq') // Default to Groq (works better!)
   const [productCategory, setProductCategory] = useState('')
   const [hasGeminiKey, setHasGeminiKey] = useState(false)
   const [hasGroqKey, setHasGroqKey] = useState(false)
@@ -493,11 +493,11 @@ export default function CreateProductPage() {
                   onChange={(e) => setAiProvider(e.target.value)}
                   className="w-full px-4 py-2 border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
                 >
+                  <option value="groq">⚡ Groq (Llama 3.1) - RECOMMENDED {hasGroqKey ? '✅' : '❌'}</option>
                   <option value="gemini">Google Gemini 2.0 {hasGeminiKey ? '✅' : '❌'}</option>
-                  <option value="groq">Groq (Llama 3.1) {hasGroqKey ? '✅' : '❌'}</option>
                 </select>
                 <p className="mt-1 text-xs text-gray-600">
-                  💡 Gemini: Lebih kreatif | Groq: Lebih cepat
+                  💡 Groq: Super cepat (134ms avg) | Gemini: Perlu setup API key
                 </p>
               </div>
               

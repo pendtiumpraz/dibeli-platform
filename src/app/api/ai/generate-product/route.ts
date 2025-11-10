@@ -205,6 +205,7 @@ PENTING:
       
     } else if (provider === 'groq') {
       // Call Groq API - FREE tier = 30 req/min, 14,400 req/day (VERY GENEROUS!)
+      // Using llama-3.1-8b-instant - FASTEST model (134ms avg)!
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -212,7 +213,7 @@ PENTING:
           'Authorization': `Bearer ${finalApiKey}`
         },
         body: JSON.stringify({
-          model: 'llama-3.1-70b-versatile',
+          model: 'llama-3.1-8b-instant', // Updated to working model
           messages: [{
             role: 'user',
             content: prompt
