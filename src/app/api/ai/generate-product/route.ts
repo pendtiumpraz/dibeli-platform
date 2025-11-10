@@ -16,13 +16,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Feature ini hanya untuk UNLIMITED users' }, { status: 403 })
     }
     
-    // Get user's current usage
+    // Get user's current usage AND API keys in one query
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
         tier: true,
         aiGenerationsThisMonth: true,
         aiMonthlyResetDate: true,
+        geminiApiKey: true,
+        groqApiKey: true,
       },
     })
     
@@ -63,31 +65,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
     
-    // Get API key from request OR from user's saved keys
+    // Get API key from request OR from user's saved keys (already fetched above)
     let finalApiKey = apiKey
     
     if (!finalApiKey) {
-      // Try to get from database
-      const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: {
-          geminiApiKey: true,
-          groqApiKey: true,
-        },
-      })
-      
-      if (provider === 'gemini' && user?.geminiApiKey) {
+      // Use saved API key from database
+      if (provider === 'gemini' && user.geminiApiKey) {
         finalApiKey = user.geminiApiKey
-      } else if (provider === 'groq' && user?.groqApiKey) {
+        console.log('✅ Using saved Gemini API key from database')
+      } else if (provider === 'groq' && user.groqApiKey) {
         finalApiKey = user.groqApiKey
+        console.log('✅ Using saved Groq API key from database')
       }
     }
     
     if (!finalApiKey) {
       return NextResponse.json({ 
-        error: 'API key not found. Please provide API key or save it in settings.' 
+        error: `${provider === 'gemini' ? 'Gemini' : 'Groq'} API key not found. Please save your API key in Settings first.`,
+        missingKey: true,
       }, { status: 400 })
     }
+    
+    console.log(`🤖 AI Generation starting with ${provider}...`)
     
     let generatedText = ''
     
