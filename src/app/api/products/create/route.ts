@@ -96,11 +96,15 @@ export async function POST(req: Request) {
       subheadline = formData.get('subheadline') as string || null
       
       // Phase 3: Benefits & Features
+      // NOTE: Schema expects String[] but we store objects with {text, imageUrl}
+      // Need to extract just the text values for now (until schema migration)
       if (formData.get('benefits')) {
-        benefits = JSON.parse(formData.get('benefits') as string)
+        const benefitsData = JSON.parse(formData.get('benefits') as string)
+        benefits = benefitsData.map((b: any) => typeof b === 'string' ? b : b.text)
       }
       if (formData.get('features')) {
-        features = JSON.parse(formData.get('features') as string)
+        const featuresData = JSON.parse(formData.get('features') as string)
+        features = featuresData.map((f: any) => typeof f === 'string' ? f : f.text)
       }
       
       // Phase 4: Urgency Settings
@@ -182,45 +186,58 @@ export async function POST(req: Request) {
       isAvailable = body.isAvailable !== false
     }
 
-    const product = await prisma.product.create({
-      data: {
-        storeId: store.id,
-        name,
-        slug: name.toLowerCase().replace(/\s+/g, '-'),
-        description,
-        price,
-        stock,
-        isAvailable,
-        images, // Array of Drive file IDs
-        // Phase 1: Video + Discount
-        videoUrl,
-        originalPrice,
-        discountPercent,
-        discountValidUntil,
-        // Phase 2: Conversion Page
-        hasConversionPage,
-        conversionPageSlug,
-        conversionTemplate,
-        headline,
-        subheadline,
-        // Phase 3: Benefits & Features  
-        benefits,
-        features,
-        // Phase 4: Urgency Settings
-        hasCountdown,
-        countdownEnd,
-        limitedStock,
-        urgencyText,
-        ctaText,
-        ctaColor,
-        // Phase 5: Social Proof
-        testimonials,
-        bonuses,
-        faqs,
-        guarantee,
-        socialProof,
-      },
-    })
+    console.log('🔧 About to create product with data:')
+    console.log('  hasConversionPage:', hasConversionPage)
+    console.log('  conversionPageSlug:', conversionPageSlug)
+    
+    let product
+    try {
+      product = await prisma.product.create({
+        data: {
+          storeId: store.id,
+          name,
+          slug: name.toLowerCase().replace(/\s+/g, '-'),
+          description,
+          price,
+          stock,
+          isAvailable,
+          images, // Array of Drive file IDs
+          // Phase 1: Video + Discount
+          videoUrl,
+          originalPrice,
+          discountPercent,
+          discountValidUntil,
+          // Phase 2: Conversion Page
+          hasConversionPage,
+          conversionPageSlug,
+          conversionTemplate,
+          headline,
+          subheadline,
+          // Phase 3: Benefits & Features  
+          benefits,
+          features,
+          // Phase 4: Urgency Settings
+          hasCountdown,
+          countdownEnd,
+          limitedStock,
+          urgencyText,
+          ctaText,
+          ctaColor,
+          // Phase 5: Social Proof
+          testimonials,
+          bonuses,
+          faqs,
+          guarantee,
+          socialProof,
+        },
+      })
+    } catch (prismaError: any) {
+      console.error('❌ Prisma create error:', prismaError)
+      console.error('Error code:', prismaError.code)
+      console.error('Error message:', prismaError.message)
+      console.error('Error meta:', prismaError.meta)
+      throw new Error(`Database error: ${prismaError.message}`)
+    }
     
     console.log('✅ Product created with ID:', product.id)
     console.log('✅ hasConversionPage in DB:', product.hasConversionPage)
