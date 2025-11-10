@@ -653,8 +653,8 @@ model Product {
   // Conversion Page Content
   headline    String?
   subheadline String?  @db.Text
-  benefits    Json? // [{text: string, imageUrl?: string}]
-  features    Json? // [{text: string, imageUrl?: string}]
+  benefits    String[] // Array of benefit texts - TODO: migrate to Json for photo support
+  features    String[] // Array of feature texts - TODO: migrate to Json for photo support
 
   // Social Proof
   testimonials Json? // [{name, text, rating, role, photoUrl}]

@@ -18,6 +18,16 @@ export default async function ProductsPage() {
     include: {
       products: {
         orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          price: true,
+          stock: true,
+          isAvailable: true,
+          images: true,
+          createdAt: true,
+        }
       },
     },
   })
